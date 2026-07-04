@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { readBeadsIntegration, readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
+import { readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
 import { configPath, normalizeSourceBaseUrl, readWikiwikiConfig, writeWikiwikiConfig, type WikiwikiConfig } from "./config";
 import { changedFiles } from "./git";
 import { relativeReportPath, reportPath, sitePath, wikiPath, wikiwikiPath } from "./paths";
@@ -117,7 +117,6 @@ export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupRe
   const sourceBaseUrl = normalizeSourceBaseUrl(options.sourceBaseUrl ?? existingConfig.source_base_url);
   const desiredScripts = setupScripts(profile, audience);
   const packageJson = preparePackageScripts(root, desiredScripts, options.force === true);
-  const existingBeads = readBeadsIntegration(root, existingConfig.integrations?.beads);
   const nextConfig: WikiwikiConfig = {
     ...existingConfig,
     wiki_profile: profile,
@@ -129,16 +128,6 @@ export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupRe
   } else {
     delete nextConfig.source_base_url;
   }
-  if (existingBeads.detected && existingConfig.integrations?.beads?.enabled === undefined) {
-    nextConfig.integrations = {
-      ...existingConfig.integrations,
-      beads: {
-        ...existingConfig.integrations?.beads,
-        enabled: true
-      }
-    };
-  }
-
   ensureStore(root);
   writeWikiwikiConfig(root, nextConfig);
   writePackageScripts(root, packageJson);

@@ -115,9 +115,25 @@ The integration appears in JSON reports for `wk setup`, `wk status`,
 so an agent can relate durable wiki updates to active work without treating
 tasks as records.
 
-`wk site --audience all` and `wk site --audience developer` generate
-`work.html` with ready work, in-progress work, and recently closed work.
-`wk site --audience user` hides Beads entirely.
+Site publishing is explicit opt-in for task details. `wk site --audience all`
+and `wk site --audience developer` generate `work.html` with ready work,
+in-progress work, and recently closed work only when `.wikiwiki/config.json`
+contains `integrations.beads.enabled: true`. Without that explicit opt-in, site
+manifests keep at most safe Beads counts and omit issue IDs, titles, labels, and
+assignees. `wk site --audience user` hides Beads entirely, including from
+`site-manifest.json` and search data.
+
+Enable Beads site output only for internal developer publishing:
+
+```json
+{
+  "integrations": {
+    "beads": {
+      "enabled": true
+    }
+  }
+}
+```
 
 Disable the integration in `.wikiwiki/config.json` when needed:
 

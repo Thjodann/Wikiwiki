@@ -109,6 +109,11 @@ generated Markdown, and the human wiki. During closeout, review the Beads
 context in `.wikiwiki/drafts/closeout/<closeout-id>/summary.md`, but only add
 Wikiwiki records for knowledge that should outlive the task.
 
+Generated sites do not publish Beads task details unless
+`.wikiwiki/config.json` explicitly sets `integrations.beads.enabled` to `true`.
+Use that only for internal developer sites; user-audience sites omit Beads from
+pages, manifests, and search data.
+
 ## Search
 
 Search active records and rendered docs:

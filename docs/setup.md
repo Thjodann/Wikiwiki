@@ -11,7 +11,7 @@ repo that should use Wikiwiki:
 
 ```sh
 npm install --save-dev github:Thjodann/Wikiwiki
-npx wk --help
+./node_modules/.bin/wk --help
 ```
 
 For local development on Wikiwiki itself, install from source:
@@ -164,13 +164,30 @@ agent to use the same deterministic CLI that non-AI users can run themselves.
 
 ## Optional Beads Coordination
 
-Wikiwiki's Beads integration is automatic and read-only:
+Wikiwiki's Beads integration is automatic and read-only for internal command
+output:
 
 - No `.beads/`: Wikiwiki behaves normally.
 - `.beads/` plus `bd`: `wk status`, `wk spin`, `wk closeout`, and the
-  developer-facing site include task context.
+  developer-facing JSON outputs include task context.
 - `.beads/` without `bd`: Wikiwiki still works and reports that Beads context
   is unavailable.
+
+Publishing Beads task data into `wiki-site/work.html` is explicit opt-in. Add
+this only for internal developer sites:
+
+```json
+{
+  "integrations": {
+    "beads": {
+      "enabled": true
+    }
+  }
+}
+```
+
+User-audience sites omit Beads data from generated pages, `site-manifest.json`,
+and search data.
 
 Beads owns tasks, blockers, dependencies, ownership, and follow-ups. Wikiwiki
 owns durable concepts, decisions, notes, events, symbols, links, generated

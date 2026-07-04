@@ -136,7 +136,7 @@ wiki-site/
   notes.html
   symbols.html
   links.html
-  work.html        # optional, developer-only when Beads is detected
+  work.html        # optional, developer-only when Beads site output is enabled
   search.html
   assets/
     wikiwiki.css
@@ -171,9 +171,11 @@ generated Markdown, and the human wiki.
 
 When `.beads/` exists, Wikiwiki automatically tries to read Beads through
 `bd --readonly --json`. That context appears in JSON reports and closeout
-drafts, and `wk site --audience all` or `wk site --audience developer` adds a
-developer-only `work.html` page. User-focused sites hide Beads so task state
-does not leak into standard user documentation.
+drafts. Site publishing is stricter: `work.html` is only generated for
+developer/all audiences when `.wikiwiki/config.json` explicitly sets
+`integrations.beads.enabled` to `true`. User-focused sites hide Beads from
+pages, manifests, and search data so task state does not leak into standard
+user documentation.
 
 If Beads is absent, nothing changes. If `.beads/` exists but `bd` is not
 available, Wikiwiki keeps running and shows an unavailable state instead of

@@ -298,6 +298,7 @@ test("buildSiteFiles emits developer-only Beads work page when .beads exists", (
   const root = tempRoot();
   seedRecords(root);
   fs.mkdirSync(path.join(root, ".beads"));
+  writeFile(root, ".wikiwiki/config.json", `${JSON.stringify({ integrations: { beads: { enabled: true } } }, null, 2)}\n`);
   const bin = createFakeBd(root);
 
   const files = withPath(`${bin}${path.delimiter}${process.env.PATH || ""}`, () => buildSiteFiles(root, { audience: "all" }));
@@ -333,13 +334,40 @@ test("buildSiteFiles hides Beads work page for user audience", () => {
   assert.equal(files.some((item) => item.fileName === "work.html"), false);
   assert.doesNotMatch(index, /Project Work/);
   assert.equal(manifest.pages.includes("work.html"), false);
+  assert.equal(manifest.integrations, undefined);
   assert.equal(searchIndex.some((entry) => entry.id.startsWith("beads:")), false);
+  assert.doesNotMatch(file(files, "site-manifest.json"), /PRISM-a1|Ready task|Active task|codex/);
+  assert.doesNotMatch(file(files, "assets/search-index.js"), /PRISM-a1|Ready task|Active task|codex/);
+});
+
+test("buildSiteFiles redacts Beads issue details when site output is not opted in", () => {
+  const root = tempRoot();
+  seedRecords(root);
+  fs.mkdirSync(path.join(root, ".beads"));
+  const bin = createFakeBd(root);
+
+  const files = withPath(`${bin}${path.delimiter}${process.env.PATH || ""}`, () => buildSiteFiles(root, { audience: "all" }));
+  const manifestText = file(files, "site-manifest.json");
+  const manifest = JSON.parse(manifestText);
+  const searchIndexText = file(files, "assets/search-index.js");
+
+  assert.equal(files.some((item) => item.fileName === "work.html"), false);
+  assert.equal(manifest.pages.includes("work.html"), false);
+  assert.equal(manifest.integrations.beads.available, true);
+  assert.equal(manifest.integrations.beads.counts.ready, 2);
+  assert.deepEqual(manifest.integrations.beads.issue_ids, []);
+  assert.deepEqual(manifest.integrations.beads.ready, []);
+  assert.deepEqual(manifest.integrations.beads.in_progress, []);
+  assert.deepEqual(manifest.integrations.beads.recent_closed, []);
+  assert.doesNotMatch(manifestText, /PRISM-a1|Ready task|Active task|codex/);
+  assert.doesNotMatch(searchIndexText, /beads:|PRISM-a1|Ready task|Active task|codex/);
 });
 
 test("buildSiteFiles renders unavailable Beads state without failing", () => {
   const root = tempRoot();
   seedRecords(root);
   fs.mkdirSync(path.join(root, ".beads"));
+  writeFile(root, ".wikiwiki/config.json", `${JSON.stringify({ integrations: { beads: { enabled: true } } }, null, 2)}\n`);
 
   const files = withPath("", () => buildSiteFiles(root, { audience: "developer" }));
   const work = file(files, "work.html");

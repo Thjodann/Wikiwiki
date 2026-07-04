@@ -966,6 +966,7 @@ window.WIKIWIKI_SEARCH_INDEX = ${JSON.stringify(entries, null, 2)};
 }
 
 function siteManifest(model: SiteModel) {
+  const integrations = siteManifestIntegrations(model);
   return {
     generator: "Wikiwiki",
     generated_from: ".wikiwiki/records",
@@ -975,13 +976,45 @@ function siteManifest(model: SiteModel) {
     project_name: model.repoName,
     theme_file: ".wikiwiki/site-theme.json",
     pages: sitePages(model),
-    ...(shouldReportIntegrations(model.integrations) ? { integrations: model.integrations } : {}),
+    ...(integrations ? { integrations } : {}),
     records: model.flatRecords.map((record) => ({
       type: record.type,
       id: record.id,
       title: recordTitle(record),
       url: recordHref(record)
     }))
+  };
+}
+
+function siteManifestIntegrations(model: SiteModel): IntegrationSummary | undefined {
+  const beads = model.integrations.beads;
+  if (!beads || model.audience === "user") {
+    return undefined;
+  }
+
+  if (showBeadsWork(model)) {
+    return { beads };
+  }
+
+  if (!shouldReportIntegrations(model.integrations)) {
+    return undefined;
+  }
+
+  return {
+    beads: {
+      detected: beads.detected,
+      enabled: beads.enabled,
+      available: beads.available,
+      configured: beads.configured,
+      ...(beads.beads_path ? { beads_path: beads.beads_path } : {}),
+      ...(beads.error ? { error: beads.error } : {}),
+      warnings: beads.warnings,
+      counts: beads.counts,
+      issue_ids: [],
+      ready: [],
+      in_progress: [],
+      recent_closed: []
+    }
   };
 }
 
@@ -1233,7 +1266,8 @@ function showBeadsWork(model: SiteModel): boolean {
   const beads = model.integrations.beads;
   return model.audience !== "user" &&
     Boolean(beads?.detected) &&
-    Boolean(beads?.enabled);
+    Boolean(beads?.enabled) &&
+    beads?.configured === "enabled";
 }
 
 function beadsNavCount(beads: BeadsIntegrationSummary | undefined): number | undefined {
@@ -1568,6 +1602,7 @@ code {
   padding: 0.12rem 0.32rem;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.9em;
+  overflow-wrap: anywhere;
 }
 
 .skip-link {
@@ -1709,6 +1744,7 @@ input[type="search"]:focus {
 
 .content {
   width: min(100%, 1120px);
+  min-width: 0;
   padding: 2.3rem clamp(1rem, 4vw, 4rem) 4rem;
 }
 
@@ -1809,6 +1845,7 @@ input[type="search"]:focus {
 
 .section-card {
   display: block;
+  min-width: 0;
   min-height: 9.5rem;
   color: var(--text);
   padding: 1rem;
@@ -1848,6 +1885,7 @@ input[type="search"]:focus {
 
 .record-card,
 .search-result {
+  min-width: 0;
   padding: 1rem;
 }
 
@@ -1865,10 +1903,34 @@ input[type="search"]:focus {
   justify-content: space-between;
 }
 
+.record-card-top > *,
+.record-card footer > *,
+.search-result footer > *,
+.tag-list span {
+  min-width: 0;
+}
+
 .record-card h3,
 .search-result h3 {
   margin: 0.6rem 0 0.25rem;
   font-size: 1.15rem;
+}
+
+.record-card h3,
+.record-card p,
+.search-result h3,
+.search-result p,
+.section-card strong,
+.section-card p,
+.prose,
+.record-meta,
+.sources-panel {
+  overflow-wrap: anywhere;
+}
+
+.work-card code {
+  max-width: 100%;
+  white-space: normal;
 }
 
 .record-card h3 a,

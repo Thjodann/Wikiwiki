@@ -129,8 +129,15 @@ test("README documents GitHub source install before npm publish", () => {
   const readme = fs.readFileSync(path.join(process.cwd(), "README.md"), "utf8");
 
   assert.match(readme, /npm install --save-dev github:Thjodann\/Wikiwiki/);
-  assert.match(readme, /npx wk --help/);
+  assert.match(readme, /\.\/node_modules\/\.bin\/wk --help/);
+  assert.doesNotMatch(readme, /npx wk --help/);
   assert.match(readme, /publishing is still a manual\s+release step/);
+});
+
+test("package prepares dist for GitHub dependency installs", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
+
+  assert.equal(pkg.scripts.prepare, "npm run build");
 });
 
 test("bundled wk skill includes Beads coordination rules", () => {
@@ -305,7 +312,7 @@ test("setup, status, spin, and closeout report Beads context when .beads exists"
   const config = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8"));
   assert.equal(setup.integrations.beads.detected, true);
   assert.equal(setup.integrations.beads.available, true);
-  assert.equal(config.integrations.beads.enabled, true);
+  assert.equal(config.integrations, undefined);
 
   const status = runJson(root, ["status", "--json"], { env: fakeBd.env });
   assert.equal(status.integrations.beads.counts.ready, 2);
@@ -328,6 +335,27 @@ test("setup, status, spin, and closeout report Beads context when .beads exists"
   assert.match(summary, /Beads Work Context/);
   assert.deepEqual(after, before);
   assert.doesNotMatch(calls, /\b(create|update|close|claim|dep)\b/);
+});
+
+test("setup does not make Beads site output implicit", () => {
+  const root = tempRepo();
+  fs.mkdirSync(path.join(root, ".beads"));
+  const fakeBd = createFakeBd(root);
+
+  runJson(root, ["setup", "--profile", "mixed", "--audience", "all", "--json"], { env: fakeBd.env });
+  const config = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8"));
+  run(root, ["site", "--json"], { env: fakeBd.env });
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, "wiki-site/site-manifest.json"), "utf8"));
+  const searchIndex = fs.readFileSync(path.join(root, "wiki-site/assets/search-index.js"), "utf8");
+
+  assert.equal(config.integrations, undefined);
+  assert.equal(fs.existsSync(path.join(root, "wiki-site/work.html")), false);
+  assert.equal(manifest.pages.includes("work.html"), false);
+  assert.equal(manifest.integrations.beads.counts.ready, 2);
+  assert.deepEqual(manifest.integrations.beads.issue_ids, []);
+  assert.deepEqual(manifest.integrations.beads.ready, []);
+  assert.doesNotMatch(JSON.stringify(manifest), /Ready task|Active task|codex|PRISM-a1/);
+  assert.doesNotMatch(searchIndex, /beads:|Ready task|Active task|codex|PRISM-a1/);
 });
 
 test("record lifecycle commands list, get, update, and delete active records", () => {

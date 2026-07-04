@@ -23,7 +23,7 @@ target repo:
 
 ```sh
 npm install --save-dev github:Thjodann/Wikiwiki
-npx wk --help
+./node_modules/.bin/wk --help
 ```
 
 For local development on Wikiwiki itself, install and run from source:
@@ -76,8 +76,10 @@ wk closeout --profile mixed --audience all --json
 ```
 
 If a repo already uses Beads, Wikiwiki detects `.beads/` automatically and
-adds read-only developer work context to status, spin, closeout, and the
-developer-facing site. If Beads is absent, the normal flow is unchanged.
+adds read-only developer work context to status, spin, and closeout. Publishing
+the Beads-powered `work.html` site page is explicit opt-in through
+`.wikiwiki/config.json`; user-audience sites omit Beads data entirely. If Beads
+is absent, the normal flow is unchanged.
 
 ## Docs
 
