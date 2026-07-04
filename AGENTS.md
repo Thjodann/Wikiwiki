@@ -4,8 +4,8 @@ This repo uses Wikiwiki for agent-readable project knowledge.
 
 ## Before Starting Work
 
-1. Run `wikiwiki status --json`.
-2. Run `wikiwiki spin --json` to inspect current repo changes.
+1. Run `wk status --json`.
+2. Run `wk spin --json` to inspect current repo changes.
 3. Review relevant records if available.
 
 ## During Work
@@ -18,17 +18,17 @@ This repo uses Wikiwiki for agent-readable project knowledge.
 
 ## After Making Changes
 
-1. Run `wikiwiki spin --json`.
+1. Run `wk spin --json`.
 2. Add or update concepts, decisions, notes, events, or links as needed.
-3. Run `wikiwiki validate`.
-4. Run `wikiwiki render`.
+3. Run `wk validate`.
+4. Run `wk render`.
 5. Summarize knowledge updates in the final response.
 
 ## Generated Files
 
 Wikiwiki owns generated Markdown files in `wiki/`.
 
-Do not manually edit generated wiki files unless the user explicitly asks for a one-off repair. Prefer changing structured records in `.wikiwiki/records/`, then run `wikiwiki render`.
+Do not manually edit generated wiki files unless the user explicitly asks for a one-off repair. Prefer changing structured records in `.wikiwiki/records/`, then run `wk render`.
 
 ## Authority Rules
 

@@ -13,7 +13,7 @@ export function registerRenderCommand(program: Command): void {
     .action((options: { json?: boolean }) => {
       const root = findRepoRoot();
       if (!isInitialized(root)) {
-        throw new Error("Wikiwiki is not initialized. Run `wikiwiki init` first.");
+        throw new Error("Wikiwiki is not initialized. Run `wk init` first.");
       }
 
       const files = renderWiki(root);

@@ -56,7 +56,7 @@ export function readRecords<T extends RecordType>(
     const where = issue.line ? `${issue.file}:${issue.line}` : issue.file;
     throw new Error(`${where}: ${issue.message}`);
   }
-  return records;
+  return activeRecords(records);
 }
 
 export function readRecordsWithIssues<T extends RecordType>(
@@ -107,6 +107,14 @@ export function readAllRecords(root: string): RecordsByType {
   };
 }
 
+export function readActiveRecord<T extends RecordType>(
+  root: string,
+  type: T,
+  id: string
+): RecordByType[T] | undefined {
+  return readRecords(root, type).find((record) => record.id === id);
+}
+
 export function readAllRecordsWithIssues(root: string): {
   records: Record<RecordType, AnyRecord[]>;
   issues: JsonlIssue[];
@@ -132,14 +140,45 @@ export function recordCounts(root: string): Record<RecordType, number> {
       continue;
     }
 
-    counts[type] = fs
-      .readFileSync(file, "utf8")
-      .split(/\r?\n/)
-      .filter((line) => line.trim().length > 0).length;
+    const { records } = readRecordsWithIssues(root, type);
+    counts[type] = activeRecords(records).length;
   }
   return counts;
 }
 
 export function relativePath(root: string, absolutePath: string): string {
   return path.relative(root, absolutePath);
+}
+
+export function activeRecords<T extends AnyRecord>(records: T[]): T[] {
+  return latestRecords(records).filter((record) => !isDeletedRecord(record));
+}
+
+export function latestRecords<T extends AnyRecord>(records: T[]): T[] {
+  const latest = new Map<string, T>();
+
+  for (const record of records) {
+    const current = latest.get(record.id);
+    if (!current || recordTimestamp(record) >= recordTimestamp(current)) {
+      latest.set(record.id, record);
+    }
+  }
+
+  return [...latest.values()];
+}
+
+export function isDeletedRecord(record: AnyRecord): boolean {
+  return typeof record.deleted_at === "string" && record.deleted_at.length > 0;
+}
+
+export function recordTimestamp(record: AnyRecord): string {
+  if (typeof record.deleted_at === "string" && record.deleted_at.length > 0) {
+    return record.deleted_at;
+  }
+
+  if (typeof record.updated_at === "string" && record.updated_at.length > 0) {
+    return record.updated_at;
+  }
+
+  return record.created_at;
 }

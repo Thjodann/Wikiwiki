@@ -10,11 +10,14 @@ const recordBaseSchema = z.object({
   id: z.string().min(1),
   source: sourceSchema,
   authority: authoritySchema,
-  confidence: confidenceSchema
+  confidence: confidenceSchema,
+  deleted_at: z.string().datetime().optional(),
+  delete_reason: z.string().optional()
 });
 
 const timestampedSchema = recordBaseSchema.extend({
-  created_at: z.string().datetime()
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime().optional()
 });
 
 const updatableSchema = timestampedSchema.extend({

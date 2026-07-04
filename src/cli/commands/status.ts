@@ -4,6 +4,7 @@ import { Command } from "commander";
 import { printJson } from "../helpers";
 import { changedFiles } from "../../core/git";
 import { findRepoRoot, wikiPath, wikiwikiPath } from "../../core/paths";
+import { wikiPageFileNames } from "../../core/renderer";
 import { recordTypes } from "../../core/schemas";
 import { isInitialized, recordCounts } from "../../core/store";
 
@@ -16,7 +17,7 @@ export function registerStatusCommand(program: Command): void {
       const root = findRepoRoot();
       const initialized = isInitialized(root);
       const counts = initialized ? recordCounts(root) : emptyCounts();
-      const generatedFiles = ["index.md", "concepts.md", "decisions.md", "devlog.md", "notes.md"]
+      const generatedFiles = wikiPageFileNames
         .map((fileName) => path.join(wikiPath(root), fileName))
         .filter((file) => fs.existsSync(file));
 

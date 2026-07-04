@@ -2,7 +2,13 @@ import fs from "fs";
 import path from "path";
 import { buildWikiPages } from "./renderer";
 import { type AnyRecord, type RecordType, recordTypes } from "./schemas";
-import { isInitialized, readAllRecordsWithIssues } from "./store";
+import {
+  activeRecords,
+  isDeletedRecord,
+  isInitialized,
+  readAllRecordsWithIssues,
+  recordTimestamp
+} from "./store";
 import { wikiwikiPath } from "./paths";
 
 export type ValidationResult = {
@@ -18,12 +24,12 @@ export function validateWikiwiki(root: string): ValidationResult {
   const counts = Object.fromEntries(recordTypes.map((type) => [type, 0])) as Record<RecordType, number>;
 
   if (!fs.existsSync(wikiwikiPath(root))) {
-    errors.push(".wikiwiki folder does not exist. Run `wikiwiki init`.");
+    errors.push(".wikiwiki folder does not exist. Run `wk init`.");
     return { valid: false, errors, warnings, counts };
   }
 
   if (!isInitialized(root)) {
-    errors.push(".wikiwiki/records folder does not exist. Run `wikiwiki init`.");
+    errors.push(".wikiwiki/records folder does not exist. Run `wk init`.");
     return { valid: false, errors, warnings, counts };
   }
 
@@ -34,14 +40,8 @@ export function validateWikiwiki(root: string): ValidationResult {
   }
 
   for (const type of recordTypes) {
-    counts[type] = records[type].length;
-    const seen = new Set<string>();
-    for (const record of records[type]) {
-      if (seen.has(record.id)) {
-        errors.push(`Duplicate ${type} id: ${record.id}`);
-      }
-      seen.add(record.id);
-    }
+    counts[type] = activeRecords(records[type]).length;
+    validateRevisionGroups(type, records[type], errors);
   }
 
   validateLinks(root, records, warnings);
@@ -61,19 +61,71 @@ export function validateWikiwiki(root: string): ValidationResult {
   };
 }
 
+function validateRevisionGroups(
+  type: RecordType,
+  records: AnyRecord[],
+  errors: string[]
+): void {
+  const byId = new Map<string, AnyRecord[]>();
+  for (const record of records) {
+    const revisions = byId.get(record.id) ?? [];
+    revisions.push(record);
+    byId.set(record.id, revisions);
+  }
+
+  for (const [id, revisions] of byId.entries()) {
+    if (revisions.length === 1) {
+      continue;
+    }
+
+    let previousTimestamp = "";
+    let deleted = false;
+    revisions.forEach((record, index) => {
+      const revisionNumber = index + 1;
+      const isDeletion = isDeletedRecord(record);
+      const hasUpdatedAt = typeof record.updated_at === "string" && record.updated_at.length > 0;
+
+      if (index === 0 && isDeletion) {
+        errors.push(`${type} ${id} starts with a deletion tombstone.`);
+      }
+
+      if (index > 0 && !hasUpdatedAt && !isDeletion) {
+        errors.push(`${type} ${id} revision ${revisionNumber} must include updated_at or deleted_at.`);
+      }
+
+      if (deleted) {
+        errors.push(`${type} ${id} has revisions after a deletion tombstone.`);
+      }
+
+      const timestamp = recordTimestamp(record);
+      if (previousTimestamp && timestamp < previousTimestamp) {
+        errors.push(`${type} ${id} revision ${revisionNumber} timestamp predates the previous revision.`);
+      }
+
+      if (isDeletion) {
+        deleted = true;
+      }
+      previousTimestamp = timestamp;
+    });
+  }
+}
+
 function validateLinks(
   root: string,
   records: Record<RecordType, AnyRecord[]>,
   warnings: string[]
 ): void {
+  const activeByType = Object.fromEntries(
+    recordTypes.map((type) => [type, activeRecords(records[type])])
+  ) as Record<RecordType, AnyRecord[]>;
   const ids = new Set<string>();
   for (const type of recordTypes) {
-    for (const record of records[type]) {
+    for (const record of activeByType[type]) {
       ids.add(record.id);
     }
   }
 
-  for (const link of records.link) {
+  for (const link of activeByType.link) {
     const from = "from" in link ? link.from : "";
     const to = "to" in link ? link.to : "";
     for (const endpoint of [from, to]) {

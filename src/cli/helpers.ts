@@ -1,5 +1,6 @@
 import { Command } from "commander";
-import type { Authority, Confidence, Source } from "../core/schemas";
+import { recordTypes } from "../core/schemas";
+import type { AnyRecord, Authority, Confidence, RecordType, Source } from "../core/schemas";
 
 export type CommonRecordOptions = {
   source?: Source;
@@ -119,4 +120,36 @@ export function printAdded(
   }
 
   console.log(`Added ${type}: ${id}`);
+}
+
+export function parseRecordType(value: string): RecordType {
+  if ((recordTypes as readonly string[]).includes(value)) {
+    return value as RecordType;
+  }
+
+  throw new Error(`Unknown record type: ${value}. Expected one of: ${recordTypes.join(", ")}.`);
+}
+
+export function recordTitle(record: AnyRecord): string {
+  if ("name" in record && typeof record.name === "string") {
+    return record.name;
+  }
+
+  if ("title" in record && typeof record.title === "string") {
+    return record.title;
+  }
+
+  if ("summary" in record && typeof record.summary === "string") {
+    return record.summary;
+  }
+
+  if ("body" in record && typeof record.body === "string") {
+    return record.body.slice(0, 80);
+  }
+
+  if ("relationship" in record && typeof record.relationship === "string") {
+    return `${record.from} ${record.relationship} ${record.to}`;
+  }
+
+  return record.id;
 }

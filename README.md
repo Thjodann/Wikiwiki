@@ -35,11 +35,11 @@ Docs that keep up, in other words.
 Wikiwiki is built around a small, repeatable workflow:
 
 ```sh
-wikiwiki status --json
-wikiwiki spin --json
-wikiwiki note add "Renderer owns generated wiki files." --tags renderer,docs
-wikiwiki validate
-wikiwiki render
+wk status --json
+wk spin --json
+wk note add "Renderer owns generated wiki files." --tags renderer,docs
+wk validate
+wk render
 ```
 
 That loop lets an agent:
@@ -80,6 +80,8 @@ wiki/
   decisions.md
   devlog.md
   notes.md
+  symbols.md
+  links.md
 ```
 
 Generated wiki files are plainly marked:
@@ -89,11 +91,12 @@ Generated wiki files are plainly marked:
 ```
 
 That boundary matters. Agents should update structured records first, then run
-`wikiwiki render`.
+`wk render`.
 
 ## Install From Source
 
-Wikiwiki is currently source-first.
+Wikiwiki is package-ready as `@thjodann/wk`; publishing is still a manual
+release step. For now, install from source:
 
 ```sh
 npm install
@@ -107,37 +110,39 @@ npm run dev -- status --json
 node dist/index.js status --json
 ```
 
-Link it locally as `wikiwiki`:
+Link it locally as `wk`:
 
 ```sh
 npm link
-wikiwiki status --json
+wk status --json
 ```
+
+The package installs `wk`; `wikiwiki` remains as a compatibility alias.
 
 ## Quick Start
 
 Initialize Wikiwiki in a repo:
 
 ```sh
-wikiwiki init
+wk init
 ```
 
 Check status:
 
 ```sh
-wikiwiki status --json
+wk status --json
 ```
 
 Ask Wikiwiki to inspect the current working tree:
 
 ```sh
-wikiwiki spin --json
+wk spin --json
 ```
 
 Add a concept:
 
 ```sh
-wikiwiki concept add \
+wk concept add \
   --name "Structured records" \
   --summary "JSONL records are the source of truth for repo knowledge." \
   --files .wikiwiki/records/concepts.jsonl \
@@ -147,7 +152,7 @@ wikiwiki concept add \
 Add a decision:
 
 ```sh
-wikiwiki decision add \
+wk decision add \
   --title "Use JSONL storage" \
   --context "Agents need storage they can inspect, append, validate, and repair." \
   --decision "Store each record type as append-only JSONL under .wikiwiki/records." \
@@ -157,8 +162,14 @@ wikiwiki decision add \
 Render the wiki:
 
 ```sh
-wikiwiki validate
-wikiwiki render
+wk validate
+wk render
+```
+
+Search active records and rendered docs:
+
+```sh
+wk search renderer --json
 ```
 
 ## JSON-First Agent Workflows
@@ -166,7 +177,7 @@ wikiwiki render
 Most add commands support JSON input and JSON output:
 
 ```sh
-wikiwiki concept add --json '{
+wk concept add --json '{
   "name": "Spin",
   "summary": "Inspects repo changes and suggests knowledge updates.",
   "files": ["src/cli/commands/spin.ts"],
@@ -183,20 +194,36 @@ Recommended authority rules:
 - Use `authority: "agent"` for agent-authored or inferred records.
 - Use lower confidence when a record is a guess, partial summary, or stale.
 
+## Record Revisions
+
+Wikiwiki keeps record changes append-only. Updates add a new JSONL line with the
+same logical `id`; deletes add a tombstone revision with `deleted_at`. Status,
+rendering, search, and record reads use the latest active revision.
+
+```sh
+wk record list concept --json
+wk record get concept concept_123 --json
+wk record update concept concept_123 --json '{"summary":"Updated summary."}'
+wk record delete concept concept_123 --reason "Superseded by decision_456"
+```
+
 ## Commands
 
 | Command | Purpose |
 | --- | --- |
-| `wikiwiki init` | Create the knowledge store and generated wiki folder |
-| `wikiwiki status --json` | Report store status, record counts, generated pages, and Git changes |
-| `wikiwiki spin --json` | Inspect current repo changes and suggest knowledge updates |
-| `wikiwiki concept add` | Add a durable project concept |
-| `wikiwiki decision add` | Add an architecture, product, or workflow decision |
-| `wikiwiki event add` | Add a development event |
-| `wikiwiki note add` | Add a lightweight note |
-| `wikiwiki link add` | Link records, files, or wiki pages |
-| `wikiwiki validate` | Validate records and references |
-| `wikiwiki render` | Render Markdown pages into `wiki/` |
+| `wk init` | Create the knowledge store and generated wiki folder |
+| `wk status --json` | Report store status, record counts, generated pages, and Git changes |
+| `wk spin --json` | Inspect current repo changes and suggest knowledge updates |
+| `wk search <query> --json` | Search active records and rendered Markdown |
+| `wk concept add` | Add a durable project concept |
+| `wk decision add` | Add an architecture, product, or workflow decision |
+| `wk event add` | Add a development event |
+| `wk note add` | Add a lightweight note |
+| `wk symbol add` | Add an important code symbol |
+| `wk link add` | Link records, files, or wiki pages |
+| `wk record list/get/update/delete` | Read and revise active records append-only |
+| `wk validate` | Validate records and references |
+| `wk render` | Render Markdown pages into `wiki/` |
 
 ## Where It Is Headed
 
@@ -214,23 +241,24 @@ capabilities grow.
 
 ## Current Status
 
-Wikiwiki is an early MVP. The foundation exists:
+Wikiwiki is a V1 CLI foundation. It currently includes:
 
 - TypeScript CLI
 - JSONL record storage
+- append-only record revisions and deletion tombstones
 - Zod validation
-- Git-aware `spin`
-- Markdown rendering
+- Git-aware `spin` with draft templates
+- Markdown rendering for concepts, decisions, events, notes, symbols, and links
+- local search across active records and rendered docs
 - Agent-readable JSON output
+- CI, tests, and package metadata for `@thjodann/wk`
 
 Some planned pieces are not built yet:
 
-- record update and delete commands
 - richer symbol extraction
-- search and retrieval
 - draft review flows
 - watch mode
-- package publishing
+- actual npm publishing
 
 The north star is still clear: living docs that are easy for agents to maintain
 and easy for humans to trust.
@@ -247,6 +275,18 @@ Run checks:
 
 ```sh
 npm run check
+```
+
+Run tests:
+
+```sh
+npm test
+```
+
+Verify package contents:
+
+```sh
+npm run pack:dry-run
 ```
 
 Run the CLI in development:

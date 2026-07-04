@@ -1,17 +1,45 @@
 {
-  "name": "wikiwiki",
-  "version": "0.1.0",
-  "description": "Agent-native living documentation for code repos.",
+  "name": "@thjodann/wk",
+  "version": "1.0.0",
+  "description": "Wikiwiki is an agent-native living documentation system for code repos.",
   "license": "MIT",
   "type": "commonjs",
+  "homepage": "https://github.com/Thjodann/Wikiwiki#readme",
+  "bugs": {
+    "url": "https://github.com/Thjodann/Wikiwiki/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thjodann/Wikiwiki.git"
+  },
+  "keywords": [
+    "agents",
+    "documentation",
+    "knowledge-base",
+    "cli",
+    "wiki"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "assets/wikiwiki-banner.png",
+    "wiki"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "bin": {
+    "wk": "dist/index.js",
     "wikiwiki": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
-    "check": "npm run build && node dist/index.js validate --json"
+    "test": "npm run build && node --test test/*.test.js",
+    "check": "npm run build && node dist/index.js validate --json",
+    "pack:dry-run": "npm pack --dry-run",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "commander": "^12.1.0",

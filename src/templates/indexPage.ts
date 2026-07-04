@@ -16,6 +16,8 @@ Wikiwiki is the generated human-readable view of this repo's structured project 
 - [Decisions](./decisions.md)
 - [Devlog](./devlog.md)
 - [Notes](./notes.md)
+- [Symbols](./symbols.md)
+- [Links](./links.md)
 
 ## Record Counts
 
