@@ -43,13 +43,29 @@ test("package exposes wk primary binary and wikiwiki compatibility alias", () =>
   assert.equal(pkg.bin.wikiwiki, "dist/index.js");
 });
 
-test("package publishes only runtime build files and package docs", () => {
+test("package publishes runtime build files, package docs, and the wk skill", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
 
-  assert.deepEqual(pkg.files, ["dist", "README.md", "LICENSE"]);
+  assert.deepEqual(pkg.files, ["dist", "README.md", "LICENSE", "skills/wk"]);
   assert.equal(pkg.files.includes("wiki"), false);
   assert.equal(pkg.files.includes("wiki-site"), false);
   assert.equal(pkg.files.includes("assets/wikiwiki-banner.png"), false);
+});
+
+test("install-agent codex previews and installs the bundled wk skill", () => {
+  const root = tempRepo();
+  const destination = path.join(root, "codex-skills/wk");
+
+  const preview = runJson(root, ["install-agent", "codex", "--dest", destination, "--json"]);
+  assert.equal(preview.ok, false);
+  assert.equal(preview.confirmation_required, true);
+  assert.equal(fs.existsSync(path.join(destination, "SKILL.md")), false);
+
+  const installed = runJson(root, ["install-agent", "codex", "--dest", destination, "--yes", "--json"]);
+  assert.equal(installed.ok, true);
+  assert.equal(installed.destination, destination);
+  assert.ok(fs.existsSync(path.join(destination, "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(destination, "agents/openai.yaml")));
 });
 
 test("init creates record files and all generated wiki pages", () => {

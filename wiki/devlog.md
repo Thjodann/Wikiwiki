@@ -81,3 +81,27 @@ Added LICENSE, switched the README banner to a GitHub-hosted URL, narrowed packa
 Files: `package.json`, `README.md`, `LICENSE`, `test/cli.test.js`
 
 Recorded: 2026-07-04T16:41:01.840Z | Record: `event_495227ea-a813-41fa-b7a6-910f338a518f` | Confidence: high
+
+## Added installable wk agent skill
+
+Created skills/wk/SKILL.md with the daily agent loop, closeout protocol, install guidance, and Codex UI metadata; updated README with an agentic IDE setup section; included skills/wk in package files; and adjusted the package hygiene test.
+
+Files: `skills/wk/SKILL.md`, `skills/wk/agents/openai.yaml`, `README.md`, `package.json`, `test/cli.test.js`
+
+Recorded: 2026-07-04T17:38:24.698Z | Record: `event_e116aa8a-281e-4d85-a8be-abca622110e6` | Confidence: high
+
+## Improved generated site product UX
+
+Used the PRISM PDF dogfood export as evidence to reduce visible Wikiwiki branding, add project-first titles and footer credit, introduce guides.html, curate homepage records, hide raw IDs and confidence badges from listing/search cards, add .wikiwiki/site-theme.json support, improve mobile navigation and print behavior, and add wk install-agent codex.
+
+Files: `src/core/site.ts`, `src/core/config.ts`, `src/cli/commands/installAgent.ts`, `src/index.ts`, `test/site.test.js`, `test/cli.test.js`, `README.md`, `skills/wk/SKILL.md`
+
+Recorded: 2026-07-04T17:51:59.099Z | Record: `event_2c53f001-eb63-4e55-82d3-fc9df43b53f2` | Confidence: high
+
+## Documented script-first Wikiwiki automation
+
+Updated the README and bundled wk skill to clarify that Wikiwiki works without AI through deterministic CLI scripts, while agentic IDE setup remains an optional enhancement for richer record capture and curation.
+
+Files: `README.md`, `skills/wk/SKILL.md`
+
+Recorded: 2026-07-04T17:59:07.939Z | Record: `event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86` | Confidence: high

@@ -20,17 +20,17 @@
       ? '<span class="tag-list">' + entry.tags.slice(0, 6).map((tag) => '<span>' + escapeHtml(tag) + '</span>').join("") + '</span>'
       : "";
     return '<article class="search-result">' +
-      '<div class="record-card-top"><span class="type-badge">' + escapeHtml(entry.type) + '</span><span class="confidence ' + escapeHtml(entry.confidence) + '">' + escapeHtml(entry.confidence) + '</span></div>' +
+      '<div class="record-card-top"><span class="type-badge">' + escapeHtml(entry.typeLabel || entry.type) + '</span></div>' +
       '<h3><a href="' + encodeURI(entry.url) + '">' + escapeHtml(entry.title) + '</a></h3>' +
       '<p>' + escapeHtml(entry.summary) + '</p>' +
-      '<footer>' + tags + '<code>' + escapeHtml(entry.id) + '</code></footer>' +
+      (tags ? '<footer>' + tags + '</footer>' : '') +
     '</article>';
   }
 
   function search(query) {
     const normalizedQuery = normalize(query).trim();
     if (!normalizedQuery) {
-      return entries.slice(0, 20);
+      return [];
     }
 
     const terms = normalizedQuery.split(/\s+/).filter(Boolean);
@@ -49,6 +49,11 @@
   function updateSearchPage(query) {
     const resultsRoot = document.querySelector("[data-search-results]");
     if (!resultsRoot) {
+      return;
+    }
+
+    if (!normalize(query).trim()) {
+      resultsRoot.innerHTML = '<div class="empty-state"><strong>Search is ready.</strong><p>Try a concept, decision, tag, or source file. Results stay local to this generated site.</p></div>';
       return;
     }
 
@@ -76,6 +81,17 @@
       const target = input.getAttribute("data-search-target") || "search.html";
       const query = input.value ? "?q=" + encodeURIComponent(input.value) : "";
       window.location.href = target + query;
+    });
+  });
+
+  document.querySelectorAll("[data-nav-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nav = document.querySelector("[data-sidebar-nav]");
+      if (!nav) {
+        return;
+      }
+      const isOpen = nav.classList.toggle("open");
+      button.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
   });
 }());

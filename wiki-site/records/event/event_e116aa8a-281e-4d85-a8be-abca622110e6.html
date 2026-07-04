@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Role-oriented human wiki compiler - Wikiwiki Wiki</title>
+  <title>Added installable wk agent skill - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <link rel="stylesheet" href="../../assets/project-theme.css">
   <script src="../../assets/search-index.js" defer></script>
@@ -32,9 +32,9 @@
 <a class="nav-link" href="../../guides.html">Guides</a>
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
-<a class="nav-link active" href="../../concepts.html" aria-current="page">Concepts<span>7</span></a>
+<a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
 <a class="nav-link" href="../../decisions.html">Decisions<span>10</span></a>
-<a class="nav-link" href="../../devlog.html">Devlog<span>13</span></a>
+<a class="nav-link active" href="../../devlog.html" aria-current="page">Devlog<span>13</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
@@ -43,41 +43,44 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Role-oriented human wiki compiler</h1>
-        <p>Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose.</p>
+        <h1>Added installable wk agent skill</h1>
+        <p>Added installable wk agent skill</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../concepts.html">Concepts</a>
+    <a href="../../devlog.html">Devlog</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Concept</span>
-    <span class="tag-list"><span>compile</span><span>ux</span><span>dx</span><span>agent-workflow</span></span>
+    <span class="type-badge">Devlog</span>
   </div>
   <section class="prose">
-  <h2>Summary</h2>
-  <p>Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose.</p>
-  <h2>Details</h2><p>The compiler keeps records as the source of truth, stores draft packets under .wikiwiki/drafts/compile, and publishes validated human pages under wiki/human.</p>
+  <h2>What happened</h2>
+  <p>Created skills/wk/SKILL.md with the daily agent loop, closeout protocol, install guidance, and Codex UI metadata; updated README with an agentic IDE setup section; included skills/wk in package files; and adjusted the package hygiene test.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/compiler.ts"><code>src/core/compiler.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/compile.ts"><code>src/cli/commands/compile.ts</code></a></li></ul>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/agents/openai.yaml"><code>skills/wk/agents/openai.yaml</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/package.json"><code>package.json</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>concept_4e17c000-edc9-4895-9da1-85cde9756eab</code></dd></div>
+    <div><dt>ID</dt><dd><code>event_e116aa8a-281e-4d85-a8be-abca622110e6</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T02:49:53.773Z">2026-07-04</time></dd></div>
-    <div><dt>Updated</dt><dd><time datetime="2026-07-04T02:50:19.623Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd><code>compile</code> <code>ux</code> <code>dx</code> <code>agent-workflow</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/compiler.ts"><code>src/core/compiler.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/compile.ts"><code>src/cli/commands/compile.ts</code></a></li></ul></dd></div>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T17:38:24.698Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd>None</dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/agents/openai.yaml"><code>skills/wk/agents/openai.yaml</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/package.json"><code>package.json</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

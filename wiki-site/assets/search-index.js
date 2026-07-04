@@ -2,6 +2,7 @@
 window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_17ca8065-a8d3-4373-9afe-b47b51a424d3",
     "title": "Append-only record revisions",
     "summary": "Record updates append a new JSONL revision with the same logical id, while deletes append a tombstone that active reads, rendering, and search exclude.",
@@ -17,6 +18,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_650e0409-9414-4667-8b40-f36c406a1cb0",
     "title": "CLI-first knowledge store",
     "summary": "Wikiwiki stores repo knowledge as validated JSONL records and renders deterministic Markdown pages.",
@@ -31,6 +33,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_4fde0906-d53a-4b9f-b977-3fe964a9d447",
     "title": "Daily agent loop",
     "summary": "Wikiwiki V1 supports a CLI-first loop for status, spin, structured capture, revision, validation, rendering, and local search.",
@@ -46,6 +49,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_9014ffe0-3948-4333-b6c9-f02896f81f84",
     "title": "Human-facing static wiki site",
     "summary": "Wikiwiki generates a first-class static HTML site for humans while preserving Markdown and JSONL artifacts for agents.",
@@ -62,6 +66,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_2f7f15b0-5a10-4097-9d78-93a24c060f39",
     "title": "Portable reporting paths",
     "summary": "Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally.",
@@ -78,6 +83,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_4e17c000-edc9-4895-9da1-85cde9756eab",
     "title": "Role-oriented human wiki compiler",
     "summary": "Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose.",
@@ -94,6 +100,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_26478291-0b15-4363-b661-436bab183226",
     "title": "Spin heuristics",
     "summary": "The spin command turns git working tree changes into structured update suggestions without AI summarization.",
@@ -108,6 +115,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_5ad8c2cf-266c-4824-8833-1d40103933b9",
     "title": "Compile UX and DX human wikis through agent-mediated drafts",
     "summary": "Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.",
@@ -125,6 +133,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574",
     "title": "Generate a static HTML site for human wiki browsing",
     "summary": "Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/ folder with .html links, navigation, subtle metadata, responsive CSS, and local search data.",
@@ -142,6 +151,25 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "typeLabel": "Decision",
+    "id": "decision_364c44ff-012c-4d15-b978-5e91adf73521",
+    "title": "Make generated sites project-first",
+    "summary": "Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish.",
+    "tags": [
+      "site",
+      "ux",
+      "human-wiki",
+      "theme",
+      "homepage"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html",
+    "text": "decision_364c44ff-012c-4d15-b978-5e91adf73521 agent agent high 2026-07-04T17:51:59.006Z 2026-07-04T17:51:59.006Z decision Make generated sites project-first PRISM dogfooding showed the generated site was mechanically sound but still felt like a Wikiwiki-branded record browser, with generator branding, raw IDs, visible confidence badges, empty categories, and implementation churn on the homepage. Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish. Humans get a clearer reader journey while agents retain JSONL records, generated Markdown, searchable record pages, metadata, and deterministic static output. src/core/site.ts src/core/config.ts test/site.test.js README.md site ux human-wiki theme homepage"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5",
     "title": "Make generated sites publishable without adjacent repo files",
     "summary": "Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.",
@@ -158,6 +186,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_e5333a83-7321-4a65-b040-12c1487f60e7",
     "title": "Prepare scoped npm package without publishing",
     "summary": "Use @thjodann/wk as the scoped npm package name, expose wk as the primary binary, keep wikiwiki as a compatibility alias, and verify package contents with npm pack --dry-run.",
@@ -174,6 +203,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_45f2d29a-3140-40f6-b62c-8e299621419b",
     "title": "Ship a lean npm package",
     "summary": "Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL.",
@@ -189,6 +219,41 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "typeLabel": "Decision",
+    "id": "decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747",
+    "title": "Ship wk as an installable agent skill",
+    "summary": "Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in the npm package while continuing to exclude generated wiki output and large decorative assets.",
+    "tags": [
+      "agent-workflow",
+      "skills",
+      "package",
+      "docs"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/decision/decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747.html",
+    "text": "decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747 agent agent high 2026-07-04T17:38:24.597Z 2026-07-04T17:38:24.597Z decision Ship wk as an installable agent skill Wikiwiki is designed to assist coding agents before humans, so agentic IDEs need persistent instructions that make the wk loop automatic rather than dependent on each prompt. Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in the npm package while continuing to exclude generated wiki output and large decorative assets. Agents can discover and run wk status, spin, record, validate, render, site, and compile workflows consistently across repos; package users get the skill artifact without bloating the tarball. skills/wk/SKILL.md skills/wk/agents/openai.yaml README.md package.json test/cli.test.js agent-workflow skills package docs"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
+    "id": "decision_d7a1f846-57be-4c31-9fd6-27dc704622ab",
+    "title": "Support script-first wiki automation",
+    "summary": "Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture, curation, and human-readable drafts.",
+    "tags": [
+      "product",
+      "automation",
+      "agents",
+      "docs"
+    ],
+    "authority": "user",
+    "confidence": "high",
+    "url": "records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html",
+    "text": "decision_d7a1f846-57be-4c31-9fd6-27dc704622ab manual user high 2026-07-04T17:59:00.773Z 2026-07-04T17:59:00.773Z decision Support script-first wiki automation The product should work for users who do not use agentic IDEs while becoming more capable when agents are present. Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture, curation, and human-readable drafts. README setup should lead with non-AI CLI automation, then describe the optional agent-led install path. Agents should lean on wk commands and scripts for repeatable work to avoid unnecessary LLM calls. README.md skills/wk/SKILL.md product automation agents docs"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd",
     "title": "Use JSONL for MVP storage",
     "summary": "Store each record type in an append-only JSONL file under .wikiwiki/records.",
@@ -203,6 +268,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_e28e5351-dd00-4ba1-841d-278b639ae1c8",
     "title": "Use wk as primary CLI identity",
     "summary": "Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve wikiwiki as a compatibility alias.",
@@ -218,6 +284,19 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_e116aa8a-281e-4d85-a8be-abca622110e6",
+    "title": "Added installable wk agent skill",
+    "summary": "Added installable wk agent skill",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/event/event_e116aa8a-281e-4d85-a8be-abca622110e6.html",
+    "text": "event_e116aa8a-281e-4d85-a8be-abca622110e6 agent agent high 2026-07-04T17:38:24.698Z event Added installable wk agent skill Created skills/wk/SKILL.md with the daily agent loop, closeout protocol, install guidance, and Codex UI metadata; updated README with an agentic IDE setup section; included skills/wk in package files; and adjusted the package hygiene test. skills/wk/SKILL.md skills/wk/agents/openai.yaml README.md package.json test/cli.test.js"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_da489cef-22d6-46db-989d-25eb52891c37",
     "title": "Aligned agent protocol with wk command",
     "summary": "Aligned agent protocol with wk command",
@@ -229,6 +308,19 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86",
+    "title": "Documented script-first Wikiwiki automation",
+    "summary": "Documented script-first Wikiwiki automation",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/event/event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86.html",
+    "text": "event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86 agent agent high 2026-07-04T17:59:07.939Z event Documented script-first Wikiwiki automation Updated the README and bundled wk skill to clarify that Wikiwiki works without AI through deterministic CLI scripts, while agentic IDE setup remains an optional enhancement for richer record capture and curation. README.md skills/wk/SKILL.md"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_410942e4-5e5f-445a-88be-db5aa7cfa176",
     "title": "Drafted aspirational README",
     "summary": "Drafted aspirational README",
@@ -240,6 +332,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_77558856-112d-4c41-9003-696a8c1e3dda",
     "title": "Hardened static site portability for PRISM dogfooding",
     "summary": "Hardened static site portability for PRISM dogfooding",
@@ -251,6 +344,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_dddc9fc5-611a-4902-b27c-8ee455c6832a",
     "title": "Implemented static human wiki site generation",
     "summary": "Implemented static human wiki site generation",
@@ -262,6 +356,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8",
     "title": "Implemented UX/DX human wiki compile pilot",
     "summary": "Implemented UX/DX human wiki compile pilot",
@@ -273,6 +368,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_bc62fab0-ba40-4a0e-8d3a-b816ea356345",
     "title": "Implemented Wikiwiki V1 CLI loop",
     "summary": "Implemented Wikiwiki V1 CLI loop",
@@ -284,6 +380,19 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_2c53f001-eb63-4e55-82d3-fc9df43b53f2",
+    "title": "Improved generated site product UX",
+    "summary": "Improved generated site product UX",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/event/event_2c53f001-eb63-4e55-82d3-fc9df43b53f2.html",
+    "text": "event_2c53f001-eb63-4e55-82d3-fc9df43b53f2 agent agent high 2026-07-04T17:51:59.099Z event Improved generated site product UX Used the PRISM PDF dogfood export as evidence to reduce visible Wikiwiki branding, add project-first titles and footer credit, introduce guides.html, curate homepage records, hide raw IDs and confidence badges from listing/search cards, add .wikiwiki/site-theme.json support, improve mobile navigation and print behavior, and add wk install-agent codex. src/core/site.ts src/core/config.ts src/cli/commands/installAgent.ts src/index.ts test/site.test.js test/cli.test.js README.md skills/wk/SKILL.md"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_6c360d34-0e2b-414e-9445-af1fe597103a",
     "title": "Initialized Wikiwiki CLI MVP",
     "summary": "Initialized Wikiwiki CLI MVP",
@@ -295,6 +404,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_d67ebd8e-e9f4-4c08-a011-72295a6e7210",
     "title": "Refreshed README with hero banner",
     "summary": "Refreshed README with hero banner",
@@ -306,6 +416,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_1222a170-521f-476b-bd83-7359a4ba66c2",
     "title": "Renamed CLI identity to wk",
     "summary": "Renamed CLI identity to wk",
@@ -317,6 +428,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_495227ea-a813-41fa-b7a6-910f338a518f",
     "title": "Trimmed npm package contents for release readiness",
     "summary": "Trimmed npm package contents for release readiness",
@@ -328,6 +440,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "link",
+    "typeLabel": "Link",
     "id": "link_f1dadf17-2e61-4024-bb02-d237e43ea911",
     "title": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd chooses-storage src/core/store.ts",
     "summary": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd chooses-storage src/core/store.ts",
@@ -339,6 +452,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "link",
+    "typeLabel": "Link",
     "id": "link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0",
     "title": "README.md embeds assets/wikiwiki-banner.png",
     "summary": "README.md embeds assets/wikiwiki-banner.png",
@@ -350,6 +464,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "note",
+    "typeLabel": "Note",
     "id": "note_482c1563-27d5-48b3-a8f7-81075cc69b28",
     "title": "Generated wiki pages are owned by Wikiwiki; edit structured records instead.",
     "summary": "Generated wiki pages are owned by Wikiwiki; edit structured records instead.",
@@ -364,6 +479,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "note",
+    "typeLabel": "Note",
     "id": "note_e237de63-0391-4d81-8a69-f47666a6dfd7",
     "title": "User chose the supplied Wikiwiki banner image for the README and explicitly allo",
     "summary": "User chose the supplied Wikiwiki banner image for the README and explicitly allowed an idealistic README draft, including future-facing product language for capabilities that may not exist yet.",
@@ -379,6 +495,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "note",
+    "typeLabel": "Note",
     "id": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92",
     "title": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model",
     "summary": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata.",
@@ -393,6 +510,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "typeLabel": "Symbol",
     "id": "symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652",
     "title": "activeRecords",
     "summary": "Filters raw record revisions down to latest non-deleted records for status, rendering, search, and record reads.",
@@ -404,6 +522,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "typeLabel": "Symbol",
     "id": "symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c",
     "title": "readWikiwikiConfig",
     "summary": "Reads optional .wikiwiki/config.json settings such as source_base_url for generated site source links.",
@@ -415,6 +534,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "typeLabel": "Symbol",
     "id": "symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98",
     "title": "registerRecordCommand",
     "summary": "Registers generic record list, get, update, and delete commands for append-only record lifecycle management.",
@@ -426,6 +546,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "typeLabel": "Symbol",
     "id": "symbol_fa848524-5a78-4fc0-9781-cf7673acae13",
     "title": "registerSearchCommand",
     "summary": "Registers local search across active records and rendered Markdown wiki pages.",
@@ -437,6 +558,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "typeLabel": "Symbol",
     "id": "symbol_766a4f0e-54ee-44cc-a9f3-62faac669612",
     "title": "registerSiteCommand",
     "summary": "Registers wk site, which generates the human-facing static Wikiwiki frontend into wiki-site/.",
@@ -448,6 +570,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "typeLabel": "Symbol",
     "id": "symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959",
     "title": "renderSite",
     "summary": "Builds and writes the generated wiki-site/ static HTML frontend from active Wikiwiki records.",
@@ -459,6 +582,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "typeLabel": "Symbol",
     "id": "symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5",
     "title": "resolveSiteOptions",
     "summary": "Resolves wk site options by combining .wikiwiki/config.json with CLI overrides, including sourceBaseUrl.",

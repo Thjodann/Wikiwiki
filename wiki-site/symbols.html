@@ -5,8 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Symbols - Wikiwiki</title>
+  <title>Symbols - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="assets/wikiwiki.css">
+  <link rel="stylesheet" href="assets/project-theme.css">
   <script src="assets/search-index.js" defer></script>
   <script src="assets/wikiwiki.js" defer></script>
 </head>
@@ -14,33 +15,34 @@
   <a class="skip-link" href="#content">Skip to content</a>
   <div class="site-shell">
     <aside class="sidebar" aria-label="Wiki navigation">
-      <a class="brand" href="index.html" aria-label="Wiki home">
-        <span class="brand-mark">wk</span>
-        <span>
-          <strong>Wikiwiki</strong>
-          <small>Wikiwiki</small>
-        </span>
-      </a>
-      <label class="sidebar-search">
-        <span>Search</span>
-        <input type="search" placeholder="Search records" data-site-search data-search-target="search.html">
-      </label>
-      <nav class="nav">
-  <p class="nav-heading">Start Here</p>
-  <a class="nav-link" href="index.html">Home</a>
-  <a class="nav-link" href="search.html">Search</a>
-  <p class="nav-heading">Records</p>
-  <a class="nav-link" href="concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="decisions.html">Decisions<span>7</span></a>
-<a class="nav-link" href="devlog.html">Devlog<span>10</span></a>
+      <div class="sidebar-top">
+        <a class="brand" href="index.html" aria-label="Wiki home">
+          <span class="brand-mark">WI</span>
+          <span>
+            <strong>Wikiwiki</strong>
+            <small>Project wiki</small>
+          </span>
+        </a>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false">Menu</button>
+      </div>
+      <div class="sidebar-nav" data-sidebar-nav>
+        <nav class="nav">
+<p class="nav-heading">Start Here</p>
+<a class="nav-link" href="index.html">Home</a>
+<a class="nav-link" href="guides.html">Guides</a>
+<a class="nav-link" href="search.html">Search</a>
+<p class="nav-heading">Agent records</p>
+<a class="nav-link" href="concepts.html">Concepts<span>7</span></a>
+<a class="nav-link" href="decisions.html">Decisions<span>10</span></a>
+<a class="nav-link" href="devlog.html">Devlog<span>13</span></a>
 <a class="nav-link" href="notes.html">Notes<span>3</span></a>
 <a class="nav-link active" href="symbols.html" aria-current="page">Symbols<span>7</span></a>
 <a class="nav-link" href="links.html">Links<span>2</span></a>
 </nav>
+      </div>
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <p class="eyebrow">Generated Wikiwiki site</p>
         <h1>Symbols</h1>
         <p>Important code symbols and where maintainers should look first.</p>
       </header>
@@ -52,81 +54,54 @@
   <div class="record-list"><article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Symbol</span>
-    <span class="confidence high">high</span>
   </div>
   <h3><a href="records/symbol/symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652.html">activeRecords</a></h3>
   <p>Filters raw record revisions down to latest non-deleted records for status, rendering, search, and record reads.</p>
-  <footer>
-    <code>symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652</code>
-  </footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Symbol</span>
-    <span class="confidence high">high</span>
   </div>
   <h3><a href="records/symbol/symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c.html">readWikiwikiConfig</a></h3>
   <p>Reads optional .wikiwiki/config.json settings such as source_base_url for generated site source links.</p>
-  <footer>
-    <code>symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c</code>
-  </footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Symbol</span>
-    <span class="confidence high">high</span>
   </div>
   <h3><a href="records/symbol/symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98.html">registerRecordCommand</a></h3>
   <p>Registers generic record list, get, update, and delete commands for append-only record lifecycle management.</p>
-  <footer>
-    <code>symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98</code>
-  </footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Symbol</span>
-    <span class="confidence high">high</span>
   </div>
   <h3><a href="records/symbol/symbol_fa848524-5a78-4fc0-9781-cf7673acae13.html">registerSearchCommand</a></h3>
   <p>Registers local search across active records and rendered Markdown wiki pages.</p>
-  <footer>
-    <code>symbol_fa848524-5a78-4fc0-9781-cf7673acae13</code>
-  </footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Symbol</span>
-    <span class="confidence high">high</span>
   </div>
   <h3><a href="records/symbol/symbol_766a4f0e-54ee-44cc-a9f3-62faac669612.html">registerSiteCommand</a></h3>
   <p>Registers wk site, which generates the human-facing static Wikiwiki frontend into wiki-site/.</p>
-  <footer>
-    <code>symbol_766a4f0e-54ee-44cc-a9f3-62faac669612</code>
-  </footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Symbol</span>
-    <span class="confidence high">high</span>
   </div>
   <h3><a href="records/symbol/symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959.html">renderSite</a></h3>
   <p>Builds and writes the generated wiki-site/ static HTML frontend from active Wikiwiki records.</p>
-  <footer>
-    <code>symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959</code>
-  </footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Symbol</span>
-    <span class="confidence high">high</span>
   </div>
   <h3><a href="records/symbol/symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5.html">resolveSiteOptions</a></h3>
   <p>Resolves wk site options by combining .wikiwiki/config.json with CLI overrides, including sourceBaseUrl.</p>
-  <footer>
-    <code>symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5</code>
-  </footer>
 </article></div>
 </section>
+      <footer class="site-footer">Created with <a href="https://github.com/Thjodann/Wikiwiki">Wikiwiki</a>.</footer>
     </main>
   </div>
 </body>

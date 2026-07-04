@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { normalizeSourceBaseUrl, readWikiwikiConfig } from "./config";
+import { normalizeSourceBaseUrl, readWikiwikiConfig, readWikiwikiSiteTheme, type WikiwikiSiteTheme } from "./config";
 import { sitePath } from "./paths";
 import { readAllRecords, type RecordsByType } from "./store";
 import { type AnyRecord, type RecordType, recordTypes } from "./schemas";
@@ -10,6 +10,7 @@ export const siteGeneratedNotice =
 
 export const siteStaticPageFileNames = [
   "index.html",
+  "guides.html",
   "concepts.html",
   "decisions.html",
   "devlog.html",
@@ -30,6 +31,7 @@ export type SiteOptions = {
 
 export type ResolvedSiteOptions = {
   sourceBaseUrl?: string;
+  theme: WikiwikiSiteTheme;
 };
 
 type Category = {
@@ -43,10 +45,14 @@ type Category = {
 type SiteModel = {
   root: string;
   repoName: string;
+  siteTitle: string;
+  siteDescription: string;
+  projectInitials: string;
   records: RecordsByType;
   flatRecords: AnyRecord[];
   hrefById: Map<string, string>;
   counts: Record<RecordType, number>;
+  visibleCategories: Category[];
   options: ResolvedSiteOptions;
 };
 
@@ -68,6 +74,7 @@ type RenderContext = {
 
 type SearchEntry = {
   type: RecordType;
+  typeLabel: string;
   id: string;
   title: string;
   summary: string;
@@ -135,10 +142,22 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
     content: renderLayout({
       model,
       fileName: "index.html",
-      title: `${model.repoName} Wiki`,
-      description: "A generated, browseable wiki built from structured Wikiwiki records.",
+      title: model.siteTitle,
+      description: model.siteDescription,
       active: "home",
       body: renderHomePage(model)
+    })
+  });
+
+  files.push({
+    fileName: "guides.html",
+    content: renderLayout({
+      model,
+      fileName: "guides.html",
+      title: "Guides",
+      description: `Curated paths through ${model.repoName} knowledge.`,
+      active: "guides",
+      body: renderGuidesPage(model)
     })
   });
 
@@ -162,7 +181,7 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
       model,
       fileName: "search.html",
       title: "Search",
-      description: "Search active Wikiwiki records without a backend.",
+      description: "Search this project wiki without a backend.",
       active: "search",
       body: renderSearchPage()
     })
@@ -185,6 +204,7 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
 
   files.push(
     { fileName: "assets/wikiwiki.css", content: siteCss() },
+    { fileName: "assets/project-theme.css", content: projectThemeCss(model.options.theme) },
     { fileName: "assets/search-index.js", content: searchIndexJs(model) },
     { fileName: "assets/wikiwiki.js", content: siteJs() },
     { fileName: ".nojekyll", content: "" },
@@ -212,7 +232,8 @@ export function renderSite(root: string, options: SiteOptions = {}): string[] {
 export function resolveSiteOptions(root: string, options: SiteOptions = {}): ResolvedSiteOptions {
   const config = readWikiwikiConfig(root);
   return {
-    sourceBaseUrl: normalizeSourceBaseUrl(options.sourceBaseUrl ?? config.source_base_url)
+    sourceBaseUrl: normalizeSourceBaseUrl(options.sourceBaseUrl ?? config.source_base_url),
+    theme: readWikiwikiSiteTheme(root)
   };
 }
 
@@ -224,21 +245,28 @@ function createSiteModel(root: string, records: RecordsByType, options: Resolved
   flatRecords.sort(compareRecords);
   const hrefById = new Map(flatRecords.map((record) => [record.id, recordHref(record)]));
   const counts = Object.fromEntries(recordTypes.map((type) => [type, records[type].length])) as Record<RecordType, number>;
+  const repoName = options.theme.project_name?.trim() || path.basename(root);
 
   return {
     root,
-    repoName: path.basename(root),
+    repoName,
+    siteTitle: `${repoName} Wiki`,
+    siteDescription: options.theme.project_description?.trim() || "A project wiki generated from durable repo knowledge.",
+    projectInitials: initialsForName(repoName),
     records,
     flatRecords,
     hrefById,
     counts,
+    visibleCategories: categories.filter((category) => counts[category.type] > 0),
     options
   };
 }
 
 function renderLayout(options: LayoutOptions): string {
   const prefix = relativePrefix(options.fileName);
-  const searchHref = hrefFrom(options.fileName, "search.html");
+  const htmlTitle = options.title === options.model.siteTitle
+    ? options.title
+    : `${options.title} - ${options.model.siteTitle}`;
 
   return `${siteGeneratedNotice}
 <!doctype html>
@@ -247,8 +275,9 @@ function renderLayout(options: LayoutOptions): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>${escapeHtml(options.title)} - Wikiwiki</title>
+  <title>${escapeHtml(htmlTitle)}</title>
   <link rel="stylesheet" href="${prefix}assets/wikiwiki.css">
+  <link rel="stylesheet" href="${prefix}assets/project-theme.css">
   <script src="${prefix}assets/search-index.js" defer></script>
   <script src="${prefix}assets/wikiwiki.js" defer></script>
 </head>
@@ -256,26 +285,27 @@ function renderLayout(options: LayoutOptions): string {
   <a class="skip-link" href="#content">Skip to content</a>
   <div class="site-shell">
     <aside class="sidebar" aria-label="Wiki navigation">
-      <a class="brand" href="${hrefFrom(options.fileName, "index.html")}" aria-label="Wiki home">
-        <span class="brand-mark">wk</span>
-        <span>
-          <strong>${escapeHtml(options.model.repoName)}</strong>
-          <small>Wikiwiki</small>
-        </span>
-      </a>
-      <label class="sidebar-search">
-        <span>Search</span>
-        <input type="search" placeholder="Search records" data-site-search data-search-target="${searchHref}">
-      </label>
-      ${renderNav(options.model, options.fileName, options.active)}
+      <div class="sidebar-top">
+        <a class="brand" href="${hrefFrom(options.fileName, "index.html")}" aria-label="Wiki home">
+          <span class="brand-mark">${escapeHtml(options.model.projectInitials)}</span>
+          <span>
+            <strong>${escapeHtml(options.model.repoName)}</strong>
+            <small>Project wiki</small>
+          </span>
+        </a>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false">Menu</button>
+      </div>
+      <div class="sidebar-nav" data-sidebar-nav>
+        ${renderNav(options.model, options.fileName, options.active)}
+      </div>
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <p class="eyebrow">Generated Wikiwiki site</p>
         <h1>${escapeHtml(options.title)}</h1>
         <p>${escapeHtml(options.description)}</p>
       </header>
       ${options.body}
+      <footer class="site-footer">Created with <a href="https://github.com/Thjodann/Wikiwiki">Wikiwiki</a>.</footer>
     </main>
   </div>
 </body>
@@ -284,16 +314,22 @@ function renderLayout(options: LayoutOptions): string {
 }
 
 function renderNav(model: SiteModel, currentFile: string, active: string): string {
-  const categoryLinks = categories
+  const categoryLinks = model.visibleCategories
     .map((category) => navLink(currentFile, category.fileName, category.navLabel, active === category.type, model.counts[category.type]))
     .join("\n");
+  const categorySection = categoryLinks
+    ? `<p class="nav-heading">Agent records</p>\n${categoryLinks}`
+    : "";
+  const links = [
+    `<p class="nav-heading">Start Here</p>`,
+    navLink(currentFile, "index.html", "Home", active === "home"),
+    navLink(currentFile, "guides.html", "Guides", active === "guides"),
+    navLink(currentFile, "search.html", "Search", active === "search"),
+    categorySection
+  ].filter(Boolean).join("\n");
 
   return `<nav class="nav">
-  <p class="nav-heading">Start Here</p>
-  ${navLink(currentFile, "index.html", "Home", active === "home")}
-  ${navLink(currentFile, "search.html", "Search", active === "search")}
-  <p class="nav-heading">Records</p>
-  ${categoryLinks}
+${links}
 </nav>`;
 }
 
@@ -304,54 +340,107 @@ function navLink(currentFile: string, targetFile: string, label: string, active:
 }
 
 function renderHomePage(model: SiteModel): string {
-  const primaryCards = categories
-    .slice(0, 4)
+  const coreCategories = categories
+    .filter((category) => ["concept", "decision"].includes(category.type) && model.counts[category.type] > 0);
+  const supportCategories = categories
+    .filter((category) => !["concept", "decision"].includes(category.type) && model.counts[category.type] > 0);
+  const guideCards = [
+    sectionCard("index.html", "guides.html", "Guides", "Curated paths through project concepts, decisions, and maintainer context.")
+  ].join("\n");
+  const primaryCards = coreCategories
     .map((category) => sectionCard("index.html", category.fileName, category.title, category.description, model.counts[category.type]))
     .join("\n");
-  const supportCards = categories
-    .slice(4)
+  const supportCards = supportCategories
     .map((category) => sectionCard("index.html", category.fileName, category.title, category.description, model.counts[category.type]))
     .join("\n");
-  const recentRecords = [...model.flatRecords]
-    .sort((a, b) => recordTimestamp(b).localeCompare(recordTimestamp(a)) || recordTitle(a).localeCompare(recordTitle(b)))
-    .slice(0, 6)
+  const featuredRecords = homepageRecords(model)
     .map((record) => recordCard(record, "index.html", model))
+    .join("\n");
+  const stats = statsTypes(model)
+    .map((type) => `<div><dt>${escapeHtml(labelForType(type))}</dt><dd>${model.counts[type]}</dd></div>`)
     .join("\n");
 
   return `<section class="hero-panel">
   <div>
     <p class="eyebrow">Start here</p>
-    <h2>Browse the project knowledge without reading raw records.</h2>
-    <p>Wikiwiki keeps JSONL and Markdown for agents, then generates this static site for humans. Links are plain HTML files, so the site works locally and on static hosts.</p>
+    <h2>Understand ${escapeHtml(model.repoName)} without reading raw records.</h2>
+    <p>${escapeHtml(model.siteDescription)} Start with curated guides, then browse source-backed concepts, decisions, notes, and maintainer records when you need more detail.</p>
   </div>
-  <dl class="stats-grid">
-    ${recordTypes.map((type) => `<div><dt>${escapeHtml(labelForType(type))}</dt><dd>${model.counts[type]}</dd></div>`).join("\n")}
-  </dl>
+  ${stats ? `<dl class="stats-grid">${stats}</dl>` : ""}
 </section>
 
 <section class="section">
   <div class="section-heading">
-    <p class="eyebrow">Browse</p>
-    <h2>Core Pages</h2>
+    <p class="eyebrow">Field guide</p>
+    <h2>Start with the project story</h2>
   </div>
-  <div class="card-grid">${primaryCards}</div>
+  <div class="card-grid">${guideCards}${primaryCards}</div>
 </section>
 
-<section class="section">
+${supportCards ? `<section class="section">
   <div class="section-heading">
-    <p class="eyebrow">Reference</p>
-    <h2>Developer Context</h2>
+    <p class="eyebrow">Maintainer context</p>
+    <h2>Browse the source records</h2>
   </div>
   <div class="card-grid compact">${supportCards}</div>
-</section>
+</section>` : ""}
 
 <section class="section">
   <div class="section-heading">
-    <p class="eyebrow">Latest</p>
-    <h2>Recently Updated Records</h2>
+    <p class="eyebrow">Featured</p>
+    <h2>High-signal knowledge</h2>
   </div>
-  <div class="record-list">${recentRecords || emptyState("No records captured yet.")}</div>
+  <div class="record-list">${featuredRecords || emptyState("No curated records yet. Add high-confidence concepts or decisions to shape this front page.")}</div>
 </section>`;
+}
+
+function renderGuidesPage(model: SiteModel): string {
+  const startHere = homepageRecords(model)
+    .slice(0, 6)
+    .map((record) => recordCard(record, "guides.html", model))
+    .join("\n");
+  const conceptCards = curatedRecords(model, ["concept"], 6)
+    .map((record) => recordCard(record, "guides.html", model))
+    .join("\n");
+  const decisionCards = curatedRecords(model, ["decision"], 6)
+    .map((record) => recordCard(record, "guides.html", model))
+    .join("\n");
+  const maintainerCards = categories
+    .filter((category) => model.counts[category.type] > 0)
+    .map((category) => sectionCard("guides.html", category.fileName, category.title, category.description, model.counts[category.type]))
+    .join("\n");
+
+  return `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Start here</p>
+    <h2>Project essentials</h2>
+  </div>
+  <div class="record-list">${startHere || emptyState("No high-signal records captured yet.")}</div>
+</section>
+
+${conceptCards ? `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Experience</p>
+    <h2>Concepts to understand first</h2>
+  </div>
+  <div class="record-list">${conceptCards}</div>
+</section>` : ""}
+
+${decisionCards ? `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Rationale</p>
+    <h2>Decisions that shaped the project</h2>
+  </div>
+  <div class="record-list">${decisionCards}</div>
+</section>` : ""}
+
+${maintainerCards ? `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Docs map</p>
+    <h2>Agent-maintained record indexes</h2>
+  </div>
+  <div class="card-grid compact">${maintainerCards}</div>
+</section>` : ""}`;
 }
 
 function renderCategoryPage(model: SiteModel, category: Category): string {
@@ -371,7 +460,7 @@ function renderSearchPage(): string {
   return `<section class="section">
   <div class="search-panel">
     <label>
-      <span>Search this wiki</span>
+      <span>Search this project wiki</span>
       <input type="search" placeholder="Type a concept, file, tag, or decision" data-search-page-input autofocus>
     </label>
   </div>
@@ -390,6 +479,7 @@ function renderRecordPage(record: AnyRecord, model: SiteModel, currentFile: stri
   const backHref = category ? hrefFrom(currentFile, category.fileName) : hrefFrom(currentFile, "index.html");
   const tagsHtml = tagList(recordTags(record));
   const tagsLine = tagsHtml ? `\n    ${tagsHtml}` : "";
+  const sourcesBlock = renderSourcesBlock(record, context);
 
   return `<article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -400,7 +490,7 @@ function renderRecordPage(record: AnyRecord, model: SiteModel, currentFile: stri
   <div class="record-title-row">
     <span class="type-badge">${escapeHtml(labelForType(record.type))}</span>${tagsLine}
   </div>
-  ${renderRecordBody(record, context)}
+  ${renderRecordBody(record, context)}${sourcesBlock ? `\n  ${sourcesBlock}` : ""}
   ${renderRecordMeta(record, context)}
 </article>`;
 }
@@ -469,7 +559,7 @@ function renderRecordMeta(record: AnyRecord, context: RenderContext): string {
     : "";
 
   return `<details class="record-meta">
-  <summary>Record details</summary>
+  <summary>Agent details</summary>
   <dl>
     <div><dt>ID</dt><dd><code>${escapeHtml(record.id)}</code></dd></div>
     <div><dt>Source</dt><dd>${escapeHtml(record.source)}</dd></div>
@@ -482,15 +572,31 @@ function renderRecordMeta(record: AnyRecord, context: RenderContext): string {
 </details>`;
 }
 
-function sectionCard(currentFile: string, targetFile: string, title: string, description: string, count: number): string {
+function renderSourcesBlock(record: AnyRecord, context: RenderContext): string {
+  const files = relatedFiles(record);
+  if (files.length === 0) {
+    return "";
+  }
+
+  const fileList = files.map((file) => `<li>${sourceFileLink(file, context)}</li>`).join("\n");
+  return `<aside class="sources-panel">
+  <h2>Related files</h2>
+  <ul>${fileList}</ul>
+</aside>`;
+}
+
+function sectionCard(currentFile: string, targetFile: string, title: string, description: string, count?: number): string {
+  const countHtml = typeof count === "number"
+    ? `<span>${count} ${count === 1 ? "record" : "records"}</span>`
+    : "<span>Guide</span>";
   return `<a class="section-card" href="${hrefFrom(currentFile, targetFile)}">
-  <span>${count} ${count === 1 ? "record" : "records"}</span>
+  ${countHtml}
   <strong>${escapeHtml(title)}</strong>
   <p>${escapeHtml(description)}</p>
 </a>`;
 }
 
-function recordCard(record: AnyRecord, currentFile: string, model: SiteModel): string {
+function recordCard(record: AnyRecord, currentFile: string, _model: SiteModel): string {
   const summary = recordSummary(record);
   const tags = recordTags(record).slice(0, 5);
   const tagsHtml = tagList(tags);
@@ -499,13 +605,9 @@ function recordCard(record: AnyRecord, currentFile: string, model: SiteModel): s
   return `<article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">${escapeHtml(labelForType(record.type))}</span>
-    <span class="confidence ${escapeHtml(record.confidence)}">${escapeHtml(record.confidence)}</span>
   </div>
   <h3><a href="${hrefFrom(currentFile, recordHref(record))}">${escapeHtml(recordTitle(record))}</a></h3>
-  <p>${escapeHtml(summary)}</p>
-  <footer>${tagsLine}
-    <code>${escapeHtml(record.id)}</code>
-  </footer>
+  <p>${escapeHtml(summary)}</p>${tagsLine ? `\n  <footer>${tagsLine}</footer>` : ""}
 </article>`;
 }
 
@@ -633,6 +735,8 @@ function markdownRouteToHtml(route: string): string | undefined {
     ["", "index.html"],
     ["index", "index.html"],
     ["index.md", "index.html"],
+    ["guides", "guides.html"],
+    ["guides.md", "guides.html"],
     ["concepts", "concepts.html"],
     ["concepts.md", "concepts.html"],
     ["decisions", "decisions.html"],
@@ -684,6 +788,7 @@ function isDirectoryPath(root: string, file: string): boolean {
 function searchIndexJs(model: SiteModel): string {
   const entries: SearchEntry[] = model.flatRecords.map((record) => ({
     type: record.type,
+    typeLabel: labelForType(record.type),
     id: record.id,
     title: recordTitle(record),
     summary: recordSummary(record),
@@ -705,6 +810,8 @@ function siteManifest(model: SiteModel) {
     generated_from: ".wikiwiki/records",
     command: "wk site",
     source_base_url: model.options.sourceBaseUrl ?? null,
+    project_name: model.repoName,
+    theme_file: ".wikiwiki/site-theme.json",
     pages: siteStaticPageFileNames,
     records: model.flatRecords.map((record) => ({
       type: record.type,
@@ -795,6 +902,71 @@ function compareRecords(a: AnyRecord, b: AnyRecord): number {
     a.id.localeCompare(b.id);
 }
 
+function homepageRecords(model: SiteModel): AnyRecord[] {
+  const curated = curatedRecords(model, ["concept", "decision", "note"], 6);
+  if (curated.length > 0) {
+    return curated;
+  }
+
+  return curatedRecords(model, recordTypes, 6);
+}
+
+function curatedRecords(model: SiteModel, types: readonly RecordType[], limit: number): AnyRecord[] {
+  const allowedTypes = new Set(types);
+  return model.flatRecords
+    .filter((record) => allowedTypes.has(record.type))
+    .sort(compareRecordsForCuration)
+    .slice(0, limit);
+}
+
+function compareRecordsForCuration(a: AnyRecord, b: AnyRecord): number {
+  return curationScore(b) - curationScore(a) ||
+    recordTitle(a).localeCompare(recordTitle(b)) ||
+    a.id.localeCompare(b.id);
+}
+
+function curationScore(record: AnyRecord): number {
+  let score = 0;
+  const tags = recordTags(record).map((tag) => tag.toLowerCase());
+
+  if (tags.some((tag) => ["pinned", "homepage", "start-here", "overview", "guide"].includes(tag))) {
+    score += 80;
+  }
+  if (record.authority === "user") {
+    score += 35;
+  }
+  if (record.confidence === "high") {
+    score += 18;
+  }
+  if (record.type === "concept") {
+    score += 24;
+  }
+  if (record.type === "decision") {
+    score += 20;
+  }
+  if (record.type === "note") {
+    score += 6;
+  }
+  if (record.type === "event") {
+    score -= tags.some((tag) => ["release", "milestone", "launch"].includes(tag)) ? 6 : 28;
+  }
+  if (tags.some((tag) => ["internal", "maintenance", "implementation", "package", "ci", "devlog"].includes(tag))) {
+    score -= 12;
+  }
+
+  return score;
+}
+
+function statsTypes(model: SiteModel): RecordType[] {
+  const preferred: RecordType[] = ["concept", "decision", "event", "note"];
+  const visible = preferred.filter((type) => model.counts[type] > 0);
+  if (visible.length > 0) {
+    return visible;
+  }
+
+  return recordTypes.filter((type) => model.counts[type] > 0).slice(0, 4);
+}
+
 function tagList(tags: string[]): string {
   if (tags.length === 0) {
     return "";
@@ -813,6 +985,19 @@ function labelForType(type: RecordType): string {
   }
 
   return type[0].toUpperCase() + type.slice(1);
+}
+
+function initialsForName(value: string): string {
+  const words = value
+    .replace(/[_-]+/g, " ")
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter(Boolean);
+  const initials = words.length >= 2
+    ? `${words[0][0]}${words[1][0]}`
+    : (words[0] ?? "W").slice(0, 2);
+
+  return initials.toUpperCase();
 }
 
 function formatDate(value: string): string {
@@ -865,6 +1050,41 @@ function escapeAttribute(value: string): string {
   return escapeHtml(value);
 }
 
+function projectThemeCss(theme: WikiwikiSiteTheme): string {
+  const variables: [keyof WikiwikiSiteTheme, string][] = [
+    ["accent", "--accent"],
+    ["accent_strong", "--accent-strong"],
+    ["bg", "--bg"],
+    ["panel", "--panel"],
+    ["panel_soft", "--panel-soft"],
+    ["text", "--text"],
+    ["muted", "--muted"],
+    ["border", "--border"],
+    ["code_bg", "--code-bg"],
+    ["radius", "--radius"],
+    ["font_family", "--font-family"]
+  ];
+  const lines = variables
+    .flatMap(([key, variable]) => {
+      const value = theme[key]?.trim();
+      return value ? [`  ${variable}: ${cssValue(value)};`] : [];
+    });
+
+  if (lines.length === 0) {
+    return "/* Optional project theme. Add .wikiwiki/site-theme.json to override CSS custom properties. */\n";
+  }
+
+  return `/* Generated from .wikiwiki/site-theme.json. Edit the theme file, then run \`wk site\`. */
+:root {
+${lines.join("\n")}
+}
+`;
+}
+
+function cssValue(value: string): string {
+  return value.replace(/[;\n\r]/g, "").trim();
+}
+
 function siteCss(): string {
   return `/* Generated by Wikiwiki from .wikiwiki/records. Edit structured records instead, then run \`wk site\`. */
 :root {
@@ -880,6 +1100,8 @@ function siteCss(): string {
   --pink: #c43f7d;
   --code-bg: #eceee8;
   --shadow: 0 18px 45px rgba(35, 38, 31, 0.08);
+  --radius: 8px;
+  --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 * {
@@ -894,7 +1116,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-family);
   line-height: 1.55;
 }
 
@@ -943,6 +1165,13 @@ code {
   padding: 1.1rem;
 }
 
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -956,9 +1185,10 @@ code {
   place-items: center;
   width: 2.4rem;
   height: 2.4rem;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fbe8f2, #20211f 56%, #0f1110);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: white;
+  font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -969,7 +1199,6 @@ code {
 }
 
 .brand small,
-.sidebar-search span,
 .nav-heading,
 .eyebrow {
   color: var(--muted);
@@ -979,16 +1208,21 @@ code {
   text-transform: uppercase;
 }
 
-.sidebar-search {
-  display: grid;
-  gap: 0.35rem;
-  margin: 1.2rem 0;
+.nav-toggle {
+  display: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text);
+  padding: 0.45rem 0.65rem;
+  font: inherit;
+  font-weight: 700;
 }
 
 input[type="search"] {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: var(--radius);
   background: var(--panel);
   color: var(--text);
   padding: 0.7rem 0.78rem;
@@ -1003,6 +1237,7 @@ input[type="search"]:focus {
 .nav {
   display: grid;
   gap: 0.2rem;
+  margin-top: 1.2rem;
 }
 
 .nav-heading {
@@ -1014,7 +1249,7 @@ input[type="search"]:focus {
   align-items: center;
   justify-content: space-between;
   gap: 0.7rem;
-  border-radius: 7px;
+  border-radius: var(--radius);
   color: var(--text);
   padding: 0.5rem 0.58rem;
   text-decoration: none;
@@ -1063,7 +1298,7 @@ input[type="search"]:focus {
   gap: 1rem;
   align-items: stretch;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: linear-gradient(135deg, #ffffff 0%, #f4f6f0 100%);
   box-shadow: var(--shadow);
   padding: clamp(1.1rem, 3vw, 2rem);
@@ -1090,7 +1325,7 @@ input[type="search"]:focus {
 
 .stats-grid div {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.72);
   padding: 0.9rem;
 }
@@ -1129,9 +1364,10 @@ input[type="search"]:focus {
 .search-result,
 .empty-state,
 .search-panel,
-.record-meta {
+.record-meta,
+.sources-panel {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
@@ -1267,7 +1503,7 @@ input[type="search"]:focus {
 
 .prose {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--panel);
   padding: clamp(1rem, 3vw, 1.6rem);
 }
@@ -1289,6 +1525,21 @@ input[type="search"]:focus {
 .record-meta {
   margin-top: 1rem;
   padding: 0.75rem 1rem;
+}
+
+.sources-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.sources-panel h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.sources-panel ul {
+  margin: 0;
+  padding-left: 1.1rem;
 }
 
 .record-meta summary {
@@ -1343,6 +1594,20 @@ input[type="search"]:focus {
   padding: 1rem;
 }
 
+.empty-state strong {
+  display: block;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.site-footer {
+  margin-top: 3rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  padding-top: 1rem;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 860px) {
   .site-shell {
     grid-template-columns: 1fr;
@@ -1353,6 +1618,19 @@ input[type="search"]:focus {
     height: auto;
     border-bottom: 1px solid var(--border);
     border-right: 0;
+    padding: 0.85rem 1rem;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .sidebar-nav {
+    display: none;
+  }
+
+  .sidebar-nav.open {
+    display: block;
   }
 
   .nav {
@@ -1388,6 +1666,62 @@ input[type="search"]:focus {
     gap: 0.1rem;
   }
 }
+
+@media print {
+  :root {
+    --bg: #ffffff;
+    --panel: #ffffff;
+    --shadow: none;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  .site-shell {
+    display: block;
+  }
+
+  .sidebar,
+  .skip-link,
+  .nav-toggle,
+  script {
+    display: none !important;
+  }
+
+  .content {
+    width: auto;
+    padding: 0;
+  }
+
+  .page-header,
+  .hero-panel,
+  .section,
+  .section-card,
+  .record-card,
+  .search-result,
+  .prose,
+  .record-meta,
+  .sources-panel,
+  .site-footer {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .hero-panel,
+  .section-card,
+  .record-card,
+  .search-result,
+  .prose,
+  .record-meta,
+  .sources-panel {
+    box-shadow: none;
+  }
+
+  a {
+    color: inherit;
+  }
+}
 `;
 }
 
@@ -1414,17 +1748,17 @@ function siteJs(): string {
       ? '<span class="tag-list">' + entry.tags.slice(0, 6).map((tag) => '<span>' + escapeHtml(tag) + '</span>').join("") + '</span>'
       : "";
     return '<article class="search-result">' +
-      '<div class="record-card-top"><span class="type-badge">' + escapeHtml(entry.type) + '</span><span class="confidence ' + escapeHtml(entry.confidence) + '">' + escapeHtml(entry.confidence) + '</span></div>' +
+      '<div class="record-card-top"><span class="type-badge">' + escapeHtml(entry.typeLabel || entry.type) + '</span></div>' +
       '<h3><a href="' + encodeURI(entry.url) + '">' + escapeHtml(entry.title) + '</a></h3>' +
       '<p>' + escapeHtml(entry.summary) + '</p>' +
-      '<footer>' + tags + '<code>' + escapeHtml(entry.id) + '</code></footer>' +
+      (tags ? '<footer>' + tags + '</footer>' : '') +
     '</article>';
   }
 
   function search(query) {
     const normalizedQuery = normalize(query).trim();
     if (!normalizedQuery) {
-      return entries.slice(0, 20);
+      return [];
     }
 
     const terms = normalizedQuery.split(/\\s+/).filter(Boolean);
@@ -1443,6 +1777,11 @@ function siteJs(): string {
   function updateSearchPage(query) {
     const resultsRoot = document.querySelector("[data-search-results]");
     if (!resultsRoot) {
+      return;
+    }
+
+    if (!normalize(query).trim()) {
+      resultsRoot.innerHTML = '<div class="empty-state"><strong>Search is ready.</strong><p>Try a concept, decision, tag, or source file. Results stay local to this generated site.</p></div>';
       return;
     }
 
@@ -1470,6 +1809,17 @@ function siteJs(): string {
       const target = input.getAttribute("data-search-target") || "search.html";
       const query = input.value ? "?q=" + encodeURIComponent(input.value) : "";
       window.location.href = target + query;
+    });
+  });
+
+  document.querySelectorAll("[data-nav-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nav = document.querySelector("[data-sidebar-nav]");
+      if (!nav) {
+        return;
+      }
+      const isOpen = nav.classList.toggle("open");
+      button.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
   });
 }());

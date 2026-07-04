@@ -99,3 +99,45 @@ Files: `package.json`, `README.md`, `LICENSE`, `test/cli.test.js`
 Tags: `package`, `release`, `npm`
 
 Record: `decision_45f2d29a-3140-40f6-b62c-8e299621419b` | Authority: agent | Confidence: high
+
+## Ship wk as an installable agent skill
+
+Context: Wikiwiki is designed to assist coding agents before humans, so agentic IDEs need persistent instructions that make the wk loop automatic rather than dependent on each prompt.
+
+Decision: Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in the npm package while continuing to exclude generated wiki output and large decorative assets.
+
+Consequences: Agents can discover and run wk status, spin, record, validate, render, site, and compile workflows consistently across repos; package users get the skill artifact without bloating the tarball.
+
+Files: `skills/wk/SKILL.md`, `skills/wk/agents/openai.yaml`, `README.md`, `package.json`, `test/cli.test.js`
+
+Tags: `agent-workflow`, `skills`, `package`, `docs`
+
+Record: `decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747` | Authority: agent | Confidence: high
+
+## Make generated sites project-first
+
+Context: PRISM dogfooding showed the generated site was mechanically sound but still felt like a Wikiwiki-branded record browser, with generator branding, raw IDs, visible confidence badges, empty categories, and implementation churn on the homepage.
+
+Decision: Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish.
+
+Consequences: Humans get a clearer reader journey while agents retain JSONL records, generated Markdown, searchable record pages, metadata, and deterministic static output.
+
+Files: `src/core/site.ts`, `src/core/config.ts`, `test/site.test.js`, `README.md`
+
+Tags: `site`, `ux`, `human-wiki`, `theme`, `homepage`
+
+Record: `decision_364c44ff-012c-4d15-b978-5e91adf73521` | Authority: agent | Confidence: high
+
+## Support script-first wiki automation
+
+Context: The product should work for users who do not use agentic IDEs while becoming more capable when agents are present.
+
+Decision: Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture, curation, and human-readable drafts.
+
+Consequences: README setup should lead with non-AI CLI automation, then describe the optional agent-led install path. Agents should lean on wk commands and scripts for repeatable work to avoid unnecessary LLM calls.
+
+Files: `README.md`, `skills/wk/SKILL.md`
+
+Tags: `product`, `automation`, `agents`, `docs`
+
+Record: `decision_d7a1f846-57be-4c31-9fd6-27dc704622ab` | Authority: user | Confidence: high

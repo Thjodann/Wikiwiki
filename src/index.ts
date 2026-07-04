@@ -5,6 +5,7 @@ import { registerConceptCommand } from "./cli/commands/concept";
 import { registerDecisionCommand } from "./cli/commands/decision";
 import { registerEventCommand } from "./cli/commands/event";
 import { registerInitCommand } from "./cli/commands/init";
+import { registerInstallAgentCommand } from "./cli/commands/installAgent";
 import { registerLinkCommand } from "./cli/commands/link";
 import { registerNoteCommand } from "./cli/commands/note";
 import { registerRecordCommand } from "./cli/commands/record";
@@ -25,6 +26,7 @@ export function createProgram(): Command {
     .version("1.0.0");
 
   registerInitCommand(program);
+  registerInstallAgentCommand(program);
   registerStatusCommand(program);
   registerNoteCommand(program);
   registerConceptCommand(program);

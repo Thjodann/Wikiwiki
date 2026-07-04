@@ -22,7 +22,8 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "skills/wk"
   ],
   "engines": {
     "node": ">=22"

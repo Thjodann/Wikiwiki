@@ -6,13 +6,14 @@
 
 > Spin the docs. Ship the code.
 
-Wikiwiki is an agent-native living documentation system for code repos. It keeps
-important project knowledge in structured records, then renders both
-agent-readable Markdown and a human-facing static wiki site.
+Wikiwiki is quiet infrastructure for a project's own wiki. It works as a plain
+CLI for teams that do not use AI tools, and it becomes more capable when an
+agentic IDE uses the same commands while code changes.
 
-The goal is simple: give coding agents a safe CLI for maintaining repo knowledge
-as they work, without making the repo depend on a hosted service, database,
-vector store, or hidden memory layer.
+The goal is simple: keep a baseline project wiki scriptable, local, and
+deterministic without requiring LLM calls; then let agents add judgment,
+curation, and narrative when they are available. No hosted service, database,
+vector store, or hidden memory layer is required.
 
 ## Why Wikiwiki
 
@@ -24,9 +25,10 @@ Software teams lose context in the spaces between code:
 - what changed during a messy implementation session
 - which generated docs should never be edited by hand
 
-Wikiwiki turns that context into repo-local knowledge. Agents can update it with
-boring terminal commands. Humans can browse it as a static wiki. Future tools
-can query it as structured data.
+Wikiwiki turns that context into repo-local knowledge. Scripts can validate and
+render it with boring terminal commands. Agents can enrich it when they are part
+of the workflow. Humans browse a wiki that leads with the project, not the
+generator. Future tools can query the same structured data.
 
 Docs that keep up, in other words.
 
@@ -43,7 +45,8 @@ wk render
 wk site
 ```
 
-That loop lets an agent:
+That loop can run from a terminal, package script, Git hook, CI job, or agentic
+IDE. It lets a project:
 
 1. Inspect the current knowledge store.
 2. Read working tree changes.
@@ -54,6 +57,35 @@ That loop lets an agent:
 
 The structured records are the source of truth. Markdown stays simple and
 deterministic for agents. The static site is the first-class human wiki.
+
+## Automation Model
+
+Wikiwiki has two layers.
+
+**Deterministic baseline:** install the CLI, keep `.wikiwiki/records/` in the
+repo, and run scripts that validate, render Markdown, and build the static site.
+This path works without AI tools and should stay useful for any project.
+
+```json
+{
+  "scripts": {
+    "wiki:check": "wk validate",
+    "wiki:render": "wk validate && wk render",
+    "wiki:site": "wk validate && wk render && wk site",
+    "wiki:publish": "wk validate && wk render && wk site --source-base-url https://github.com/OWNER/REPO/blob/main/"
+  }
+}
+```
+
+**Agent-enhanced layer:** install the optional agent instructions so Codex,
+Cursor, Claude Code, or another coding agent knows when to run `wk spin`, when
+to add records, how to set honest `authority` and `confidence`, and how to
+refresh the generated wiki before closeout.
+
+Use scripts for repeatable work. Use agents for judgment: deciding what changed,
+capturing why it mattered, curating homepage-worthy knowledge, writing UX/DX
+draft prose, and adjusting the project theme. That keeps unnecessary LLM calls
+out of the loop while preserving the upside of agentic development.
 
 ## What It Stores
 
@@ -101,6 +133,7 @@ Wikiwiki also renders a static human-facing site into `wiki-site/`:
 ```text
 wiki-site/
   index.html
+  guides.html
   concepts.html
   decisions.html
   devlog.html
@@ -110,14 +143,24 @@ wiki-site/
   search.html
   assets/
     wikiwiki.css
+    project-theme.css
     search-index.js
     wikiwiki.js
 ```
 
-The site uses normal `.html` links, a sidebar, responsive styling, subtle record
-metadata, and local browser search. It does not rely on Jekyll routes or raw
-front matter, so you can open `wiki-site/index.html` directly or serve the
-folder as static files.
+The site uses normal `.html` links, curated guide pages, responsive navigation,
+local browser search, subtle agent metadata, and a small footer credit. It does
+not rely on Jekyll routes or raw front matter, so you can open
+`wiki-site/index.html` directly or serve the folder as static files.
+
+There are four surfaces:
+
+| Surface | Audience | Role |
+| --- | --- | --- |
+| `.wikiwiki/records/*.jsonl` | Agents and maintainers | Source of truth |
+| `wiki/*.md` | Agents and code review | Deterministic Markdown |
+| `wiki-site/*.html` | Humans | Browseable project wiki |
+| `wiki/human/` | Humans and editors | Compiled UX/DX narrative drafts |
 
 By default, source file links point back to files beside `wiki-site/` in a local
 checkout. For published sites, pass a source base URL so links point to GitHub:
@@ -136,6 +179,32 @@ You can also save that default in `.wikiwiki/config.json`:
 
 CLI options win over config. Directory links use GitHub `/tree/` URLs when the
 base URL uses `/blob/`.
+
+## Project Theme
+
+Agents can make the generated site feel like the project without changing the
+layout. Add `.wikiwiki/site-theme.json`, then run `wk site`:
+
+```json
+{
+  "project_name": "PRISM",
+  "project_description": "A project wiki for PRISM.",
+  "accent": "#7c3aed",
+  "accent_strong": "#4c1d95",
+  "bg": "#faf9ff",
+  "panel": "#ffffff",
+  "panel_soft": "#f3f0ff",
+  "text": "#1f1b2e",
+  "muted": "#655f75",
+  "border": "#ded7f2",
+  "code_bg": "#f1edf8",
+  "radius": "8px",
+  "font_family": "Inter, ui-sans-serif, system-ui, sans-serif"
+}
+```
+
+Wikiwiki writes those values into `wiki-site/assets/project-theme.css`. Keep
+this file generated; edit `.wikiwiki/site-theme.json` instead.
 
 ## What It Compiles
 
@@ -181,6 +250,72 @@ wk status --json
 ```
 
 The package installs `wk`; `wikiwiki` remains as a compatibility alias.
+
+## Non-AI Setup
+
+Wikiwiki does not require an AI tool. The smallest useful setup is a CLI install
+plus scripts that keep generated docs current:
+
+```sh
+wk init
+wk validate
+wk render
+wk site
+```
+
+Add repo scripts for the commands your team wants to run manually, in CI, or
+before publishing docs:
+
+```json
+{
+  "scripts": {
+    "wiki:check": "wk validate",
+    "wiki:site": "wk validate && wk render && wk site"
+  }
+}
+```
+
+This gives users a browseable local wiki in `wiki-site/` and deterministic
+Markdown in `wiki/` without asking a model to summarize anything.
+
+## Agentic IDE Setup
+
+Agentic IDE setup is optional. It is for teams that want their coding agent to
+maintain the wiki while development is happening. Install the CLI first, then
+install the bundled `wk` skill into your agentic IDE.
+
+For Codex-compatible skills, preview the destination:
+
+```sh
+wk install-agent codex
+```
+
+Then install after confirming the path:
+
+```sh
+wk install-agent codex --yes
+```
+
+To install manually instead:
+
+```sh
+WK_SKILL_HOME="${CODEX_HOME:-$HOME/.codex}/skills/wk"
+mkdir -p "$WK_SKILL_HOME/agents"
+curl -fsSL https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/SKILL.md \
+  -o "$WK_SKILL_HOME/SKILL.md"
+curl -fsSL https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/agents/openai.yaml \
+  -o "$WK_SKILL_HOME/agents/openai.yaml"
+```
+
+For other agentic IDEs, copy [skills/wk/SKILL.md](skills/wk/SKILL.md) into the
+IDE's persistent agent instructions or skill system. The important behavior is
+the same everywhere: start with `wk status --json` and `wk spin --json`, then
+close meaningful work with records, `wk validate`, `wk render`, and `wk site`
+when the human wiki should be refreshed.
+
+The npm package also includes the skill folder at `skills/wk/` for local
+copy/install flows. The skill is not a separate product surface; it teaches an
+agent to use the same deterministic CLI that non-AI users can run themselves.
 
 ## Quick Start
 
@@ -289,6 +424,7 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 | --- | --- |
 | `wk init` | Create the knowledge store and generated wiki folder |
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
+| `wk install-agent codex [--yes]` | Install the bundled wk skill for Codex-compatible agents |
 | `wk spin --json` | Inspect current repo changes and suggest knowledge updates |
 | `wk search <query> --json` | Search active records and rendered Markdown |
 | `wk site [--source-base-url <url>]` | Render a browseable static HTML wiki into `wiki-site/` |
@@ -367,9 +503,12 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - Git-aware `spin` with draft templates
 - Markdown rendering for concepts, decisions, events, notes, symbols, and links
 - static HTML site generation into `wiki-site/`
+- project-first generated site UX with curated `guides.html`
+- project theme overrides through `.wikiwiki/site-theme.json`
 - agent-mediated UX/DX human wiki compilation
 - local search across active records and rendered docs
 - Agent-readable JSON output
+- scriptable non-AI setup through plain CLI commands and repo scripts
 - CI, tests, and package metadata for `@thjodann/wk`
 
 Some planned pieces are not built yet:
@@ -378,6 +517,9 @@ Some planned pieces are not built yet:
 - draft review flows
 - watch mode
 - actual npm publishing
+
+Generated `wiki/` and `wiki-site/` are intentionally not shipped in the npm
+package. Installed users generate their own copies from their own records.
 
 The north star is still clear: living docs that are easy for agents to maintain
 and easy for humans to trust.

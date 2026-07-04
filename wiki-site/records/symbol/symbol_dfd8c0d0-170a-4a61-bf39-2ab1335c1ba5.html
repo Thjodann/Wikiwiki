@@ -5,8 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>resolveSiteOptions - Wikiwiki</title>
+  <title>resolveSiteOptions - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
+  <link rel="stylesheet" href="../../assets/project-theme.css">
   <script src="../../assets/search-index.js" defer></script>
   <script src="../../assets/wikiwiki.js" defer></script>
 </head>
@@ -14,33 +15,34 @@
   <a class="skip-link" href="#content">Skip to content</a>
   <div class="site-shell">
     <aside class="sidebar" aria-label="Wiki navigation">
-      <a class="brand" href="../../index.html" aria-label="Wiki home">
-        <span class="brand-mark">wk</span>
-        <span>
-          <strong>Wikiwiki</strong>
-          <small>Wikiwiki</small>
-        </span>
-      </a>
-      <label class="sidebar-search">
-        <span>Search</span>
-        <input type="search" placeholder="Search records" data-site-search data-search-target="../../search.html">
-      </label>
-      <nav class="nav">
-  <p class="nav-heading">Start Here</p>
-  <a class="nav-link" href="../../index.html">Home</a>
-  <a class="nav-link" href="../../search.html">Search</a>
-  <p class="nav-heading">Records</p>
-  <a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="../../decisions.html">Decisions<span>7</span></a>
-<a class="nav-link" href="../../devlog.html">Devlog<span>10</span></a>
+      <div class="sidebar-top">
+        <a class="brand" href="../../index.html" aria-label="Wiki home">
+          <span class="brand-mark">WI</span>
+          <span>
+            <strong>Wikiwiki</strong>
+            <small>Project wiki</small>
+          </span>
+        </a>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false">Menu</button>
+      </div>
+      <div class="sidebar-nav" data-sidebar-nav>
+        <nav class="nav">
+<p class="nav-heading">Start Here</p>
+<a class="nav-link" href="../../index.html">Home</a>
+<a class="nav-link" href="../../guides.html">Guides</a>
+<a class="nav-link" href="../../search.html">Search</a>
+<p class="nav-heading">Agent records</p>
+<a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
+<a class="nav-link" href="../../decisions.html">Decisions<span>10</span></a>
+<a class="nav-link" href="../../devlog.html">Devlog<span>13</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link active" href="../../symbols.html" aria-current="page">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
 </nav>
+      </div>
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <p class="eyebrow">Generated Wikiwiki site</p>
         <h1>resolveSiteOptions</h1>
         <p>Resolves wk site options by combining .wikiwiki/config.json with CLI overrides, including sourceBaseUrl.</p>
       </header>
@@ -59,8 +61,12 @@
   <h2>Location</h2>
   <p><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></p>
 </section>
+  <aside class="sources-panel">
+  <h2>Related files</h2>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li></ul>
+</aside>
   <details class="record-meta">
-  <summary>Record details</summary>
+  <summary>Agent details</summary>
   <dl>
     <div><dt>ID</dt><dd><code>symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
@@ -73,6 +79,7 @@
   </dl>
 </details>
 </article>
+      <footer class="site-footer">Created with <a href="https://github.com/Thjodann/Wikiwiki">Wikiwiki</a>.</footer>
     </main>
   </div>
 </body>

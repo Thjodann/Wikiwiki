@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Hardened static site portability for PRISM dogfooding - Wikiwiki Wiki</title>
+  <title>Make generated sites project-first - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <link rel="stylesheet" href="../../assets/project-theme.css">
   <script src="../../assets/search-index.js" defer></script>
@@ -33,8 +33,8 @@
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
 <a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="../../decisions.html">Decisions<span>10</span></a>
-<a class="nav-link active" href="../../devlog.html" aria-current="page">Devlog<span>13</span></a>
+<a class="nav-link active" href="../../decisions.html" aria-current="page">Decisions<span>10</span></a>
+<a class="nav-link" href="../../devlog.html">Devlog<span>13</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
@@ -43,53 +43,47 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Hardened static site portability for PRISM dogfooding</h1>
-        <p>Hardened static site portability for PRISM dogfooding</p>
+        <h1>Make generated sites project-first</h1>
+        <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../devlog.html">Devlog</a>
+    <a href="../../decisions.html">Decisions</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Devlog</span>
+    <span class="type-badge">Decision</span>
+    <span class="tag-list"><span>site</span><span>ux</span><span>human-wiki</span><span>theme</span><span>homepage</span></span>
   </div>
   <section class="prose">
-  <h2>What happened</h2>
-  <p>Normalized JSON/report paths to POSIX separators, added source_base_url config and wk site --source-base-url, switched configured source links to GitHub blob/tree URLs, expanded tests for Windows-style path safety and Pages-safe source links, and documented the deployment flow.</p>
+  <h2>Context</h2>
+  <p>PRISM dogfooding showed the generated site was mechanically sound but still felt like a Wikiwiki-branded record browser, with generator branding, raw IDs, visible confidence badges, empty categories, and implementation churn on the homepage.</p>
+  <h2>Decision</h2>
+  <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish.</p>
+  <h2>Consequences</h2>
+  <p>Humans get a clearer reader journey while agents retain JSONL records, generated Markdown, searchable record pages, metadata, and deterministic static output.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/paths.ts"><code>src/core/paths.ts</code></a></li>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/config.ts"><code>src/core/config.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/status.ts"><code>src/cli/commands/status.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/render.ts"><code>src/cli/commands/render.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/search.ts"><code>src/cli/commands/search.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>event_77558856-112d-4c41-9003-696a8c1e3dda</code></dd></div>
+    <div><dt>ID</dt><dd><code>decision_364c44ff-012c-4d15-b978-5e91adf73521</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T16:28:13.055Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd>None</dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/paths.ts"><code>src/core/paths.ts</code></a></li>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T17:51:59.006Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T17:51:59.006Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>site</code> <code>ux</code> <code>human-wiki</code> <code>theme</code> <code>homepage</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/config.ts"><code>src/core/config.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/status.ts"><code>src/cli/commands/status.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/render.ts"><code>src/cli/commands/render.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/search.ts"><code>src/cli/commands/search.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li></ul></dd></div>
   </dl>
 </details>

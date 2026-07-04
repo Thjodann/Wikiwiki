@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Compile UX and DX human wikis through agent-mediated drafts - Wikiwiki Wiki</title>
+  <title>Ship wk as an installable agent skill - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <link rel="stylesheet" href="../../assets/project-theme.css">
   <script src="../../assets/search-index.js" defer></script>
@@ -43,8 +43,8 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Compile UX and DX human wikis through agent-mediated drafts</h1>
-        <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.</p>
+        <h1>Ship wk as an installable agent skill</h1>
+        <p>Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in the npm package while continuing to exclude generated wiki output and large decorative assets.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -54,35 +54,39 @@
   </nav>
   <div class="record-title-row">
     <span class="type-badge">Decision</span>
-    <span class="tag-list"><span>compile</span><span>ux</span><span>dx</span><span>agent-workflow</span><span>agentic-ide</span></span>
+    <span class="tag-list"><span>agent-workflow</span><span>skills</span><span>package</span><span>docs</span></span>
   </div>
   <section class="prose">
   <h2>Context</h2>
-  <p>The project should eventually derive procedurally created human-readable wikis while integrating naturally with modern agentic IDE frameworks.</p>
+  <p>Wikiwiki is designed to assist coding agents before humans, so agentic IDEs need persistent instructions that make the wk loop automatic rather than dependent on each prompt.</p>
   <h2>Decision</h2>
-  <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.</p>
+  <p>Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in the npm package while continuing to exclude generated wiki output and large decorative assets.</p>
   <h2>Consequences</h2>
-  <p>wk stays provider-agnostic while becoming useful as repo memory middleware for Codex, Cursor, Claude Code, and similar agentic IDEs.</p>
+  <p>Agents can discover and run wk status, spin, record, validate, render, site, and compile workflows consistently across repos; package users get the skill artifact without bloating the tarball.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/compiler.ts"><code>src/core/compiler.ts</code></a></li>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/agents/openai.yaml"><code>skills/wk/agents/openai.yaml</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/AGENTS.md"><code>AGENTS.md</code></a></li></ul>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/package.json"><code>package.json</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>decision_5ad8c2cf-266c-4824-8833-1d40103933b9</code></dd></div>
-    <div><dt>Source</dt><dd>manual</dd></div>
-    <div><dt>Authority</dt><dd>user</dd></div>
+    <div><dt>ID</dt><dd><code>decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747</code></dd></div>
+    <div><dt>Source</dt><dd>agent</dd></div>
+    <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T02:50:03.431Z">2026-07-04</time></dd></div>
-    <div><dt>Updated</dt><dd><time datetime="2026-07-04T02:50:03.431Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd><code>compile</code> <code>ux</code> <code>dx</code> <code>agent-workflow</code> <code>agentic-ide</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/compiler.ts"><code>src/core/compiler.ts</code></a></li>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T17:38:24.597Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T17:38:24.597Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>agent-workflow</code> <code>skills</code> <code>package</code> <code>docs</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/agents/openai.yaml"><code>skills/wk/agents/openai.yaml</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/AGENTS.md"><code>AGENTS.md</code></a></li></ul></dd></div>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/package.json"><code>package.json</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

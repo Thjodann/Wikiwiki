@@ -3,8 +3,11 @@
   "generated_from": ".wikiwiki/records",
   "command": "wk site",
   "source_base_url": "https://github.com/Thjodann/Wikiwiki/blob/main/",
+  "project_name": "Wikiwiki",
+  "theme_file": ".wikiwiki/site-theme.json",
   "pages": [
     "index.html",
+    "guides.html",
     "concepts.html",
     "decisions.html",
     "devlog.html",
@@ -70,6 +73,12 @@
     },
     {
       "type": "decision",
+      "id": "decision_364c44ff-012c-4d15-b978-5e91adf73521",
+      "title": "Make generated sites project-first",
+      "url": "records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html"
+    },
+    {
+      "type": "decision",
       "id": "decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5",
       "title": "Make generated sites publishable without adjacent repo files",
       "url": "records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html"
@@ -88,6 +97,18 @@
     },
     {
       "type": "decision",
+      "id": "decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747",
+      "title": "Ship wk as an installable agent skill",
+      "url": "records/decision/decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747.html"
+    },
+    {
+      "type": "decision",
+      "id": "decision_d7a1f846-57be-4c31-9fd6-27dc704622ab",
+      "title": "Support script-first wiki automation",
+      "url": "records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html"
+    },
+    {
+      "type": "decision",
       "id": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd",
       "title": "Use JSONL for MVP storage",
       "url": "records/decision/decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd.html"
@@ -100,9 +121,21 @@
     },
     {
       "type": "event",
+      "id": "event_e116aa8a-281e-4d85-a8be-abca622110e6",
+      "title": "Added installable wk agent skill",
+      "url": "records/event/event_e116aa8a-281e-4d85-a8be-abca622110e6.html"
+    },
+    {
+      "type": "event",
       "id": "event_da489cef-22d6-46db-989d-25eb52891c37",
       "title": "Aligned agent protocol with wk command",
       "url": "records/event/event_da489cef-22d6-46db-989d-25eb52891c37.html"
+    },
+    {
+      "type": "event",
+      "id": "event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86",
+      "title": "Documented script-first Wikiwiki automation",
+      "url": "records/event/event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86.html"
     },
     {
       "type": "event",
@@ -133,6 +166,12 @@
       "id": "event_bc62fab0-ba40-4a0e-8d3a-b816ea356345",
       "title": "Implemented Wikiwiki V1 CLI loop",
       "url": "records/event/event_bc62fab0-ba40-4a0e-8d3a-b816ea356345.html"
+    },
+    {
+      "type": "event",
+      "id": "event_2c53f001-eb63-4e55-82d3-fc9df43b53f2",
+      "title": "Improved generated site product UX",
+      "url": "records/event/event_2c53f001-eb63-4e55-82d3-fc9df43b53f2.html"
     },
     {
       "type": "event",

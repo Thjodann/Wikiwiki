@@ -1,0 +1,4 @@
+interface:
+  display_name: "WK"
+  short_description: "Agentic living docs with wk"
+  default_prompt: "Use $wk to keep this repo's Wikiwiki records, Markdown, and site current."
