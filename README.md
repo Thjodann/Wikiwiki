@@ -155,6 +155,30 @@ Run the CLI in development:
 npm run dev -- spin --json
 ```
 
+## Roadmap
+
+Completion estimates are rough planning signals based on the current repo state,
+not release commitments.
+
+| Planned feature | Completion | Notes |
+| --- | ---: | --- |
+| Actual npm publishing | 85% | Package metadata, build, tests, and dry-run packaging are in place; publishing remains manual. |
+| Richer symbol extraction | 20% | Symbol records and pages exist, but important symbols are still captured manually. |
+| Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are still early. |
+| Watch mode | 10% | Batch commands exist for `status`, `spin`, and `closeout`; no file watcher is built yet. |
+| `scratch` review command | 10% | Validation and search exist; contradiction, drift, and stale-knowledge review is not a dedicated command yet. |
+| `press` render alias | 30% | `render`, `site`, and `closeout` cover the workflow; the friendlier alias is not implemented. |
+| `crate` rebuild/index command | 35% | Markdown, static site, and search indexes can be rebuilt; no unified rebuild/retrieval command exists yet. |
+| `ask` repo knowledge query | 25% | `wk search` provides local lookup; answer synthesis over repo knowledge is not built yet. |
+| GitHub Pages scaffolding | 55% | Static output, `.nojekyll`, and workflow docs exist; one-command Pages setup is not built. |
+| Initial product-identity theme generation | 25% | Theme overrides and contrast guardrails exist; setup does not infer or create a custom product theme yet. |
+
+Shared completion snapshot:
+
+- V1 package readiness: about 80%
+- Named future roadmap: about 35%
+- Blended overall product vision: about 65%
+
 ## License
 
 MIT
