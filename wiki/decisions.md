@@ -57,3 +57,17 @@ Files: `src/core/compiler.ts`, `README.md`, `AGENTS.md`
 Tags: `compile`, `ux`, `dx`, `agent-workflow`, `agentic-ide`
 
 Record: `decision_5ad8c2cf-266c-4824-8833-1d40103933b9` | Authority: user | Confidence: high
+
+## Generate a static HTML site for human wiki browsing
+
+Context: Testing in PRISM showed that raw Markdown previews expose front matter, Jekyll-style routes break outside GitHub Pages builds, and record-shaped pages do not feel like a normal wiki experience.
+
+Decision: Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/ folder with .html links, navigation, subtle metadata, responsive CSS, and local search data.
+
+Consequences: Agents keep deterministic JSONL and Markdown artifacts, while humans get a first-class local/static wiki that works without a backend or Jekyll. The generated site folder is owned by Wikiwiki and should be regenerated from records.
+
+Files: `src/core/site.ts`, `src/cli/commands/site.ts`, `src/index.ts`, `README.md`, `AGENTS.md`
+
+Tags: `site`, `ux`, `dx`, `human-wiki`, `static`
+
+Record: `decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574` | Authority: user | Confidence: high

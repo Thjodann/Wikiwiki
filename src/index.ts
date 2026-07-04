@@ -10,6 +10,7 @@ import { registerNoteCommand } from "./cli/commands/note";
 import { registerRecordCommand } from "./cli/commands/record";
 import { registerRenderCommand } from "./cli/commands/render";
 import { registerSearchCommand } from "./cli/commands/search";
+import { registerSiteCommand } from "./cli/commands/site";
 import { registerSpinCommand } from "./cli/commands/spin";
 import { registerStatusCommand } from "./cli/commands/status";
 import { registerSymbolCommand } from "./cli/commands/symbol";
@@ -35,6 +36,7 @@ export function createProgram(): Command {
   registerSearchCommand(program);
   registerSpinCommand(program);
   registerCompileCommand(program);
+  registerSiteCommand(program);
   registerValidateCommand(program);
   registerRenderCommand(program);
 

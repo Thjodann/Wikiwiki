@@ -1,0 +1,191 @@
+{
+  "generator": "Wikiwiki",
+  "generated_from": ".wikiwiki/records",
+  "command": "wk site",
+  "pages": [
+    "index.html",
+    "concepts.html",
+    "decisions.html",
+    "devlog.html",
+    "notes.html",
+    "symbols.html",
+    "links.html",
+    "search.html"
+  ],
+  "records": [
+    {
+      "type": "concept",
+      "id": "concept_17ca8065-a8d3-4373-9afe-b47b51a424d3",
+      "title": "Append-only record revisions",
+      "url": "records/concept/concept_17ca8065-a8d3-4373-9afe-b47b51a424d3.html"
+    },
+    {
+      "type": "concept",
+      "id": "concept_650e0409-9414-4667-8b40-f36c406a1cb0",
+      "title": "CLI-first knowledge store",
+      "url": "records/concept/concept_650e0409-9414-4667-8b40-f36c406a1cb0.html"
+    },
+    {
+      "type": "concept",
+      "id": "concept_4fde0906-d53a-4b9f-b977-3fe964a9d447",
+      "title": "Daily agent loop",
+      "url": "records/concept/concept_4fde0906-d53a-4b9f-b977-3fe964a9d447.html"
+    },
+    {
+      "type": "concept",
+      "id": "concept_9014ffe0-3948-4333-b6c9-f02896f81f84",
+      "title": "Human-facing static wiki site",
+      "url": "records/concept/concept_9014ffe0-3948-4333-b6c9-f02896f81f84.html"
+    },
+    {
+      "type": "concept",
+      "id": "concept_4e17c000-edc9-4895-9da1-85cde9756eab",
+      "title": "Role-oriented human wiki compiler",
+      "url": "records/concept/concept_4e17c000-edc9-4895-9da1-85cde9756eab.html"
+    },
+    {
+      "type": "concept",
+      "id": "concept_26478291-0b15-4363-b661-436bab183226",
+      "title": "Spin heuristics",
+      "url": "records/concept/concept_26478291-0b15-4363-b661-436bab183226.html"
+    },
+    {
+      "type": "decision",
+      "id": "decision_5ad8c2cf-266c-4824-8833-1d40103933b9",
+      "title": "Compile UX and DX human wikis through agent-mediated drafts",
+      "url": "records/decision/decision_5ad8c2cf-266c-4824-8833-1d40103933b9.html"
+    },
+    {
+      "type": "decision",
+      "id": "decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574",
+      "title": "Generate a static HTML site for human wiki browsing",
+      "url": "records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html"
+    },
+    {
+      "type": "decision",
+      "id": "decision_e5333a83-7321-4a65-b040-12c1487f60e7",
+      "title": "Prepare scoped npm package without publishing",
+      "url": "records/decision/decision_e5333a83-7321-4a65-b040-12c1487f60e7.html"
+    },
+    {
+      "type": "decision",
+      "id": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd",
+      "title": "Use JSONL for MVP storage",
+      "url": "records/decision/decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd.html"
+    },
+    {
+      "type": "decision",
+      "id": "decision_e28e5351-dd00-4ba1-841d-278b639ae1c8",
+      "title": "Use wk as primary CLI identity",
+      "url": "records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html"
+    },
+    {
+      "type": "event",
+      "id": "event_da489cef-22d6-46db-989d-25eb52891c37",
+      "title": "Aligned agent protocol with wk command",
+      "url": "records/event/event_da489cef-22d6-46db-989d-25eb52891c37.html"
+    },
+    {
+      "type": "event",
+      "id": "event_410942e4-5e5f-445a-88be-db5aa7cfa176",
+      "title": "Drafted aspirational README",
+      "url": "records/event/event_410942e4-5e5f-445a-88be-db5aa7cfa176.html"
+    },
+    {
+      "type": "event",
+      "id": "event_dddc9fc5-611a-4902-b27c-8ee455c6832a",
+      "title": "Implemented static human wiki site generation",
+      "url": "records/event/event_dddc9fc5-611a-4902-b27c-8ee455c6832a.html"
+    },
+    {
+      "type": "event",
+      "id": "event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8",
+      "title": "Implemented UX/DX human wiki compile pilot",
+      "url": "records/event/event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8.html"
+    },
+    {
+      "type": "event",
+      "id": "event_bc62fab0-ba40-4a0e-8d3a-b816ea356345",
+      "title": "Implemented Wikiwiki V1 CLI loop",
+      "url": "records/event/event_bc62fab0-ba40-4a0e-8d3a-b816ea356345.html"
+    },
+    {
+      "type": "event",
+      "id": "event_6c360d34-0e2b-414e-9445-af1fe597103a",
+      "title": "Initialized Wikiwiki CLI MVP",
+      "url": "records/event/event_6c360d34-0e2b-414e-9445-af1fe597103a.html"
+    },
+    {
+      "type": "event",
+      "id": "event_d67ebd8e-e9f4-4c08-a011-72295a6e7210",
+      "title": "Refreshed README with hero banner",
+      "url": "records/event/event_d67ebd8e-e9f4-4c08-a011-72295a6e7210.html"
+    },
+    {
+      "type": "event",
+      "id": "event_1222a170-521f-476b-bd83-7359a4ba66c2",
+      "title": "Renamed CLI identity to wk",
+      "url": "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html"
+    },
+    {
+      "type": "link",
+      "id": "link_f1dadf17-2e61-4024-bb02-d237e43ea911",
+      "title": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd chooses-storage src/core/store.ts",
+      "url": "records/link/link_f1dadf17-2e61-4024-bb02-d237e43ea911.html"
+    },
+    {
+      "type": "link",
+      "id": "link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0",
+      "title": "README.md embeds assets/wikiwiki-banner.png",
+      "url": "records/link/link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0.html"
+    },
+    {
+      "type": "note",
+      "id": "note_482c1563-27d5-48b3-a8f7-81075cc69b28",
+      "title": "Generated wiki pages are owned by Wikiwiki; edit structured records instead.",
+      "url": "records/note/note_482c1563-27d5-48b3-a8f7-81075cc69b28.html"
+    },
+    {
+      "type": "note",
+      "id": "note_e237de63-0391-4d81-8a69-f47666a6dfd7",
+      "title": "User chose the supplied Wikiwiki banner image for the README and explicitly allo",
+      "url": "records/note/note_e237de63-0391-4d81-8a69-f47666a6dfd7.html"
+    },
+    {
+      "type": "note",
+      "id": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92",
+      "title": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model",
+      "url": "records/note/note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92.html"
+    },
+    {
+      "type": "symbol",
+      "id": "symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652",
+      "title": "activeRecords",
+      "url": "records/symbol/symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652.html"
+    },
+    {
+      "type": "symbol",
+      "id": "symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98",
+      "title": "registerRecordCommand",
+      "url": "records/symbol/symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98.html"
+    },
+    {
+      "type": "symbol",
+      "id": "symbol_fa848524-5a78-4fc0-9781-cf7673acae13",
+      "title": "registerSearchCommand",
+      "url": "records/symbol/symbol_fa848524-5a78-4fc0-9781-cf7673acae13.html"
+    },
+    {
+      "type": "symbol",
+      "id": "symbol_766a4f0e-54ee-44cc-a9f3-62faac669612",
+      "title": "registerSiteCommand",
+      "url": "records/symbol/symbol_766a4f0e-54ee-44cc-a9f3-62faac669612.html"
+    },
+    {
+      "type": "symbol",
+      "id": "symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959",
+      "title": "renderSite",
+      "url": "records/symbol/symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959.html"
+    }
+  ]
+}

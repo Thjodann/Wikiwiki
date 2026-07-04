@@ -5,6 +5,7 @@ import type { RecordType } from "./schemas";
 export const storeDirectoryName = ".wikiwiki";
 export const recordsDirectoryName = "records";
 export const wikiDirectoryName = "wiki";
+export const siteDirectoryName = "wiki-site";
 
 export const recordFileNames: Record<RecordType, string> = {
   concept: "concepts.jsonl",
@@ -41,4 +42,8 @@ export function recordPath(root: string, type: RecordType): string {
 
 export function wikiPath(root: string): string {
   return path.join(root, wikiDirectoryName);
+}
+
+export function sitePath(root: string): string {
+  return path.join(root, siteDirectoryName);
 }

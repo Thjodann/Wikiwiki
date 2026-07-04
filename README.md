@@ -7,8 +7,8 @@
 > Spin the docs. Ship the code.
 
 Wikiwiki is an agent-native living documentation system for code repos. It keeps
-important project knowledge in structured records, then renders clean Markdown
-wiki pages that humans can actually read.
+important project knowledge in structured records, then renders both
+agent-readable Markdown and a human-facing static wiki site.
 
 The goal is simple: give coding agents a safe CLI for maintaining repo knowledge
 as they work, without making the repo depend on a hosted service, database,
@@ -25,8 +25,8 @@ Software teams lose context in the spaces between code:
 - which generated docs should never be edited by hand
 
 Wikiwiki turns that context into repo-local knowledge. Agents can update it with
-boring terminal commands. Humans can browse it as Markdown. Future tools can
-query it as structured data.
+boring terminal commands. Humans can browse it as a static wiki. Future tools
+can query it as structured data.
 
 Docs that keep up, in other words.
 
@@ -40,6 +40,7 @@ wk spin --json
 wk note add "Renderer owns generated wiki files." --tags renderer,docs
 wk validate
 wk render
+wk site
 ```
 
 That loop lets an agent:
@@ -49,9 +50,10 @@ That loop lets an agent:
 3. Add concepts, decisions, notes, events, symbols, and links.
 4. Validate the records.
 5. Render Markdown into `wiki/`.
+6. Render a browseable static site into `wiki-site/`.
 
-The structured records are the source of truth. The Markdown wiki is the
-human-friendly pressing.
+The structured records are the source of truth. Markdown stays simple and
+deterministic for agents. The static site is the first-class human wiki.
 
 ## What It Stores
 
@@ -71,7 +73,8 @@ honest about what they know.
 
 ## What It Renders
 
-Wikiwiki renders generated Markdown pages into `wiki/`:
+Wikiwiki renders generated Markdown pages into `wiki/` for agents and plain-text
+review:
 
 ```text
 wiki/
@@ -92,6 +95,29 @@ Generated wiki files are plainly marked:
 
 That boundary matters. Agents should update structured records first, then run
 `wk render`.
+
+Wikiwiki also renders a static human-facing site into `wiki-site/`:
+
+```text
+wiki-site/
+  index.html
+  concepts.html
+  decisions.html
+  devlog.html
+  notes.html
+  symbols.html
+  links.html
+  search.html
+  assets/
+    wikiwiki.css
+    search-index.js
+    wikiwiki.js
+```
+
+The site uses normal `.html` links, a sidebar, responsive styling, subtle record
+metadata, and local browser search. It does not rely on Jekyll routes or raw
+front matter, so you can open `wiki-site/index.html` directly or serve the
+folder as static files.
 
 ## What It Compiles
 
@@ -185,6 +211,13 @@ wk validate
 wk render
 ```
 
+Generate the human-facing site:
+
+```sh
+wk site
+open wiki-site/index.html
+```
+
 Search active records and rendered docs:
 
 ```sh
@@ -234,6 +267,7 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
 | `wk spin --json` | Inspect current repo changes and suggest knowledge updates |
 | `wk search <query> --json` | Search active records and rendered Markdown |
+| `wk site` | Render a browseable static HTML wiki into `wiki-site/` |
 | `wk compile draft --role all --json` | Create UX/DX human wiki drafts for an IDE agent |
 | `wk compile apply <draft-id> --json` | Validate and publish a human wiki draft |
 | `wk concept add` | Add a durable project concept |
@@ -245,6 +279,42 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 | `wk record list/get/update/delete` | Read and revise active records append-only |
 | `wk validate` | Validate records and references |
 | `wk render` | Render Markdown pages into `wiki/` |
+
+## GitHub Pages
+
+`wk site` writes static files and a `.nojekyll` marker into `wiki-site/`, so
+GitHub Pages can publish the folder without Jekyll-specific routing. Once the
+package is published, a minimal workflow can build and upload that folder:
+
+```yaml
+name: Publish Wikiwiki Site
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npx @thjodann/wk render
+      - run: npx @thjodann/wk site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: wiki-site
+      - uses: actions/deploy-pages@v4
+```
 
 ## Where It Is Headed
 
@@ -270,6 +340,7 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - Zod validation
 - Git-aware `spin` with draft templates
 - Markdown rendering for concepts, decisions, events, notes, symbols, and links
+- static HTML site generation into `wiki-site/`
 - agent-mediated UX/DX human wiki compilation
 - local search across active records and rendered docs
 - Agent-readable JSON output

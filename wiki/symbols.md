@@ -31,3 +31,23 @@ File: `src/cli/commands/search.ts`
 Registers local search across active records and rendered Markdown wiki pages.
 
 Record: `symbol_fa848524-5a78-4fc0-9781-cf7673acae13` | Authority: agent | Confidence: high
+
+## registerSiteCommand
+
+Kind: function
+
+File: `src/cli/commands/site.ts`
+
+Registers wk site, which generates the human-facing static Wikiwiki frontend into wiki-site/.
+
+Record: `symbol_766a4f0e-54ee-44cc-a9f3-62faac669612` | Authority: agent | Confidence: high
+
+## renderSite
+
+Kind: function
+
+File: `src/core/site.ts`
+
+Builds and writes the generated wiki-site/ static HTML frontend from active Wikiwiki records.
+
+Record: `symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959` | Authority: agent | Confidence: high

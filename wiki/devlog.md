@@ -57,3 +57,11 @@ Added wk compile draft/apply, role routing for UX and DX records, compile draft 
 Files: `src/core/compiler.ts`, `src/cli/commands/compile.ts`, `src/core/validator.ts`, `src/index.ts`, `test/compiler.test.js`, `test/cli.test.js`, `README.md`, `AGENTS.md`
 
 Recorded: 2026-07-04T02:50:10.328Z | Record: `event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8` | Confidence: high
+
+## Implemented static human wiki site generation
+
+Added wk site, the core static site generator, generated wiki-site output with sidebar navigation, record pages, client-side search data, .html link rewriting, responsive CSS, docs, and tests for local link behavior.
+
+Files: `src/core/site.ts`, `src/cli/commands/site.ts`, `src/index.ts`, `test/site.test.js`, `test/cli.test.js`, `README.md`, `AGENTS.md`, `wiki-site/index.html`
+
+Recorded: 2026-07-04T15:45:27.894Z | Record: `event_dddc9fc5-611a-4902-b27c-8ee455c6832a` | Confidence: high

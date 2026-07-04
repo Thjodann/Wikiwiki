@@ -3,7 +3,8 @@ import path from "path";
 import { Command } from "commander";
 import { printJson } from "../helpers";
 import { changedFiles } from "../../core/git";
-import { findRepoRoot, wikiPath, wikiwikiPath } from "../../core/paths";
+import { findRepoRoot, sitePath, wikiPath, wikiwikiPath } from "../../core/paths";
+import { siteStaticPageFileNames } from "../../core/site";
 import { wikiPageFileNames } from "../../core/renderer";
 import { recordTypes } from "../../core/schemas";
 import { isInitialized, recordCounts } from "../../core/store";
@@ -20,14 +21,19 @@ export function registerStatusCommand(program: Command): void {
       const generatedFiles = wikiPageFileNames
         .map((fileName) => path.join(wikiPath(root), fileName))
         .filter((file) => fs.existsSync(file));
+      const generatedSiteFiles = siteStaticPageFileNames
+        .map((fileName) => path.join(sitePath(root), fileName))
+        .filter((file) => fs.existsSync(file));
 
       const result = {
         repo_root: root,
         initialized,
         store_path: wikiwikiPath(root),
         wiki_path: wikiPath(root),
+        site_path: sitePath(root),
         records: counts,
         generated_files: generatedFiles,
+        generated_site_files: generatedSiteFiles,
         git: {
           changed_files: changedFiles(root)
         }
@@ -41,6 +47,7 @@ export function registerStatusCommand(program: Command): void {
       console.log(`Repo: ${root}`);
       console.log(`Wikiwiki: ${initialized ? "initialized" : "not initialized"}`);
       console.log(`Records: ${recordTypes.map((type) => `${type}=${counts[type]}`).join(", ")}`);
+      console.log(`Site: ${generatedSiteFiles.length ? "generated" : "not generated"}`);
       console.log(`Changed files: ${result.git.changed_files.length}`);
     });
 }

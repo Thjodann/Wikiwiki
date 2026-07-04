@@ -239,3 +239,33 @@ test("search finds active records and rendered Markdown, excluding deleted recor
   assert.equal(second.records.length, 0);
   assert.equal(second.file_matches.some((match) => match.file === "wiki/notes.md"), false);
 });
+
+test("site command creates a browseable static wiki", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+  fs.writeFileSync(path.join(root, "README.md"), "# Site fixture\n");
+
+  runJson(root, [
+    "concept",
+    "add",
+    "--json",
+    payload({
+      name: "Static site",
+      summary: "Humans browse Wikiwiki through generated HTML.",
+      details: "See [Decisions](./decisions.md).",
+      files: ["README.md"],
+      tags: ["site"],
+      source: "agent",
+      authority: "agent",
+      confidence: "high"
+    })
+  ]);
+
+  const result = runJson(root, ["site", "--json"]);
+  assert.equal(result.ok, true);
+  assert.ok(result.rendered_files.includes("wiki-site/index.html"));
+  assert.ok(result.rendered_files.includes("wiki-site/assets/wikiwiki.css"));
+  assert.ok(result.rendered_files.some((file) => file.startsWith("wiki-site/records/concept/")));
+  assert.ok(fs.existsSync(path.join(root, "wiki-site/index.html")));
+  assert.match(fs.readFileSync(path.join(root, "wiki-site/index.html"), "utf8"), /href="concepts\.html"/);
+});

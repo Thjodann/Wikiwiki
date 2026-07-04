@@ -23,7 +23,8 @@
     "dist",
     "README.md",
     "assets/wikiwiki-banner.png",
-    "wiki"
+    "wiki",
+    "wiki-site"
   ],
   "engines": {
     "node": ">=22"

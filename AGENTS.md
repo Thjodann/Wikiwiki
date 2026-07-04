@@ -23,11 +23,12 @@ This repo uses Wikiwiki for agent-readable project knowledge.
 2. Add or update concepts, decisions, notes, events, or links as needed.
 3. Run `wk validate`.
 4. Run `wk render`.
-5. Summarize knowledge updates in the final response.
+5. Run `wk site` when human-facing wiki output should be refreshed.
+6. Summarize knowledge updates in the final response.
 
 ## Generated Files
 
-Wikiwiki owns generated Markdown files in `wiki/`.
+Wikiwiki owns generated Markdown files in `wiki/` and generated static site files in `wiki-site/`.
 
 Do not manually edit generated wiki files unless the user explicitly asks for a one-off repair. Prefer changing structured records in `.wikiwiki/records/`, then run `wk render`.
 

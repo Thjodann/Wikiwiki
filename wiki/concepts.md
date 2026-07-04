@@ -38,6 +38,18 @@ Tags: `cli`, `v1`, `agent-workflow`
 
 Record: `concept_4fde0906-d53a-4b9f-b977-3fe964a9d447` | Authority: agent | Confidence: high
 
+## Human-facing static wiki site
+
+Wikiwiki generates a first-class static HTML site for humans while preserving Markdown and JSONL artifacts for agents.
+
+The site is generated from active structured records into wiki-site/, uses plain .html links, includes a sidebar and client-side search, and avoids Jekyll-only routes or raw front matter.
+
+Files: `src/core/site.ts`, `src/cli/commands/site.ts`, `README.md`
+
+Tags: `site`, `ux`, `dx`, `human-wiki`
+
+Record: `concept_9014ffe0-3948-4333-b6c9-f02896f81f84` | Authority: agent | Confidence: high
+
 ## Role-oriented human wiki compiler
 
 Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose.
