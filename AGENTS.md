@@ -1,0 +1,39 @@
+# Wikiwiki Agent Protocol
+
+This repo uses Wikiwiki for agent-readable project knowledge.
+
+## Before Starting Work
+
+1. Run `wikiwiki status --json`.
+2. Run `wikiwiki spin --json` to inspect current repo changes.
+3. Review relevant records if available.
+
+## During Work
+
+- Treat user-authored records as higher authority than agent-authored records.
+- Prefer adding structured records through the CLI instead of editing generated wiki files.
+- Use `authority: "agent"` and an appropriate confidence level for inferred records.
+- Use `authority: "user"` only when directly recording explicit user intent.
+- Keep generated wiki files deterministic and plainly marked as generated.
+
+## After Making Changes
+
+1. Run `wikiwiki spin --json`.
+2. Add or update concepts, decisions, notes, events, or links as needed.
+3. Run `wikiwiki validate`.
+4. Run `wikiwiki render`.
+5. Summarize knowledge updates in the final response.
+
+## Generated Files
+
+Wikiwiki owns generated Markdown files in `wiki/`.
+
+Do not manually edit generated wiki files unless the user explicitly asks for a one-off repair. Prefer changing structured records in `.wikiwiki/records/`, then run `wikiwiki render`.
+
+## Authority Rules
+
+- `authority: "user"` means the record captures explicit user intent.
+- `authority: "agent"` means the record is agent-authored or inferred.
+- `authority: "system"` is reserved for tool or system-created records.
+
+When uncertain, use lower confidence.
