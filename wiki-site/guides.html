@@ -33,8 +33,8 @@
 <a class="nav-link" href="search.html">Search</a>
 <p class="nav-heading">Agent records</p>
 <a class="nav-link" href="concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="decisions.html">Decisions<span>10</span></a>
-<a class="nav-link" href="devlog.html">Devlog<span>13</span></a>
+<a class="nav-link" href="decisions.html">Decisions<span>11</span></a>
+<a class="nav-link" href="devlog.html">Devlog<span>14</span></a>
 <a class="nav-link" href="notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="links.html">Links<span>2</span></a>
@@ -56,7 +56,7 @@
     <span class="type-badge">Decision</span>
   </div>
   <h3><a href="records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html">Make generated sites project-first</a></h3>
-  <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish.</p>
+  <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer...</p>
   <footer>
     <span class="tag-list"><span>site</span><span>ux</span><span>human-wiki</span><span>theme</span><span>homepage</span></span></footer>
 </article>
@@ -65,7 +65,7 @@
     <span class="type-badge">Decision</span>
   </div>
   <h3><a href="records/decision/decision_5ad8c2cf-266c-4824-8833-1d40103933b9.html">Compile UX and DX human wikis through agent-mediated drafts</a></h3>
-  <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.</p>
+  <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile...</p>
   <footer>
     <span class="tag-list"><span>compile</span><span>ux</span><span>dx</span><span>agent-workflow</span><span>agentic-ide</span></span></footer>
 </article>
@@ -74,7 +74,7 @@
     <span class="type-badge">Decision</span>
   </div>
   <h3><a href="records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html">Generate a static HTML site for human wiki browsing</a></h3>
-  <p>Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/ folder with .html links, navigation, subtle metadata, responsive CSS, and local search data.</p>
+  <p>Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/...</p>
   <footer>
     <span class="tag-list"><span>site</span><span>ux</span><span>dx</span><span>human-wiki</span><span>static</span></span></footer>
 </article>
@@ -83,7 +83,7 @@
     <span class="type-badge">Decision</span>
   </div>
   <h3><a href="records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html">Make generated sites publishable without adjacent repo files</a></h3>
-  <p>Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.</p>
+  <p>Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and...</p>
   <footer>
     <span class="tag-list"><span>site</span><span>github-pages</span><span>source-links</span><span>dx</span></span></footer>
 </article>
@@ -92,7 +92,7 @@
     <span class="type-badge">Decision</span>
   </div>
   <h3><a href="records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html">Support script-first wiki automation</a></h3>
-  <p>Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture, curation, and human-readable drafts.</p>
+  <p>Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture...</p>
   <footer>
     <span class="tag-list"><span>product</span><span>automation</span><span>agents</span><span>docs</span></span></footer>
 </article>
@@ -101,7 +101,7 @@
     <span class="type-badge">Decision</span>
   </div>
   <h3><a href="records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html">Use wk as primary CLI identity</a></h3>
-  <p>Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve wikiwiki as a compatibility alias.</p>
+  <p>Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve...</p>
   <footer>
     <span class="tag-list"><span>cli</span><span>rename</span><span>agent-workflow</span></span></footer>
 </article></div>
@@ -117,7 +117,7 @@
     <span class="type-badge">Concept</span>
   </div>
   <h3><a href="records/concept/concept_17ca8065-a8d3-4373-9afe-b47b51a424d3.html">Append-only record revisions</a></h3>
-  <p>Record updates append a new JSONL revision with the same logical id, while deletes append a tombstone that active reads, rendering, and search exclude.</p>
+  <p>Record updates append a new JSONL revision with the same logical id, while deletes append a tombstone that active reads, rendering, and search...</p>
   <footer>
     <span class="tag-list"><span>records</span><span>v1</span><span>architecture</span></span></footer>
 </article>
@@ -177,55 +177,46 @@
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html">Make generated sites project-first</a></h3>
-  <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish.</p>
+  <h3><a href="records/decision/decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f.html">Make agent skill installation safe by default</a></h3>
+  <p>Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a...</p>
   <footer>
-    <span class="tag-list"><span>site</span><span>ux</span><span>human-wiki</span><span>theme</span><span>homepage</span></span></footer>
+    <span class="tag-list"><span>cli</span><span>safety</span><span>agents</span><span>install</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_5ad8c2cf-266c-4824-8833-1d40103933b9.html">Compile UX and DX human wikis through agent-mediated drafts</a></h3>
-  <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.</p>
+  <h3><a href="records/decision/decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd.html">Use JSONL for MVP storage</a></h3>
+  <p>Store each record type in an append-only JSONL file under .wikiwiki/records.</p>
   <footer>
-    <span class="tag-list"><span>compile</span><span>ux</span><span>dx</span><span>agent-workflow</span><span>agentic-ide</span></span></footer>
+    <span class="tag-list"><span>storage</span><span>mvp</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html">Generate a static HTML site for human wiki browsing</a></h3>
-  <p>Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/ folder with .html links, navigation, subtle metadata, responsive CSS, and local search data.</p>
+  <h3><a href="records/decision/decision_e5333a83-7321-4a65-b040-12c1487f60e7.html">Prepare scoped npm package without publishing</a></h3>
+  <p>Use @thjodann/wk as the scoped npm package name, expose wk as the primary binary, keep wikiwiki as a compatibility alias, and verify package contents...</p>
   <footer>
-    <span class="tag-list"><span>site</span><span>ux</span><span>dx</span><span>human-wiki</span><span>static</span></span></footer>
+    <span class="tag-list"><span>package</span><span>ci</span><span>v1</span><span>rename</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html">Make generated sites publishable without adjacent repo files</a></h3>
-  <p>Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.</p>
+  <h3><a href="records/decision/decision_45f2d29a-3140-40f6-b62c-8e299621419b.html">Ship a lean npm package</a></h3>
+  <p>Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of...</p>
   <footer>
-    <span class="tag-list"><span>site</span><span>github-pages</span><span>source-links</span><span>dx</span></span></footer>
+    <span class="tag-list"><span>package</span><span>release</span><span>npm</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html">Support script-first wiki automation</a></h3>
-  <p>Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture, curation, and human-readable drafts.</p>
+  <h3><a href="records/decision/decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747.html">Ship wk as an installable agent skill</a></h3>
+  <p>Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in...</p>
   <footer>
-    <span class="tag-list"><span>product</span><span>automation</span><span>agents</span><span>docs</span></span></footer>
-</article>
-<article class="record-card" data-search-card>
-  <div class="record-card-top">
-    <span class="type-badge">Decision</span>
-  </div>
-  <h3><a href="records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html">Use wk as primary CLI identity</a></h3>
-  <p>Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve wikiwiki as a compatibility alias.</p>
-  <footer>
-    <span class="tag-list"><span>cli</span><span>rename</span><span>agent-workflow</span></span></footer>
+    <span class="tag-list"><span>agent-workflow</span><span>skills</span><span>package</span><span>docs</span></span></footer>
 </article></div>
 </section>
 
@@ -240,12 +231,12 @@
   <p>Durable explanations, domain terms, product ideas, and system concepts.</p>
 </a>
 <a class="section-card" href="decisions.html">
-  <span>10 records</span>
+  <span>11 records</span>
   <strong>Decisions</strong>
   <p>Product, architecture, workflow, and implementation decisions with rationale.</p>
 </a>
 <a class="section-card" href="devlog.html">
-  <span>13 records</span>
+  <span>14 records</span>
   <strong>Devlog</strong>
   <p>Meaningful changes and development milestones in chronological context.</p>
 </a>

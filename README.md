@@ -296,7 +296,17 @@ Then install after confirming the path:
 wk install-agent codex --yes
 ```
 
-To install manually instead:
+`wk install-agent codex --yes` creates a missing destination and safely
+overwrites only bundled Wikiwiki skill files. If the destination contains
+unknown files, the command refuses to install. Use `--force` only when you have
+checked the destination and intentionally want to keep those unknown files while
+overwriting the bundled `wk` skill files:
+
+```sh
+wk install-agent codex --yes --force
+```
+
+To install manually on macOS or Linux instead:
 
 ```sh
 WK_SKILL_HOME="${CODEX_HOME:-$HOME/.codex}/skills/wk"
@@ -305,6 +315,20 @@ curl -fsSL https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/SK
   -o "$WK_SKILL_HOME/SKILL.md"
 curl -fsSL https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/agents/openai.yaml \
   -o "$WK_SKILL_HOME/agents/openai.yaml"
+```
+
+PowerShell equivalent:
+
+```powershell
+$CodexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
+$WkSkillHome = Join-Path $CodexHome "skills/wk"
+New-Item -ItemType Directory -Force (Join-Path $WkSkillHome "agents") | Out-Null
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/SKILL.md" `
+  -OutFile (Join-Path $WkSkillHome "SKILL.md")
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/agents/openai.yaml" `
+  -OutFile (Join-Path $WkSkillHome "agents/openai.yaml")
 ```
 
 For other agentic IDEs, copy [skills/wk/SKILL.md](skills/wk/SKILL.md) into the
@@ -424,7 +448,7 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 | --- | --- |
 | `wk init` | Create the knowledge store and generated wiki folder |
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
-| `wk install-agent codex [--yes]` | Install the bundled wk skill for Codex-compatible agents |
+| `wk install-agent codex [--yes] [--force]` | Install the bundled wk skill for Codex-compatible agents |
 | `wk spin --json` | Inspect current repo changes and suggest knowledge updates |
 | `wk search <query> --json` | Search active records and rendered Markdown |
 | `wk site [--source-base-url <url>]` | Render a browseable static HTML wiki into `wiki-site/` |

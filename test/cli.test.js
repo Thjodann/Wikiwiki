@@ -25,6 +25,16 @@ function runJson(root, args) {
   return JSON.parse(run(root, args));
 }
 
+function runFailure(root, args) {
+  try {
+    run(root, args);
+  } catch (error) {
+    return `${error.stdout || ""}${error.stderr || ""}${error.message || ""}`;
+  }
+
+  assert.fail(`Expected command to fail: ${args.join(" ")}`);
+}
+
 function payload(value) {
   return JSON.stringify(value);
 }
@@ -66,6 +76,53 @@ test("install-agent codex previews and installs the bundled wk skill", () => {
   assert.equal(installed.destination, destination);
   assert.ok(fs.existsSync(path.join(destination, "SKILL.md")));
   assert.ok(fs.existsSync(path.join(destination, "agents/openai.yaml")));
+});
+
+test("install-agent codex installs into an empty destination", () => {
+  const root = tempRepo();
+  const destination = path.join(root, "codex-skills/wk");
+  fs.mkdirSync(destination, { recursive: true });
+
+  const installed = runJson(root, ["install-agent", "codex", "--dest", destination, "--yes", "--json"]);
+
+  assert.equal(installed.ok, true);
+  assert.deepEqual(installed.unknown_files, []);
+  assert.ok(fs.existsSync(path.join(destination, "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(destination, "agents/openai.yaml")));
+});
+
+test("install-agent codex overwrites known bundled files safely", () => {
+  const root = tempRepo();
+  const destination = path.join(root, "codex-skills/wk");
+  fs.mkdirSync(path.join(destination, "agents"), { recursive: true });
+  fs.writeFileSync(path.join(destination, "SKILL.md"), "old skill\n");
+  fs.writeFileSync(path.join(destination, "agents/openai.yaml"), "old yaml\n");
+
+  const installed = runJson(root, ["install-agent", "codex", "--dest", destination, "--yes", "--json"]);
+
+  assert.equal(installed.ok, true);
+  assert.deepEqual(installed.unknown_files, []);
+  assert.match(fs.readFileSync(path.join(destination, "SKILL.md"), "utf8"), /# WK/);
+  assert.match(fs.readFileSync(path.join(destination, "agents/openai.yaml"), "utf8"), /display_name: "WK"/);
+});
+
+test("install-agent codex refuses unknown destination files unless forced", () => {
+  const root = tempRepo();
+  const destination = path.join(root, "codex-skills/wk");
+  fs.mkdirSync(destination, { recursive: true });
+  fs.writeFileSync(path.join(destination, "custom.md"), "keep me\n");
+
+  const failed = runFailure(root, ["install-agent", "codex", "--dest", destination, "--yes", "--json"]);
+  assert.match(failed, /Refusing to install wk skill/);
+  assert.match(failed, /custom\.md/);
+  assert.equal(fs.existsSync(path.join(destination, "SKILL.md")), false);
+  assert.equal(fs.readFileSync(path.join(destination, "custom.md"), "utf8"), "keep me\n");
+
+  const installed = runJson(root, ["install-agent", "codex", "--dest", destination, "--yes", "--force", "--json"]);
+  assert.equal(installed.ok, true);
+  assert.deepEqual(installed.unknown_files, [path.join(destination, "custom.md")]);
+  assert.ok(fs.existsSync(path.join(destination, "SKILL.md")));
+  assert.equal(fs.readFileSync(path.join(destination, "custom.md"), "utf8"), "keep me\n");
 });
 
 test("init creates record files and all generated wiki pages", () => {

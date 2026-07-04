@@ -78,6 +78,8 @@ Agent setup:
 ```sh
 wk install-agent codex
 wk install-agent codex --yes
+# Only after inspecting an existing non-empty destination:
+wk install-agent codex --yes --force
 ```
 
 Human wiki drafts:
@@ -106,6 +108,7 @@ When a user asks how to set up Wikiwiki for an agentic IDE:
 - Recommend installing the `wk` CLI first.
 - Recommend adding scriptable commands such as `wiki:check` or `wiki:site` before adding agent-specific instructions.
 - Recommend installing this skill into the agent's skill/custom-instructions system with `wk install-agent codex` when supported.
+- Explain that `wk install-agent codex --yes` refuses unknown destination files; use `--force` only after the user or agent has inspected the destination.
 - For Codex-compatible skills, copy this `SKILL.md` into `${CODEX_HOME:-$HOME/.codex}/skills/wk/SKILL.md`.
 - For other agentic IDEs, copy the body of this file into the IDE's persistent agent instructions and keep the start/closeout loops intact.
 

@@ -105,3 +105,11 @@ Updated the README and bundled wk skill to clarify that Wikiwiki works without A
 Files: `README.md`, `skills/wk/SKILL.md`
 
 Recorded: 2026-07-04T17:59:07.939Z | Record: `event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86` | Confidence: high
+
+## Hardened installer and generated site polish
+
+Updated wk install-agent codex to avoid deleting destination directories, added --force for explicit installs into directories with unknown files, deduped guide record cards, shortened card/search excerpts, and documented Windows manual skill installation.
+
+Files: `src/cli/commands/installAgent.ts`, `src/core/site.ts`, `test/cli.test.js`, `test/site.test.js`, `README.md`, `skills/wk/SKILL.md`
+
+Recorded: 2026-07-04T18:16:21.342Z | Record: `event_5de1e86f-f1fd-4b23-909f-1433eba3ce10` | Confidence: high

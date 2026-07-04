@@ -35,7 +35,7 @@ function seedRecords(root) {
     created_at: "2026-01-01T00:00:00.000Z",
     updated_at: "2026-01-01T00:00:00.000Z",
     name: "Static wiki site",
-    summary: "Wikiwiki generates a static human-facing site.",
+    summary: "Wikiwiki generates a static human-facing site. This implementation-oriented sentence includes enough extra detail about generated files, search data, source links, and publishable assets to exceed the card excerpt limit while remaining available on detail pages.",
     details: "Read the [Decisions](./decisions.md) page for rationale.",
     files: ["README.md", "src/core"],
     tags: ["site", "ux"]
@@ -85,6 +85,18 @@ function file(files, fileName) {
   return found.content;
 }
 
+function countMatches(value, pattern) {
+  return [...value.matchAll(pattern)].length;
+}
+
+function parseSearchIndex(content) {
+  const match = /^window\.WIKIWIKI_SEARCH_INDEX = ([\s\S]*);\n?$/.exec(
+    content.replace(/^\/\*[\s\S]*?\*\/\n/, "")
+  );
+  assert.ok(match, "search index should be parseable");
+  return JSON.parse(match[1]);
+}
+
 test("buildSiteFiles creates a navigable static wiki without front matter", () => {
   const root = tempRoot();
   seedRecords(root);
@@ -109,14 +121,19 @@ test("buildSiteFiles creates a navigable static wiki without front matter", () =
   assert.match(index, /href="search\.html"/);
   assert.doesNotMatch(index, />Symbols</);
   assert.doesNotMatch(index, /<code>concept_static_site<\/code>/);
+  assert.doesNotMatch(index, /source links, and publishable assets/);
   assert.match(guides, /Project essentials/);
+  assert.equal(countMatches(guides, /href="records\/concept\/concept_static_site\.html"/g), 1);
+  assert.doesNotMatch(guides, /source links, and publishable assets/);
   assert.match(concepts, /href="records\/concept\/concept_static_site\.html"/);
   assert.doesNotMatch(concepts, /<code>concept_static_site<\/code>/);
+  assert.doesNotMatch(concepts, /source links, and publishable assets/);
   assert.match(concept, /href="..\/..\/decisions\.html"/);
   assert.match(concept, /href="..\/..\/..\/README\.md"/);
   assert.match(concept, /href="..\/..\/..\/src\/core"/);
   assert.match(concept, /<summary>Agent details<\/summary>/);
   assert.match(concept, /<h2>Related files<\/h2>/);
+  assert.match(concept, /source links, and publishable assets/);
   assert.match(link, /href="..\/concept\/concept_static_site\.html"/);
   assert.match(link, /href="..\/decision\/decision_site_links\.html"/);
   assert.match(readmeLink, /href="..\/..\/..\/README\.md"/);
@@ -124,6 +141,11 @@ test("buildSiteFiles creates a navigable static wiki without front matter", () =
   assert.match(searchJs, /return \[\];/);
   assert.match(searchJs, /Search is ready/);
   assert.doesNotMatch(searchJs, /<code>' \+ escapeHtml\(entry\.id\)/);
+
+  const searchIndex = parseSearchIndex(file(files, "assets/search-index.js"));
+  const searchConcept = searchIndex.find((entry) => entry.id === "concept_static_site");
+  assert.equal(searchConcept.summary, "Wikiwiki generates a static human-facing site.");
+  assert.match(searchConcept.text, /source links, and publishable assets/);
 });
 
 test("buildSiteFiles uses source base URLs for publishable source links", () => {

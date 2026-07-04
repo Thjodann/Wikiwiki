@@ -73,6 +73,12 @@
     },
     {
       "type": "decision",
+      "id": "decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f",
+      "title": "Make agent skill installation safe by default",
+      "url": "records/decision/decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f.html"
+    },
+    {
+      "type": "decision",
       "id": "decision_364c44ff-012c-4d15-b978-5e91adf73521",
       "title": "Make generated sites project-first",
       "url": "records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html"
@@ -142,6 +148,12 @@
       "id": "event_410942e4-5e5f-445a-88be-db5aa7cfa176",
       "title": "Drafted aspirational README",
       "url": "records/event/event_410942e4-5e5f-445a-88be-db5aa7cfa176.html"
+    },
+    {
+      "type": "event",
+      "id": "event_5de1e86f-f1fd-4b23-909f-1433eba3ce10",
+      "title": "Hardened installer and generated site polish",
+      "url": "records/event/event_5de1e86f-f1fd-4b23-909f-1433eba3ce10.html"
     },
     {
       "type": "event",

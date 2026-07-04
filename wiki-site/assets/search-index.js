@@ -5,7 +5,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Concept",
     "id": "concept_17ca8065-a8d3-4373-9afe-b47b51a424d3",
     "title": "Append-only record revisions",
-    "summary": "Record updates append a new JSONL revision with the same logical id, while deletes append a tombstone that active reads, rendering, and search exclude.",
+    "summary": "Record updates append a new JSONL revision with the same logical id, while deletes append a tombstone that active reads, rendering, and search...",
     "tags": [
       "records",
       "v1",
@@ -118,7 +118,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_5ad8c2cf-266c-4824-8833-1d40103933b9",
     "title": "Compile UX and DX human wikis through agent-mediated drafts",
-    "summary": "Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.",
+    "summary": "Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile...",
     "tags": [
       "compile",
       "ux",
@@ -136,7 +136,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574",
     "title": "Generate a static HTML site for human wiki browsing",
-    "summary": "Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/ folder with .html links, navigation, subtle metadata, responsive CSS, and local search data.",
+    "summary": "Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/...",
     "tags": [
       "site",
       "ux",
@@ -152,9 +152,26 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "decision",
     "typeLabel": "Decision",
+    "id": "decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f",
+    "title": "Make agent skill installation safe by default",
+    "summary": "Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a...",
+    "tags": [
+      "cli",
+      "safety",
+      "agents",
+      "install"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/decision/decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f.html",
+    "text": "decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f agent agent high 2026-07-04T18:16:14.191Z 2026-07-04T18:16:14.191Z decision Make agent skill installation safe by default The Codex skill installer writes outside a project repo and may target an existing user skill directory. Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a non-empty destination with unknown files. wk install-agent codex avoids blind recursive deletion, preserves unknown files when forced, and keeps agent setup safer for dogfood paths like PRISM. src/cli/commands/installAgent.ts test/cli.test.js README.md skills/wk/SKILL.md cli safety agents install"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_364c44ff-012c-4d15-b978-5e91adf73521",
     "title": "Make generated sites project-first",
-    "summary": "Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish.",
+    "summary": "Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer...",
     "tags": [
       "site",
       "ux",
@@ -172,7 +189,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5",
     "title": "Make generated sites publishable without adjacent repo files",
-    "summary": "Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.",
+    "summary": "Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and...",
     "tags": [
       "site",
       "github-pages",
@@ -189,7 +206,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_e5333a83-7321-4a65-b040-12c1487f60e7",
     "title": "Prepare scoped npm package without publishing",
-    "summary": "Use @thjodann/wk as the scoped npm package name, expose wk as the primary binary, keep wikiwiki as a compatibility alias, and verify package contents with npm pack --dry-run.",
+    "summary": "Use @thjodann/wk as the scoped npm package name, expose wk as the primary binary, keep wikiwiki as a compatibility alias, and verify package contents...",
     "tags": [
       "package",
       "ci",
@@ -206,7 +223,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_45f2d29a-3140-40f6-b62c-8e299621419b",
     "title": "Ship a lean npm package",
-    "summary": "Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL.",
+    "summary": "Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of...",
     "tags": [
       "package",
       "release",
@@ -222,7 +239,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747",
     "title": "Ship wk as an installable agent skill",
-    "summary": "Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in the npm package while continuing to exclude generated wiki output and large decorative assets.",
+    "summary": "Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in...",
     "tags": [
       "agent-workflow",
       "skills",
@@ -239,7 +256,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_d7a1f846-57be-4c31-9fd6-27dc704622ab",
     "title": "Support script-first wiki automation",
-    "summary": "Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture, curation, and human-readable drafts.",
+    "summary": "Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture...",
     "tags": [
       "product",
       "automation",
@@ -271,7 +288,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_e28e5351-dd00-4ba1-841d-278b639ae1c8",
     "title": "Use wk as primary CLI identity",
-    "summary": "Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve wikiwiki as a compatibility alias.",
+    "summary": "Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve...",
     "tags": [
       "cli",
       "rename",
@@ -329,6 +346,18 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "confidence": "high",
     "url": "records/event/event_410942e4-5e5f-445a-88be-db5aa7cfa176.html",
     "text": "event_410942e4-5e5f-445a-88be-db5aa7cfa176 agent agent high 2026-07-04T00:43:03.660Z event Drafted aspirational README Replaced the README banner with the supplied image and rewrote README.md as an idealistic, GitHub-facing project draft while keeping the current MVP status visible. README.md assets/wikiwiki-banner.png"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_5de1e86f-f1fd-4b23-909f-1433eba3ce10",
+    "title": "Hardened installer and generated site polish",
+    "summary": "Hardened installer and generated site polish",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/event/event_5de1e86f-f1fd-4b23-909f-1433eba3ce10.html",
+    "text": "event_5de1e86f-f1fd-4b23-909f-1433eba3ce10 agent agent high 2026-07-04T18:16:21.342Z event Hardened installer and generated site polish Updated wk install-agent codex to avoid deleting destination directories, added --force for explicit installs into directories with unknown files, deduped guide record cards, shortened card/search excerpts, and documented Windows manual skill installation. src/cli/commands/installAgent.ts src/core/site.ts test/cli.test.js test/site.test.js README.md skills/wk/SKILL.md"
   },
   {
     "type": "event",
@@ -482,7 +511,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Note",
     "id": "note_e237de63-0391-4d81-8a69-f47666a6dfd7",
     "title": "User chose the supplied Wikiwiki banner image for the README and explicitly allo",
-    "summary": "User chose the supplied Wikiwiki banner image for the README and explicitly allowed an idealistic README draft, including future-facing product language for capabilities that may not exist yet.",
+    "summary": "User chose the supplied Wikiwiki banner image for the README and explicitly allowed an idealistic README draft, including future-facing product...",
     "tags": [
       "readme",
       "product-direction",
@@ -498,7 +527,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Note",
     "id": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92",
     "title": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model",
-    "summary": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata.",
+    "summary": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle...",
     "tags": [
       "v1",
       "user-intent"

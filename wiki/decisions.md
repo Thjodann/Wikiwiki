@@ -141,3 +141,17 @@ Files: `README.md`, `skills/wk/SKILL.md`
 Tags: `product`, `automation`, `agents`, `docs`
 
 Record: `decision_d7a1f846-57be-4c31-9fd6-27dc704622ab` | Authority: user | Confidence: high
+
+## Make agent skill installation safe by default
+
+Context: The Codex skill installer writes outside a project repo and may target an existing user skill directory.
+
+Decision: Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a non-empty destination with unknown files.
+
+Consequences: wk install-agent codex avoids blind recursive deletion, preserves unknown files when forced, and keeps agent setup safer for dogfood paths like PRISM.
+
+Files: `src/cli/commands/installAgent.ts`, `test/cli.test.js`, `README.md`, `skills/wk/SKILL.md`
+
+Tags: `cli`, `safety`, `agents`, `install`
+
+Record: `decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f` | Authority: agent | Confidence: high

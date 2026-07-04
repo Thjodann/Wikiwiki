@@ -395,14 +395,17 @@ ${supportCards ? `<section class="section">
 }
 
 function renderGuidesPage(model: SiteModel): string {
-  const startHere = homepageRecords(model)
-    .slice(0, 6)
+  const usedRecords = new Set<string>();
+  const startHereRecords = takeUnusedRecords(homepageRecords(model), usedRecords, 6);
+  const conceptRecords = takeUnusedRecords(curatedRecords(model, ["concept"], model.records.concept.length), usedRecords, 6);
+  const decisionRecords = takeUnusedRecords(curatedRecords(model, ["decision"], model.records.decision.length), usedRecords, 6);
+  const startHere = startHereRecords
     .map((record) => recordCard(record, "guides.html", model))
     .join("\n");
-  const conceptCards = curatedRecords(model, ["concept"], 6)
+  const conceptCards = conceptRecords
     .map((record) => recordCard(record, "guides.html", model))
     .join("\n");
-  const decisionCards = curatedRecords(model, ["decision"], 6)
+  const decisionCards = decisionRecords
     .map((record) => recordCard(record, "guides.html", model))
     .join("\n");
   const maintainerCards = categories
@@ -597,7 +600,7 @@ function sectionCard(currentFile: string, targetFile: string, title: string, des
 }
 
 function recordCard(record: AnyRecord, currentFile: string, _model: SiteModel): string {
-  const summary = recordSummary(record);
+  const summary = recordExcerpt(record);
   const tags = recordTags(record).slice(0, 5);
   const tagsHtml = tagList(tags);
   const tagsLine = tagsHtml ? `\n    ${tagsHtml}` : "";
@@ -791,7 +794,7 @@ function searchIndexJs(model: SiteModel): string {
     typeLabel: labelForType(record.type),
     id: record.id,
     title: recordTitle(record),
-    summary: recordSummary(record),
+    summary: recordExcerpt(record),
     tags: recordTags(record),
     authority: record.authority,
     confidence: record.confidence,
@@ -861,6 +864,30 @@ function recordSummary(record: AnyRecord): string {
   return "No summary recorded.";
 }
 
+function recordExcerpt(record: AnyRecord): string {
+  return conciseExcerpt(recordSummary(record));
+}
+
+function conciseExcerpt(text: string, maxLength = 150): string {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  const window = normalized.slice(0, maxLength + 1);
+  const sentenceEnds = [". ", "! ", "? "]
+    .map((marker) => window.lastIndexOf(marker))
+    .filter((index) => index >= 32);
+  const sentenceEnd = sentenceEnds.length ? Math.max(...sentenceEnds) : -1;
+  if (sentenceEnd >= 0) {
+    return window.slice(0, sentenceEnd + 1).trim();
+  }
+
+  const wordBreak = window.lastIndexOf(" ");
+  const end = wordBreak >= 72 ? wordBreak : maxLength;
+  return `${normalized.slice(0, end).replace(/[\s,;:.-]+$/, "")}...`;
+}
+
 function recordSearchText(record: AnyRecord): string {
   return Object.values(record)
     .flatMap((value) => Array.isArray(value) ? value : [value])
@@ -917,6 +944,23 @@ function curatedRecords(model: SiteModel, types: readonly RecordType[], limit: n
     .filter((record) => allowedTypes.has(record.type))
     .sort(compareRecordsForCuration)
     .slice(0, limit);
+}
+
+function takeUnusedRecords(records: readonly AnyRecord[], usedIds: Set<string>, limit: number): AnyRecord[] {
+  const result: AnyRecord[] = [];
+  for (const record of records) {
+    if (usedIds.has(record.id)) {
+      continue;
+    }
+
+    usedIds.add(record.id);
+    result.push(record);
+    if (result.length >= limit) {
+      break;
+    }
+  }
+
+  return result;
 }
 
 function compareRecordsForCuration(a: AnyRecord, b: AnyRecord): number {
