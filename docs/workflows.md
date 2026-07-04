@@ -1,0 +1,100 @@
+# Workflows
+
+Wikiwiki is built for small, repeatable maintenance loops. Humans and scripts
+handle deterministic work; agents add judgment when they are already close to
+the code change.
+
+## Recommended Dogfood Workflow
+
+For a first real repo pass, use the profile recipe instead of free-form
+recording:
+
+```sh
+wk setup --profile mixed --audience all
+wk status --json
+wk spin --profile mixed --json
+```
+
+Then add structured records from the recipe and current repo evidence:
+
+- user-facing concepts: product promise, getting started, modes/features,
+  privacy, FAQ, troubleshooting
+- developer-facing concepts: architecture, data model, generated-file workflow
+- decisions: key product, architecture, publishing, and workflow decisions
+- devlog: only meaningful milestones, not every implementation detail
+- notes: caveats, documentation drift, generated-file reminders
+- symbols: developer-only source anchors
+
+After adding deliberate records, close the pass:
+
+```sh
+wk closeout --profile mixed --audience all --json
+```
+
+Review `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/` for suggested
+records. Apply only the drafts that are true and useful, then rerun
+`wk validate`, `wk render`, and `wk site` or run another closeout.
+
+Inspect the generated home page, guides page, search, mobile layout, and a few
+record detail pages before committing or publishing. If a theme is customized,
+inspect contrast on cards, panels, code blocks, and mobile navigation.
+
+## JSON-First Agent Workflows
+
+Most add commands support JSON input and JSON output:
+
+```sh
+wk concept add --json '{
+  "name": "Spin",
+  "summary": "Inspects repo changes and suggests knowledge updates.",
+  "files": ["src/cli/commands/spin.ts"],
+  "tags": ["audience:developer", "cli"],
+  "source": "agent",
+  "authority": "agent",
+  "confidence": "high"
+}'
+```
+
+Recommended authority rules:
+
+- Use `authority: "user"` only for explicit user intent.
+- Use `authority: "agent"` for agent-authored or inferred records.
+- Use lower confidence when a record is a guess, partial summary, or stale.
+
+## Record Revisions
+
+Wikiwiki keeps record changes append-only. Updates add a new JSONL line with
+the same logical `id`; deletes add a tombstone revision with `deleted_at`.
+Status, rendering, search, and record reads use the latest active revision.
+
+```sh
+wk record list concept --json
+wk record get concept concept_123 --json
+wk record update concept concept_123 --json '{"summary":"Updated summary."}'
+wk record delete concept concept_123 --reason "Superseded by decision_456"
+```
+
+## Closeout
+
+`wk closeout` is the end-of-objective review flow:
+
+```sh
+wk closeout --profile mixed --audience all --json
+```
+
+It runs status, spin, validation, Markdown rendering, and site generation. It
+then writes a deterministic draft packet under `.wikiwiki/drafts/closeout/`.
+
+Closeout drafts are review artifacts. They should be read before any records
+are added, and they should only become records when they are true and useful.
+
+## Search
+
+Search active records and rendered docs:
+
+```sh
+wk search renderer --json
+```
+
+Search is local and based on the repo's active records plus generated Markdown.
+It is useful for quick orientation before changing code or writing new records.

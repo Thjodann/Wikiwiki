@@ -236,6 +236,12 @@
     },
     {
       "type": "event",
+      "id": "event_e38dffad-d6eb-4d9b-9833-967ed2a947b6",
+      "title": "Split README into focused package docs",
+      "url": "records/event/event_e38dffad-d6eb-4d9b-9833-967ed2a947b6.html"
+    },
+    {
+      "type": "event",
       "id": "event_495227ea-a813-41fa-b7a6-910f338a518f",
       "title": "Trimmed npm package contents for release readiness",
       "url": "records/event/event_495227ea-a813-41fa-b7a6-910f338a518f.html"

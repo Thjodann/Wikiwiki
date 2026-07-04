@@ -31,5 +31,11 @@ export function registerCloseoutCommand(program: Command): void {
       console.log(`Record drafts: ${result.drafts.length}`);
       console.log(`Rendered Markdown files: ${result.rendered_files.length}`);
       console.log(`Rendered site files: ${result.site_files.length}`);
+      if (result.integrations?.beads?.detected) {
+        const state = result.integrations.beads.available
+          ? `${result.integrations.beads.issue_ids.length} related issue ids`
+          : result.integrations.beads.enabled ? "detected but unavailable" : "disabled";
+        console.log(`Beads: ${state}`);
+      }
     });
 }

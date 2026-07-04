@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { readBeadsIntegration, readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
 import { configPath, normalizeSourceBaseUrl, readWikiwikiConfig, writeWikiwikiConfig, type WikiwikiConfig } from "./config";
 import { changedFiles } from "./git";
 import { relativeReportPath, reportPath, sitePath, wikiPath, wikiwikiPath } from "./paths";
@@ -25,6 +26,7 @@ export type SetupResult = {
   config_path: string;
   config: WikiwikiConfig;
   package_json: PackageSetupResult;
+  integrations?: IntegrationSummary;
 };
 
 export type PackageSetupResult = {
@@ -69,6 +71,7 @@ export type CloseoutManifest = {
   audience: SiteAudience;
   changed_files: string[];
   drafts: CloseoutDraft[];
+  integrations?: IntegrationSummary;
   rendered_files: string[];
   site_files: string[];
 };
@@ -83,6 +86,7 @@ export type CloseoutResult = {
   status: AutomationStatus;
   spin: SpinResult;
   validation: ValidationResult;
+  integrations?: IntegrationSummary;
   changed_files: string[];
   drafts: CloseoutDraft[];
   rendered_files: string[];
@@ -98,6 +102,7 @@ type AutomationStatus = {
   git: {
     changed_files: string[];
   };
+  integrations?: IntegrationSummary;
 };
 
 type PackageJson = {
@@ -112,6 +117,7 @@ export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupRe
   const sourceBaseUrl = normalizeSourceBaseUrl(options.sourceBaseUrl ?? existingConfig.source_base_url);
   const desiredScripts = setupScripts(profile, audience);
   const packageJson = preparePackageScripts(root, desiredScripts, options.force === true);
+  const existingBeads = readBeadsIntegration(root, existingConfig.integrations?.beads);
   const nextConfig: WikiwikiConfig = {
     ...existingConfig,
     wiki_profile: profile,
@@ -123,12 +129,22 @@ export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupRe
   } else {
     delete nextConfig.source_base_url;
   }
+  if (existingBeads.detected && existingConfig.integrations?.beads?.enabled === undefined) {
+    nextConfig.integrations = {
+      ...existingConfig.integrations,
+      beads: {
+        ...existingConfig.integrations?.beads,
+        enabled: true
+      }
+    };
+  }
 
   ensureStore(root);
   writeWikiwikiConfig(root, nextConfig);
   writePackageScripts(root, packageJson);
+  const integrations = readIntegrations(root, nextConfig);
 
-  return {
+  const result: SetupResult = {
     ok: true,
     repo_root: reportPath(root),
     store_path: reportPath(wikiwikiPath(root)),
@@ -136,6 +152,11 @@ export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupRe
     config: nextConfig,
     package_json: packageJson.result
   };
+  if (shouldReportIntegrations(integrations)) {
+    result.integrations = integrations;
+  }
+
+  return result;
 }
 
 export function runCloseout(root: string, options: CloseoutOptions = {}): CloseoutResult {
@@ -150,6 +171,7 @@ export function runCloseout(root: string, options: CloseoutOptions = {}): Closeo
 
   const status = automationStatus(root);
   const spin = createSpinResult(root, profile);
+  const integrations = readIntegrations(root, config);
   const id = `closeout_${crypto.randomUUID()}`;
   const createdAt = new Date().toISOString();
   const draftRoot = path.join(wikiwikiPath(root), "drafts", "closeout", id);
@@ -167,6 +189,7 @@ export function runCloseout(root: string, options: CloseoutOptions = {}): Closeo
       audience,
       changed_files: spin.changed_files,
       drafts,
+      ...(shouldReportIntegrations(integrations) ? { integrations } : {}),
       rendered_files: [],
       site_files: []
     };
@@ -179,7 +202,8 @@ export function runCloseout(root: string, options: CloseoutOptions = {}): Closeo
       drafts,
       renderedFiles: [],
       siteFiles: [],
-      validation
+      validation,
+      integrations
     });
     writeJson(path.join(draftRoot, "manifest.json"), manifest);
     throw new Error(`Wikiwiki validation failed during closeout: ${validation.errors.join("; ")}`);
@@ -195,6 +219,7 @@ export function runCloseout(root: string, options: CloseoutOptions = {}): Closeo
     audience,
     changed_files: spin.changed_files,
     drafts,
+    ...(shouldReportIntegrations(integrations) ? { integrations } : {}),
     rendered_files: renderedFiles,
     site_files: siteFiles
   };
@@ -208,7 +233,8 @@ export function runCloseout(root: string, options: CloseoutOptions = {}): Closeo
     drafts,
     renderedFiles,
     siteFiles,
-    validation
+    validation,
+    integrations
   });
   writeJson(path.join(draftRoot, "manifest.json"), manifest);
 
@@ -222,6 +248,7 @@ export function runCloseout(root: string, options: CloseoutOptions = {}): Closeo
     status,
     spin,
     validation,
+    ...(shouldReportIntegrations(integrations) ? { integrations } : {}),
     changed_files: spin.changed_files,
     drafts,
     rendered_files: renderedFiles,
@@ -324,7 +351,8 @@ function automationStatus(root: string): AutomationStatus {
     .map((fileName) => path.join(sitePath(root), fileName))
     .filter((file) => fs.existsSync(file));
 
-  return {
+  const integrations = readIntegrations(root, readWikiwikiConfig(root));
+  const result: AutomationStatus = {
     repo_root: reportPath(root),
     initialized: isInitialized(root),
     records: recordCounts(root),
@@ -334,6 +362,11 @@ function automationStatus(root: string): AutomationStatus {
       changed_files: changedFiles(root)
     }
   };
+  if (shouldReportIntegrations(integrations)) {
+    result.integrations = integrations;
+  }
+
+  return result;
 }
 
 function writeCloseoutRecordDrafts(
@@ -423,6 +456,7 @@ function writeCloseoutSummary(
     renderedFiles: string[];
     siteFiles: string[];
     validation: ValidationResult;
+    integrations: IntegrationSummary;
   }
 ): void {
   const lines = [
@@ -453,6 +487,23 @@ function writeCloseoutSummary(
     lines.push("- None");
   } else {
     lines.push(...summary.drafts.map((draft) => `- ${draft.type}: ${draft.title} (${draft.draft_path})`));
+  }
+
+  const beads = summary.integrations.beads;
+  if (beads && shouldReportIntegrations(summary.integrations)) {
+    lines.push("", "## Beads Work Context", "");
+    if (!beads.enabled) {
+      lines.push("- Beads is detected but disabled in Wikiwiki config.");
+    } else if (!beads.available) {
+      lines.push(`- Beads is detected but unavailable: ${beads.error ?? "bd unavailable"}`);
+    } else {
+      lines.push(`- Ready work: ${beads.counts.ready}`);
+      lines.push(`- In progress: ${beads.counts.in_progress}`);
+      lines.push(`- Recent closed: ${beads.counts.recent_closed}`);
+      if (beads.issue_ids.length > 0) {
+        lines.push(`- Related issue ids: ${beads.issue_ids.join(", ")}`);
+      }
+    }
   }
 
   lines.push("");

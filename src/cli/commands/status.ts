@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import { Command } from "commander";
 import { printJson } from "../helpers";
+import { readIntegrations, shouldReportIntegrations } from "../../core/beads";
+import { readWikiwikiConfig } from "../../core/config";
 import { changedFiles } from "../../core/git";
 import { findRepoRoot, relativeReportPath, reportPath, sitePath, wikiPath, wikiwikiPath } from "../../core/paths";
 import { siteStaticPageFileNames } from "../../core/site";
@@ -24,6 +26,7 @@ export function registerStatusCommand(program: Command): void {
       const generatedSiteFiles = siteStaticPageFileNames
         .map((fileName) => path.join(sitePath(root), fileName))
         .filter((file) => fs.existsSync(file));
+      const integrations = readIntegrations(root, readWikiwikiConfig(root));
 
       const result = {
         repo_root: reportPath(root),
@@ -36,7 +39,8 @@ export function registerStatusCommand(program: Command): void {
         generated_site_files: generatedSiteFiles.map((file) => relativeReportPath(root, file)),
         git: {
           changed_files: changedFiles(root)
-        }
+        },
+        ...(shouldReportIntegrations(integrations) ? { integrations } : {})
       };
 
       if (options.json) {

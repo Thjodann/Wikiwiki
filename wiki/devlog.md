@@ -129,3 +129,11 @@ Implemented wk setup for repo defaults and safe package scripts, plus wk closeou
 Files: `src/core/automation.ts`, `src/core/spin.ts`, `src/cli/commands/setup.ts`, `src/cli/commands/closeout.ts`, `src/index.ts`, `test/cli.test.js`, `README.md`, `skills/wk/SKILL.md`, `AGENTS.md`
 
 Recorded: 2026-07-04T19:55:50.024Z | Record: `event_1d0da54d-a525-45ce-8060-592f4fece547` | Confidence: high
+
+## Split README into focused package docs
+
+Replaced the long README with a compact overview and quick start, moved detailed concepts/setup/workflow/reference material into hand-maintained docs pages, and included docs in the npm package file list so README links remain valid for package readers.
+
+Files: `README.md`, `docs/concepts.md`, `docs/setup.md`, `docs/workflows.md`, `docs/reference.md`, `package.json`, `test/cli.test.js`
+
+Recorded: 2026-07-04T20:23:06.856Z | Record: `event_e38dffad-d6eb-4d9b-9833-967ed2a947b6` | Confidence: high

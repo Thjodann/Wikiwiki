@@ -1,0 +1,111 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
+const test = require("node:test");
+
+const {
+  readBeadsIntegration
+} = require("../dist/core/beads.js");
+
+function tempRoot() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), "wikiwiki-beads-"));
+}
+
+function withPath(value, fn) {
+  const previousPath = process.env.PATH;
+  process.env.PATH = value;
+  try {
+    return fn();
+  } finally {
+    process.env.PATH = previousPath;
+  }
+}
+
+function createFakeBd(root) {
+  const bin = path.join(root, "bin");
+  fs.mkdirSync(bin, { recursive: true });
+  const script = path.join(bin, "fake-bd.js");
+  fs.writeFileSync(script, `const path = require("node:path");
+const args = process.argv.slice(2);
+const has = (value) => args.includes(value);
+const flag = (name) => args[args.indexOf(name) + 1];
+function out(value) {
+  process.stdout.write(JSON.stringify(value, null, 2));
+}
+if (has("where")) {
+  out({ beads_dir: path.join(process.cwd(), ".beads") });
+} else if (has("status")) {
+  out({ counts: { total: 7, open: 4, closed: 3, ready: 2, in_progress: 1 } });
+} else if (has("ready")) {
+  out({ issues: [
+    { id: "PRISM-a1", title: "Ready task", status: "open", type: "task", priority: 1, labels: ["ui"] }
+  ] });
+} else if (has("list") && flag("--status") === "in_progress") {
+  out({ issues: [
+    { id: "PRISM-b2", title: "Active task", status: "in_progress", type: "feature", assignee: "codex", labels: ["agent"] }
+  ] });
+} else if (has("list") && flag("--status") === "closed") {
+  out({ issues: [
+    { id: "PRISM-c3", title: "Closed task", status: "closed", type: "task", closed_at: "2026-07-04T00:00:00.000Z" }
+  ] });
+} else {
+  out({ issues: [] });
+}
+`, "utf8");
+  fs.writeFileSync(
+    path.join(bin, "bd"),
+    `#!/bin/sh\nDIR=\${0%/*}\nexec ${JSON.stringify(process.execPath)} "$DIR/fake-bd.js" "$@"\n`,
+    { mode: 0o755 }
+  );
+  fs.writeFileSync(
+    path.join(bin, "bd.cmd"),
+    `@echo off\r\n"${process.execPath}" "%~dp0\\fake-bd.js" %*\r\n`,
+    "utf8"
+  );
+  return bin;
+}
+
+test("readBeadsIntegration is quiet when .beads is absent", () => {
+  const root = tempRoot();
+
+  const beads = readBeadsIntegration(root);
+
+  assert.equal(beads.detected, false);
+  assert.equal(beads.enabled, false);
+  assert.equal(beads.available, false);
+  assert.deepEqual(beads.issue_ids, []);
+});
+
+test("readBeadsIntegration detects .beads but handles missing bd", () => {
+  const root = tempRoot();
+  fs.mkdirSync(path.join(root, ".beads"));
+
+  const beads = withPath("", () => readBeadsIntegration(root));
+
+  assert.equal(beads.detected, true);
+  assert.equal(beads.enabled, true);
+  assert.equal(beads.available, false);
+  assert.match(beads.error, /bd|ENOENT|spawn/i);
+});
+
+test("readBeadsIntegration normalizes fake bd JSON summaries", () => {
+  const root = tempRoot();
+  fs.mkdirSync(path.join(root, ".beads"));
+  const bin = createFakeBd(root);
+
+  const beads = withPath(`${bin}${path.delimiter}${process.env.PATH || ""}`, () => readBeadsIntegration(root));
+
+  assert.equal(beads.detected, true);
+  assert.equal(beads.enabled, true);
+  assert.equal(beads.available, true);
+  assert.equal(beads.beads_path.includes("\\"), false);
+  assert.equal(beads.counts.total, 7);
+  assert.equal(beads.counts.ready, 2);
+  assert.equal(beads.counts.in_progress, 1);
+  assert.equal(beads.counts.recent_closed, 1);
+  assert.deepEqual(beads.issue_ids, ["PRISM-a1", "PRISM-b2", "PRISM-c3"]);
+  assert.equal(beads.ready[0].id, "PRISM-a1");
+  assert.equal(beads.ready[0].priority, "P1");
+  assert.equal(beads.in_progress[0].assignee, "codex");
+});

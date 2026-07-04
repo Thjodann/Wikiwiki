@@ -577,6 +577,22 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "event",
     "typeLabel": "Devlog",
+    "id": "event_e38dffad-d6eb-4d9b-9833-967ed2a947b6",
+    "title": "Split README into focused package docs",
+    "summary": "Split README into focused package docs",
+    "tags": [
+      "docs",
+      "devlog"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For everyone",
+    "url": "records/event/event_e38dffad-d6eb-4d9b-9833-967ed2a947b6.html",
+    "text": "event_e38dffad-d6eb-4d9b-9833-967ed2a947b6 agent agent high 2026-07-04T20:23:06.856Z event Split README into focused package docs Replaced the long README with a compact overview and quick start, moved detailed concepts/setup/workflow/reference material into hand-maintained docs pages, and included docs in the npm package file list so README links remain valid for package readers. README.md docs/concepts.md docs/setup.md docs/workflows.md docs/reference.md package.json test/cli.test.js audience:all docs devlog"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_495227ea-a813-41fa-b7a6-910f338a518f",
     "title": "Trimmed npm package contents for release readiness",
     "summary": "Trimmed npm package contents for release readiness",

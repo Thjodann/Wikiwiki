@@ -17,7 +17,7 @@ Wikiwiki is the generated human-readable view of this repo's structured project 
 
 - Concept: 7
 - Decision: 14
-- Event: 16
+- Event: 17
 - Note: 3
 - Symbol: 7
 - Link: 2

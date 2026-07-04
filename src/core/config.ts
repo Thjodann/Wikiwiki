@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { type BeadsIntegrationConfig } from "./beads";
 import { parseSiteAudience, parseWikiProfile, type SiteAudience, type WikiProfile } from "./profiles";
 import { wikiwikiPath } from "./paths";
 
@@ -7,6 +8,9 @@ export type WikiwikiConfig = {
   source_base_url?: string;
   wiki_profile?: WikiProfile;
   site_audience?: SiteAudience;
+  integrations?: {
+    beads?: BeadsIntegrationConfig;
+  };
 };
 
 export type WikiwikiSiteTheme = {
@@ -57,11 +61,13 @@ export function readWikiwikiConfig(root: string): WikiwikiConfig {
   if (siteAudience !== undefined && typeof siteAudience !== "string") {
     throw new Error(".wikiwiki/config.json site_audience must be a string.");
   }
+  const integrations = parseIntegrationsConfig(config.integrations);
 
   return {
     source_base_url: sourceBaseUrl,
     wiki_profile: parseWikiProfile(wikiProfile, "mixed"),
-    site_audience: parseSiteAudience(siteAudience, "all")
+    site_audience: parseSiteAudience(siteAudience, "all"),
+    ...(integrations ? { integrations } : {})
   };
 }
 
@@ -104,6 +110,35 @@ export function normalizeSourceBaseUrl(value: string | undefined): string | unde
   }
 
   return trimmed.endsWith("/") ? trimmed : `${trimmed}/`;
+}
+
+function parseIntegrationsConfig(value: unknown): WikiwikiConfig["integrations"] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(".wikiwiki/config.json integrations must be an object.");
+  }
+
+  const integrations = value as Record<string, unknown>;
+  const result: NonNullable<WikiwikiConfig["integrations"]> = {};
+  const beads = integrations.beads;
+  if (beads !== undefined) {
+    if (!beads || typeof beads !== "object" || Array.isArray(beads)) {
+      throw new Error(".wikiwiki/config.json integrations.beads must be an object.");
+    }
+
+    const beadsConfig = beads as Record<string, unknown>;
+    if (beadsConfig.enabled !== undefined && typeof beadsConfig.enabled !== "boolean") {
+      throw new Error(".wikiwiki/config.json integrations.beads.enabled must be a boolean.");
+    }
+    result.beads = {
+      ...(beadsConfig.enabled !== undefined ? { enabled: beadsConfig.enabled } : {})
+    };
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
 }
 
 const siteThemeKeys = [

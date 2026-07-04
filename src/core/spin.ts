@@ -1,4 +1,6 @@
+import { readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
 import { readGitDiffStat, readGitStatus, type GitStatusEntry } from "./git";
+import { readWikiwikiConfig } from "./config";
 import { profileRecipes, type ProfileSeed, type SiteAudience, type WikiProfile } from "./profiles";
 
 export type SuggestedUpdate = {
@@ -36,19 +38,26 @@ export type SpinResult = {
   diff_stat: string;
   profile: FirstPassRecipe;
   suggested_updates: SuggestedUpdate[];
+  integrations?: IntegrationSummary;
 };
 
 export function createSpinResult(root: string, profile: WikiProfile): SpinResult {
   const status = readGitStatus(root);
   const changedFiles = status.map((entry) => entry.path);
+  const integrations = readIntegrations(root, readWikiwikiConfig(root));
 
-  return {
+  const result: SpinResult = {
     changed_files: changedFiles,
     file_status: status,
     diff_stat: readGitDiffStat(root),
     profile: firstPassRecipe(profile),
     suggested_updates: suggestUpdates(changedFiles)
   };
+  if (shouldReportIntegrations(integrations)) {
+    result.integrations = integrations;
+  }
+
+  return result;
 }
 
 export function suggestUpdates(files: string[]): SuggestedUpdate[] {

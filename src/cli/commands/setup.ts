@@ -33,6 +33,12 @@ export function registerSetupCommand(program: Command): void {
       if (result.config.source_base_url) {
         console.log(`Source base URL: ${result.config.source_base_url}`);
       }
+      if (result.integrations?.beads?.detected) {
+        const state = result.integrations.beads.available
+          ? "available"
+          : result.integrations.beads.enabled ? "detected but unavailable" : "disabled";
+        console.log(`Beads: ${state}`);
+      }
 
       if (result.package_json.present) {
         const changed = [

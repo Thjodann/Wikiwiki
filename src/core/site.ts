@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { readIntegrations, shouldReportIntegrations, type BeadsIntegrationSummary, type BeadsIssueSummary, type IntegrationSummary } from "./beads";
 import { normalizeSourceBaseUrl, readWikiwikiConfig, readWikiwikiSiteTheme, type WikiwikiSiteTheme } from "./config";
 import { sitePath } from "./paths";
 import { readAllRecords, type RecordsByType } from "./store";
@@ -18,6 +19,7 @@ export const siteStaticPageFileNames = [
   "notes.html",
   "symbols.html",
   "links.html",
+  "work.html",
   "search.html"
 ] as const;
 
@@ -58,6 +60,7 @@ type SiteModel = {
   visibleCategories: Category[];
   options: ResolvedSiteOptions;
   audience: SiteAudience;
+  integrations: IntegrationSummary;
 };
 
 type LayoutOptions = {
@@ -77,7 +80,7 @@ type RenderContext = {
 };
 
 type SearchEntry = {
-  type: RecordType;
+  type: string;
   typeLabel: string;
   id: string;
   title: string;
@@ -180,6 +183,20 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
     });
   }
 
+  if (showBeadsWork(model)) {
+    files.push({
+      fileName: "work.html",
+      content: renderLayout({
+        model,
+        fileName: "work.html",
+        title: "Project Work",
+        description: "Developer-only Beads task context for this project.",
+        active: "work",
+        body: renderWorkPage(model)
+      })
+    });
+  }
+
   files.push({
     fileName: "search.html",
     content: renderLayout({
@@ -245,6 +262,7 @@ export function resolveSiteOptions(root: string, options: SiteOptions = {}): Res
 
 function createSiteModel(root: string, records: RecordsByType, options: ResolvedSiteOptions): SiteModel {
   const audienceRecords = filterRecordsByAudience(records, options.audience);
+  const integrations = readIntegrations(root, readWikiwikiConfig(root));
   const flatRecords: AnyRecord[] = [];
   for (const type of recordTypes) {
     flatRecords.push(...audienceRecords[type]);
@@ -266,7 +284,8 @@ function createSiteModel(root: string, records: RecordsByType, options: Resolved
     counts,
     visibleCategories: categories.filter((category) => counts[category.type] > 0),
     options,
-    audience: options.audience
+    audience: options.audience,
+    integrations
   };
 }
 
@@ -333,6 +352,7 @@ function renderNav(model: SiteModel, currentFile: string, active: string): strin
     navLink(currentFile, "index.html", "Home", active === "home"),
     navLink(currentFile, "guides.html", "Guides", active === "guides"),
     navLink(currentFile, "search.html", "Search", active === "search"),
+    showBeadsWork(model) ? navLink(currentFile, "work.html", "Project Work", active === "work", beadsNavCount(model.integrations.beads)) : "",
     categorySection
   ].filter(Boolean).join("\n");
 
@@ -361,6 +381,9 @@ function renderHomePage(model: SiteModel): string {
   const supportCards = supportCategories
     .map((category) => sectionCard("index.html", category.fileName, category.title, category.description, model.counts[category.type]))
     .join("\n");
+  const workCards = showBeadsWork(model)
+    ? sectionCard("index.html", "work.html", "Project Work", "Developer-only Beads task context: ready work, in-progress issues, and recent closed work.", beadsNavCount(model.integrations.beads))
+    : "";
   const featuredRecords = homepageRecords(model)
     .map((record) => recordCard(record, "index.html", model))
     .join("\n");
@@ -385,12 +408,12 @@ function renderHomePage(model: SiteModel): string {
   <div class="card-grid">${guideCards}${primaryCards}</div>
 </section>
 
-${supportCards ? `<section class="section">
+${workCards || supportCards ? `<section class="section">
   <div class="section-heading">
     <p class="eyebrow">Maintainer context</p>
     <h2>Browse the source records</h2>
   </div>
-  <div class="card-grid compact">${supportCards}</div>
+  <div class="card-grid compact">${workCards}${supportCards}</div>
 </section>` : ""}
 
 <section class="section">
@@ -433,6 +456,9 @@ function renderGuidesPage(model: SiteModel): string {
     .filter((category) => model.counts[category.type] > 0)
     .map((category) => sectionCard("guides.html", category.fileName, category.title, category.description, model.counts[category.type]))
     .join("\n");
+  const workCard = showBeadsWork(model)
+    ? sectionCard("guides.html", "work.html", "Project Work", "Developer-only Beads task context for planning, blockers, and completed work.", beadsNavCount(model.integrations.beads))
+    : "";
 
   return `${userGuideSection}<section class="section">
   <div class="section-heading">
@@ -458,13 +484,87 @@ ${decisionCards ? `<section class="section">
   <div class="record-list">${decisionCards}</div>
 </section>` : ""}
 
-${maintainerCards ? `<section class="section">
+${workCard || maintainerCards ? `<section class="section">
   <div class="section-heading">
     <p class="eyebrow">Docs map</p>
     <h2>Agent-maintained record indexes</h2>
   </div>
-  <div class="card-grid compact">${maintainerCards}</div>
+  <div class="card-grid compact">${workCard}${maintainerCards}</div>
 </section>` : ""}`;
+}
+
+function renderWorkPage(model: SiteModel): string {
+  const beads = model.integrations.beads;
+  if (!beads) {
+    return `<section class="section">${emptyState("No Beads workspace detected.")}</section>`;
+  }
+
+  if (!beads.enabled) {
+    return `<section class="section">${emptyState("Beads is detected but disabled in Wikiwiki config.")}</section>`;
+  }
+
+  if (!beads.available) {
+    return `<section class="section">
+  <div class="empty-state">
+    <strong>Beads workspace detected.</strong>
+    <p>Wikiwiki could not read Beads with <code>bd --readonly --json</code>. ${escapeHtml(beads.error ?? "Install bd or check the Beads workspace, then rerun wk site.")}</p>
+  </div>
+</section>`;
+  }
+
+  const stats = [
+    ["Ready", beads.counts.ready],
+    ["In progress", beads.counts.in_progress],
+    ["Recent closed", beads.counts.recent_closed],
+    ["Total", beads.counts.total]
+  ]
+    .filter(([, value]) => typeof value === "number")
+    .map(([label, value]) => `<div><dt>${escapeHtml(String(label))}</dt><dd>${value}</dd></div>`)
+    .join("\n");
+
+  return `<section class="hero-panel">
+  <div>
+    <p class="eyebrow">Developer work graph</p>
+    <h2>Beads tracks what to do; Wikiwiki records what becomes true.</h2>
+    <p>Use this page to orient on active task context without turning tasks into wiki records.</p>
+  </div>
+  ${stats ? `<dl class="stats-grid">${stats}</dl>` : ""}
+</section>
+
+${beadsIssueSection("Ready work", "Open work with no active blockers.", beads.ready)}
+${beadsIssueSection("In progress", "Work currently claimed or underway.", beads.in_progress)}
+${beadsIssueSection("Recently closed", "Completed work that may have durable wiki outcomes.", beads.recent_closed)}`;
+}
+
+function beadsIssueSection(title: string, description: string, issues: BeadsIssueSummary[]): string {
+  const cards = issues.map(beadsIssueCard).join("\n");
+  return `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Beads</p>
+    <h2>${escapeHtml(title)}</h2>
+    <p>${escapeHtml(description)}</p>
+  </div>
+  <div class="record-list">${cards || emptyState(`No ${title.toLowerCase()} found.`)}</div>
+</section>`;
+}
+
+function beadsIssueCard(issue: BeadsIssueSummary): string {
+  const details = [
+    issue.type,
+    issue.status,
+    issue.priority,
+    issue.assignee ? `Assigned to ${issue.assignee}` : ""
+  ].filter(Boolean).join(" · ");
+  const labels = issue.labels.length > 0 ? tagList(issue.labels.slice(0, 6)) : "";
+  return `<article class="record-card work-card">
+  <div class="record-card-top">
+    <span class="type-badge">Beads</span>
+    <code>${escapeHtml(issue.id)}</code>
+  </div>
+  <h3>${escapeHtml(issue.title)}</h3>
+  ${details ? `<p>${escapeHtml(details)}</p>` : ""}
+  ${labels ? `<footer>${labels}</footer>` : ""}
+</article>`;
 }
 
 function renderCategoryPage(model: SiteModel, category: Category): string {
@@ -816,7 +916,7 @@ function isDirectoryPath(root: string, file: string): boolean {
 }
 
 function searchIndexJs(model: SiteModel): string {
-  const entries: SearchEntry[] = model.flatRecords.map((record) => ({
+  const recordEntries: SearchEntry[] = model.flatRecords.map((record) => ({
     type: record.type,
     typeLabel: labelForType(record.type),
     id: record.id,
@@ -829,6 +929,34 @@ function searchIndexJs(model: SiteModel): string {
     url: recordHref(record),
     text: recordSearchText(record)
   }));
+  const workEntries: SearchEntry[] = showBeadsWork(model) && model.integrations.beads?.available
+    ? [
+      ...model.integrations.beads.ready,
+      ...model.integrations.beads.in_progress,
+      ...model.integrations.beads.recent_closed
+    ].map((issue) => ({
+      type: "work",
+      typeLabel: "Project Work",
+      id: `beads:${issue.id}`,
+      title: issue.title,
+      summary: beadsIssueSummary(issue),
+      tags: issue.labels,
+      authority: "system",
+      confidence: "high",
+      audienceLabel: "For developers",
+      url: "work.html",
+      text: [
+        issue.id,
+        issue.title,
+        issue.status,
+        issue.type,
+        issue.priority,
+        issue.assignee,
+        issue.labels.join(" ")
+      ].filter(Boolean).join(" ")
+    }))
+    : [];
+  const entries = [...recordEntries, ...workEntries];
 
   return `/* Generated by Wikiwiki from .wikiwiki/records. Edit structured records instead, then run \`wk site\`. */
 window.WIKIWIKI_SEARCH_INDEX = ${JSON.stringify(entries, null, 2)};
@@ -844,7 +972,8 @@ function siteManifest(model: SiteModel) {
     audience: model.audience,
     project_name: model.repoName,
     theme_file: ".wikiwiki/site-theme.json",
-    pages: siteStaticPageFileNames,
+    pages: sitePages(model),
+    ...(shouldReportIntegrations(model.integrations) ? { integrations: model.integrations } : {}),
     records: model.flatRecords.map((record) => ({
       type: record.type,
       id: record.id,
@@ -852,6 +981,10 @@ function siteManifest(model: SiteModel) {
       url: recordHref(record)
     }))
   };
+}
+
+function sitePages(model: SiteModel): string[] {
+  return siteStaticPageFileNames.filter((fileName) => fileName !== "work.html" || showBeadsWork(model));
 }
 
 function recordHref(record: AnyRecord): string {
@@ -1092,6 +1225,30 @@ function statsTypes(model: SiteModel): RecordType[] {
   }
 
   return recordTypes.filter((type) => model.counts[type] > 0).slice(0, 4);
+}
+
+function showBeadsWork(model: SiteModel): boolean {
+  const beads = model.integrations.beads;
+  return model.audience !== "user" &&
+    Boolean(beads?.detected) &&
+    Boolean(beads?.enabled);
+}
+
+function beadsNavCount(beads: BeadsIntegrationSummary | undefined): number | undefined {
+  if (!beads?.available) {
+    return undefined;
+  }
+
+  return beads.counts.ready + beads.counts.in_progress;
+}
+
+function beadsIssueSummary(issue: BeadsIssueSummary): string {
+  return [
+    issue.status,
+    issue.type,
+    issue.priority,
+    issue.assignee ? `assigned to ${issue.assignee}` : ""
+  ].filter(Boolean).join(" · ") || "Beads work item.";
 }
 
 function tagList(tags: string[]): string {

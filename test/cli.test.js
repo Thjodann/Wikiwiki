@@ -13,16 +13,17 @@ function tempRepo() {
   return root;
 }
 
-function run(root, args) {
+function run(root, args, options = {}) {
   return execFileSync(process.execPath, [cli, ...args], {
     cwd: root,
+    env: { ...process.env, ...(options.env || {}) },
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"]
   });
 }
 
-function runJson(root, args) {
-  return JSON.parse(run(root, args));
+function runJson(root, args, options = {}) {
+  return JSON.parse(run(root, args, options));
 }
 
 function runFailure(root, args) {
@@ -45,6 +46,55 @@ function assertPosixPaths(paths) {
   }
 }
 
+function createFakeBd(root) {
+  const bin = path.join(root, "bin");
+  fs.mkdirSync(bin, { recursive: true });
+  const script = path.join(bin, "fake-bd.js");
+  fs.writeFileSync(script, `const fs = require("node:fs");
+const path = require("node:path");
+const args = process.argv.slice(2);
+fs.appendFileSync(path.join(process.cwd(), "bd-calls.log"), args.join(" ") + "\\n");
+const has = (value) => args.includes(value);
+const flag = (name) => args[args.indexOf(name) + 1];
+function out(value) {
+  process.stdout.write(JSON.stringify(value, null, 2));
+}
+if (has("where")) {
+  out({ beads_dir: path.join(process.cwd(), ".beads") });
+} else if (has("status")) {
+  out({ counts: { total: 7, open: 4, closed: 3, ready: 2, in_progress: 1 } });
+} else if (has("ready")) {
+  out({ issues: [
+    { id: "PRISM-a1", title: "Ready task", status: "open", type: "task", priority: 1, labels: ["ui"] }
+  ] });
+} else if (has("list") && flag("--status") === "in_progress") {
+  out({ issues: [
+    { id: "PRISM-b2", title: "Active task", status: "in_progress", type: "feature", assignee: "codex", labels: ["agent"] }
+  ] });
+} else if (has("list") && flag("--status") === "closed") {
+  out({ issues: [
+    { id: "PRISM-c3", title: "Closed task", status: "closed", type: "task", closed_at: "2026-07-04T00:00:00.000Z" }
+  ] });
+} else {
+  out({ issues: [] });
+}
+`, "utf8");
+  fs.writeFileSync(
+    path.join(bin, "bd"),
+    `#!/bin/sh\nDIR=\${0%/*}\nexec ${JSON.stringify(process.execPath)} "$DIR/fake-bd.js" "$@"\n`,
+    { mode: 0o755 }
+  );
+  fs.writeFileSync(
+    path.join(bin, "bd.cmd"),
+    `@echo off\r\n"${process.execPath}" "%~dp0\\fake-bd.js" %*\r\n`,
+    "utf8"
+  );
+  return {
+    env: { PATH: `${bin}${path.delimiter}${process.env.PATH || ""}` },
+    log: path.join(root, "bd-calls.log")
+  };
+}
+
 test("package exposes wk primary binary and wikiwiki compatibility alias", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
 
@@ -56,7 +106,7 @@ test("package exposes wk primary binary and wikiwiki compatibility alias", () =>
 test("package publishes runtime build files, package docs, and the wk skill", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
 
-  assert.deepEqual(pkg.files, ["dist", "README.md", "LICENSE", "skills/wk"]);
+  assert.deepEqual(pkg.files, ["dist", "README.md", "docs", "LICENSE", "skills/wk"]);
   assert.equal(pkg.files.includes("wiki"), false);
   assert.equal(pkg.files.includes("wiki-site"), false);
   assert.equal(pkg.files.includes("assets/wikiwiki-banner.png"), false);
