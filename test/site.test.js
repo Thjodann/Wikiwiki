@@ -38,7 +38,35 @@ function seedRecords(root) {
     summary: "Wikiwiki generates a static human-facing site. This implementation-oriented sentence includes enough extra detail about generated files, search data, source links, and publishable assets to exceed the card excerpt limit while remaining available on detail pages.",
     details: "Read the [Decisions](./decisions.md) page for rationale.",
     files: ["README.md", "src/core"],
-    tags: ["site", "ux"]
+    tags: ["audience:all", "site", "ux"]
+  });
+  appendRecord(root, "concept", {
+    type: "concept",
+    id: "concept_user_faq",
+    source: "agent",
+    authority: "agent",
+    confidence: "high",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z",
+    name: "FAQ",
+    summary: "Answers common user questions before they need to read maintainer notes.",
+    details: "Use this page for user-facing questions.",
+    files: ["README.md"],
+    tags: ["audience:user", "faq", "getting-started"]
+  });
+  appendRecord(root, "concept", {
+    type: "concept",
+    id: "concept_developer_architecture",
+    source: "agent",
+    authority: "agent",
+    confidence: "high",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z",
+    name: "Developer architecture",
+    summary: "Developer-only architecture details.",
+    details: "This should not lead a user-focused site.",
+    files: ["src/core/site.ts"],
+    tags: ["audience:developer", "architecture"]
   });
   appendRecord(root, "decision", {
     type: "decision",
@@ -53,7 +81,21 @@ function seedRecords(root) {
     decision: "Generate .html pages with deterministic relative links.",
     consequences: "The site works locally and on static hosts without Jekyll.",
     files: ["src/core/site.ts"],
-    tags: ["site", "links"]
+    tags: ["audience:developer", "site", "links"]
+  });
+  appendRecord(root, "symbol", {
+    type: "symbol",
+    id: "symbol_site_renderer",
+    source: "agent",
+    authority: "agent",
+    confidence: "high",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z",
+    name: "buildSiteFiles",
+    kind: "function",
+    file: "src/core/site.ts",
+    summary: "Developer-only static site renderer anchor.",
+    tags: ["audience:developer", "symbol"]
   });
   appendRecord(root, "link", {
     type: "link",
@@ -119,10 +161,12 @@ test("buildSiteFiles creates a navigable static wiki without front matter", () =
   assert.match(index, /href="guides\.html"/);
   assert.match(index, /href="concepts\.html"/);
   assert.match(index, /href="search\.html"/);
-  assert.doesNotMatch(index, />Symbols</);
+  assert.match(index, />Symbols</);
   assert.doesNotMatch(index, /<code>concept_static_site<\/code>/);
   assert.doesNotMatch(index, /source links, and publishable assets/);
   assert.match(guides, /Project essentials/);
+  assert.match(guides, /User guide/);
+  assert.match(guides, /For users/);
   assert.equal(countMatches(guides, /href="records\/concept\/concept_static_site\.html"/g), 1);
   assert.doesNotMatch(guides, /source links, and publishable assets/);
   assert.match(concepts, /href="records\/concept\/concept_static_site\.html"/);
@@ -146,6 +190,27 @@ test("buildSiteFiles creates a navigable static wiki without front matter", () =
   const searchConcept = searchIndex.find((entry) => entry.id === "concept_static_site");
   assert.equal(searchConcept.summary, "Wikiwiki generates a static human-facing site.");
   assert.match(searchConcept.text, /source links, and publishable assets/);
+});
+
+test("buildSiteFiles filters records for a user-focused audience", () => {
+  const root = tempRoot();
+  seedRecords(root);
+
+  const files = buildSiteFiles(root, { audience: "user" });
+  const index = file(files, "index.html");
+  const guides = file(files, "guides.html");
+  const manifest = JSON.parse(file(files, "site-manifest.json"));
+  const searchIndex = parseSearchIndex(file(files, "assets/search-index.js"));
+
+  assert.equal(manifest.audience, "user");
+  assert.match(index, /getting started, product orientation, privacy, FAQ, and troubleshooting/);
+  assert.match(guides, /User guide/);
+  assert.match(guides, /FAQ/);
+  assert.doesNotMatch(index, />Symbols</);
+  assert.equal(files.some((item) => item.fileName === "records/symbol/symbol_site_renderer.html"), false);
+  assert.equal(files.some((item) => item.fileName === "records/concept/concept_developer_architecture.html"), false);
+  assert.equal(searchIndex.some((entry) => entry.id === "concept_developer_architecture"), false);
+  assert.ok(searchIndex.some((entry) => entry.id === "concept_user_faq" && entry.audienceLabel === "For users"));
 });
 
 test("buildSiteFiles uses source base URLs for publishable source links", () => {
@@ -189,6 +254,26 @@ test("buildSiteFiles supports project theme overrides", () => {
   assert.match(theme, /--radius: 4px;/);
   assert.equal(manifest.project_name, "Acme Docs");
   assert.equal(manifest.theme_file, ".wikiwiki/site-theme.json");
+});
+
+test("buildSiteFiles guards common low-contrast theme overrides", () => {
+  const root = tempRoot();
+  seedRecords(root);
+  writeFile(root, ".wikiwiki/site-theme.json", `${JSON.stringify({
+    project_name: "Dark Docs",
+    bg: "#050505",
+    panel: "#111111",
+    text: "#181818",
+    muted: "#222222"
+  }, null, 2)}\n`);
+
+  const files = buildSiteFiles(root);
+  const theme = file(files, "assets/project-theme.css");
+
+  assert.match(theme, /Adjusted --text for readable contrast/);
+  assert.match(theme, /Adjusted --muted for readable contrast/);
+  assert.match(theme, /--text: #f8fafc;/);
+  assert.match(theme, /--muted: #cbd5e1;/);
 });
 
 test("renderSite writes a self-contained wiki-site folder", () => {

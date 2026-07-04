@@ -1,4 +1,5 @@
 node_modules/
 dist/
+.wikiwiki/drafts/closeout/
 .DS_Store
 *.log

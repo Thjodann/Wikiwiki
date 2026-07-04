@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Hardened installer and generated site polish - Wikiwiki Wiki</title>
+  <title>Use deterministic wiki profiles for first-pass seeding - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <link rel="stylesheet" href="../../assets/project-theme.css">
   <script src="../../assets/search-index.js" defer></script>
@@ -33,8 +33,8 @@
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
 <a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="../../decisions.html">Decisions<span>14</span></a>
-<a class="nav-link active" href="../../devlog.html" aria-current="page">Devlog<span>16</span></a>
+<a class="nav-link active" href="../../decisions.html" aria-current="page">Decisions<span>14</span></a>
+<a class="nav-link" href="../../devlog.html">Devlog<span>16</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
@@ -43,44 +43,48 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Hardened installer and generated site polish</h1>
-        <p>Hardened installer and generated site polish</p>
+        <h1>Use deterministic wiki profiles for first-pass seeding</h1>
+        <p>Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates. Keep mixed as the default profile.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../devlog.html">Devlog</a>
+    <a href="../../decisions.html">Decisions</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Devlog</span>
+    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
+    <span class="tag-list"><span>product</span><span>dogfood</span><span>profiles</span><span>docs</span></span>
   </div>
   <section class="prose">
-  <h2>What happened</h2>
-  <p>Updated wk install-agent codex to avoid deleting destination directories, added --force for explicit installs into directories with unknown files, deduped guide record cards, shortened card/search excerpts, and documented Windows manual skill installation.</p>
+  <h2>Context</h2>
+  <p>Dogfood against the same PRISM repo produced materially different record counts, page emphasis, and audience coverage across runs.</p>
+  <h2>Decision</h2>
+  <p>Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates. Keep mixed as the default profile.</p>
+  <h2>Consequences</h2>
+  <p>Agents and scripts get a shared initialization recipe, first-pass wikis should converge across machines, and user-facing material such as getting started, FAQ, privacy, and troubleshooting becomes part of the default mixed shape.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/installAgent.ts"><code>src/cli/commands/installAgent.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/profiles.ts"><code>src/core/profiles.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/spin.ts"><code>src/cli/commands/spin.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/init.ts"><code>src/cli/commands/init.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>event_5de1e86f-f1fd-4b23-909f-1433eba3ce10</code></dd></div>
-    <div><dt>Source</dt><dd>agent</dd></div>
-    <div><dt>Authority</dt><dd>agent</dd></div>
+    <div><dt>ID</dt><dd><code>decision_4054b35e-c388-4e72-b116-c7efdb7e2d77</code></dd></div>
+    <div><dt>Source</dt><dd>manual</dd></div>
+    <div><dt>Authority</dt><dd>user</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T18:16:21.342Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd>None</dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/installAgent.ts"><code>src/cli/commands/installAgent.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T19:14:41.158Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T19:14:41.158Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>audience:all</code> <code>product</code> <code>dogfood</code> <code>profiles</code> <code>docs</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/profiles.ts"><code>src/core/profiles.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/spin.ts"><code>src/cli/commands/spin.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/init.ts"><code>src/cli/commands/init.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li></ul></dd></div>
   </dl>

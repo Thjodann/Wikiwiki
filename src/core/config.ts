@@ -1,9 +1,12 @@
 import fs from "fs";
 import path from "path";
+import { parseSiteAudience, parseWikiProfile, type SiteAudience, type WikiProfile } from "./profiles";
 import { wikiwikiPath } from "./paths";
 
 export type WikiwikiConfig = {
   source_base_url?: string;
+  wiki_profile?: WikiProfile;
+  site_audience?: SiteAudience;
 };
 
 export type WikiwikiSiteTheme = {
@@ -46,10 +49,26 @@ export function readWikiwikiConfig(root: string): WikiwikiConfig {
   if (sourceBaseUrl !== undefined && typeof sourceBaseUrl !== "string") {
     throw new Error(".wikiwiki/config.json source_base_url must be a string.");
   }
+  const wikiProfile = config.wiki_profile;
+  if (wikiProfile !== undefined && typeof wikiProfile !== "string") {
+    throw new Error(".wikiwiki/config.json wiki_profile must be a string.");
+  }
+  const siteAudience = config.site_audience;
+  if (siteAudience !== undefined && typeof siteAudience !== "string") {
+    throw new Error(".wikiwiki/config.json site_audience must be a string.");
+  }
 
   return {
-    source_base_url: sourceBaseUrl
+    source_base_url: sourceBaseUrl,
+    wiki_profile: parseWikiProfile(wikiProfile, "mixed"),
+    site_audience: parseSiteAudience(siteAudience, "all")
   };
+}
+
+export function writeWikiwikiConfig(root: string, config: WikiwikiConfig): void {
+  const file = configPath(root);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(config, null, 2)}\n`, "utf8");
 }
 
 export function readWikiwikiSiteTheme(root: string): WikiwikiSiteTheme {

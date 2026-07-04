@@ -19,8 +19,11 @@
     const tags = Array.isArray(entry.tags) && entry.tags.length
       ? '<span class="tag-list">' + entry.tags.slice(0, 6).map((tag) => '<span>' + escapeHtml(tag) + '</span>').join("") + '</span>'
       : "";
+    const audience = entry.audienceLabel
+      ? '<span class="audience-badge">' + escapeHtml(entry.audienceLabel) + '</span>'
+      : "";
     return '<article class="search-result">' +
-      '<div class="record-card-top"><span class="type-badge">' + escapeHtml(entry.typeLabel || entry.type) + '</span></div>' +
+      '<div class="record-card-top"><span class="type-badge">' + escapeHtml(entry.typeLabel || entry.type) + '</span>' + audience + '</div>' +
       '<h3><a href="' + encodeURI(entry.url) + '">' + escapeHtml(entry.title) + '</a></h3>' +
       '<p>' + escapeHtml(entry.summary) + '</p>' +
       (tags ? '<footer>' + tags + '</footer>' : '') +

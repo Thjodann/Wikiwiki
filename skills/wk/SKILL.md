@@ -18,9 +18,9 @@ Prefer JSON output, preserve user work, and treat structured records as the sour
    - `node dist/index.js <command>` when working inside the Wikiwiki repo.
    - `npm run dev -- <command>` when the repo has Wikiwiki source installed.
    - `npx @thjodann/wk <command>` when the package is available.
-3. If the repo is not initialized and the user wants Wikiwiki adopted, run `wk init`.
+3. If the repo is not initialized and the user wants Wikiwiki adopted, run `wk setup --profile mixed --audience all` unless the user clearly wants `user`, `developer`, or a narrower site audience.
 4. Run `wk status --json`.
-5. Run `wk spin --json`.
+5. Run `wk spin --profile mixed --json` unless the repo config or user request specifies another profile.
 6. Read relevant existing records before adding new ones.
 
 ## During Work
@@ -31,6 +31,9 @@ Prefer JSON output, preserve user work, and treat structured records as the sour
 - Prefer CLI commands over hand-editing JSONL records.
 - Prefer existing project scripts such as `npm run wiki:site` when they exist.
 - Avoid unnecessary LLM calls for deterministic work that `wk` or repo scripts can do directly.
+- Use audience tags consistently: `audience:user`, `audience:developer`, or `audience:all`.
+- For user-facing first-pass material, prefer tags such as `getting-started`, `instructions`, `faq`, `troubleshooting`, `privacy`, and `features`.
+- For developer-facing material, prefer tags such as `architecture`, `data-model`, `generated-files`, `maintenance`, `tests`, and `symbol`.
 - Do not manually edit generated files in `wiki/`, `wiki-site/`, or `wiki/human/` unless the user asks for a one-off repair.
 - Keep record prose factual and compact; human-facing narrative belongs in compile drafts or generated site pages.
 
@@ -39,8 +42,9 @@ Prefer JSON output, preserve user work, and treat structured records as the sour
 Inspect:
 
 ```sh
+wk setup --profile mixed --audience all
 wk status --json
-wk spin --json
+wk spin --profile mixed --json
 wk search <query> --json
 ```
 
@@ -69,8 +73,9 @@ Generate:
 ```sh
 wk validate
 wk render
-wk site
-wk site --source-base-url https://github.com/OWNER/REPO/blob/main/
+wk site --audience all
+wk site --audience user
+wk site --audience all --source-base-url https://github.com/OWNER/REPO/blob/main/
 ```
 
 Agent setup:
@@ -89,16 +94,25 @@ wk compile draft --role all --json
 wk compile apply <draft-id> --json
 ```
 
+Objective closeout:
+
+```sh
+wk closeout --profile mixed --audience all --json
+```
+
 ## Closeout
 
 After meaningful repo changes:
 
-1. Run `wk spin --json`.
-2. Add or update records for durable decisions, events, notes, concepts, symbols, or links.
-3. Run `wk validate`.
-4. Run `wk render`.
-5. Run `wk site` when the human static wiki should stay current.
-6. Summarize any knowledge updates in the final response.
+1. Run `wk closeout --profile mixed --audience all --json` unless the repo config or user request specifies another profile/audience.
+2. Review `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`.
+3. Apply only the record drafts that are true, useful, and properly sourced.
+4. If records changed, run `wk validate`, `wk render`, and `wk site --audience all`; also run `wk site --audience user` when checking the standard user experience.
+5. Summarize any knowledge updates and closeout draft path in the final response.
+
+Closeout drafts are deterministic prompts, not automatic truth. Do not treat a
+draft JSON file as a record until a user or agent deliberately applies it with
+the appropriate `wk <type> add --json ...` command.
 
 ## Install Guidance For Users
 
@@ -106,7 +120,10 @@ When a user asks how to set up Wikiwiki for an agentic IDE:
 
 - Explain that Wikiwiki works without AI through the CLI and repo scripts.
 - Recommend installing the `wk` CLI first.
-- Recommend adding scriptable commands such as `wiki:check` or `wiki:site` before adding agent-specific instructions.
+- Recommend `wk setup --profile mixed --audience all` before adding agent-specific instructions.
+- Explain that `wk setup` creates `.wikiwiki/config.json`, adds safe package scripts when `package.json` exists, and refuses conflicting scripts unless `--force` is explicit.
+- Recommend `wk spin --profile mixed --json` for first-pass dogfood, then audience tags on every durable user/developer record.
+- Recommend `wk closeout --profile mixed --audience all --json` after meaningful work; clarify that it creates reviewable drafts and does not append records automatically.
 - Recommend installing this skill into the agent's skill/custom-instructions system with `wk install-agent codex` when supported.
 - Explain that `wk install-agent codex --yes` refuses unknown destination files; use `--force` only after the user or agent has inspected the destination.
 - For Codex-compatible skills, copy this `SKILL.md` into `${CODEX_HOME:-$HOME/.codex}/skills/wk/SKILL.md`.

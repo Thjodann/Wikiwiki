@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Portable reporting paths - Wikiwiki Wiki</title>
+  <title>Render audience-focused wiki sites - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <link rel="stylesheet" href="../../assets/project-theme.css">
   <script src="../../assets/search-index.js" defer></script>
@@ -32,8 +32,8 @@
 <a class="nav-link" href="../../guides.html">Guides</a>
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
-<a class="nav-link active" href="../../concepts.html" aria-current="page">Concepts<span>7</span></a>
-<a class="nav-link" href="../../decisions.html">Decisions<span>14</span></a>
+<a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
+<a class="nav-link active" href="../../decisions.html" aria-current="page">Decisions<span>14</span></a>
 <a class="nav-link" href="../../devlog.html">Devlog<span>16</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
@@ -43,47 +43,48 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Portable reporting paths</h1>
-        <p>Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally.</p>
+        <h1>Render audience-focused wiki sites</h1>
+        <p>Support wk site --audience user, developer, or all. User sites keep shared/user records and hide developer-only symbols, links, and records; developer sites keep shared/developer records.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../concepts.html">Concepts</a>
+    <a href="../../decisions.html">Decisions</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Concept</span>
-    <span class="tag-list"><span>windows</span><span>paths</span><span>dx</span><span>agent-workflow</span></span>
+    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
+    <span class="tag-list"><span>site</span><span>ux</span><span>dx</span></span>
   </div>
   <section class="prose">
-  <h2>Summary</h2>
-  <p>Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally.</p>
-  <h2>Details</h2><p>CLI outputs normalize rendered_files, generated_files, generated_site_files, file_matches, compile paths, and related file metadata so Windows runs do not leak backslashes into agent-facing reports.</p>
+  <h2>Context</h2>
+  <p>A single generated site can over-index on developer/project records and miss the standard user journey.</p>
+  <h2>Decision</h2>
+  <p>Support wk site --audience user, developer, or all. User sites keep shared/user records and hide developer-only symbols, links, and records; developer sites keep shared/developer records.</p>
+  <h2>Consequences</h2>
+  <p>Projects can publish or inspect a standard user wiki without losing developer and agent records from the underlying source of truth.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/paths.ts"><code>src/core/paths.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/render.ts"><code>src/cli/commands/render.ts</code></a></li>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/status.ts"><code>src/cli/commands/status.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/search.ts"><code>src/cli/commands/search.ts</code></a></li></ul>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>concept_2f7f15b0-5a10-4097-9d78-93a24c060f39</code></dd></div>
+    <div><dt>ID</dt><dd><code>decision_aea0762f-b222-4ea3-971d-bfba768255a7</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T16:28:13.023Z">2026-07-04</time></dd></div>
-    <div><dt>Updated</dt><dd><time datetime="2026-07-04T16:28:13.023Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd><code>windows</code> <code>paths</code> <code>dx</code> <code>agent-workflow</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/paths.ts"><code>src/core/paths.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/render.ts"><code>src/cli/commands/render.ts</code></a></li>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T19:14:49.234Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T19:14:49.234Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>audience:all</code> <code>site</code> <code>ux</code> <code>dx</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/status.ts"><code>src/cli/commands/status.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/search.ts"><code>src/cli/commands/search.ts</code></a></li></ul></dd></div>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

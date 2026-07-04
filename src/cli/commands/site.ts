@@ -10,20 +10,22 @@ export function registerSiteCommand(program: Command): void {
     .command("site")
     .description("Generate a static human-facing Wikiwiki site into wiki-site/.")
     .option("--source-base-url <url>", "base URL for source file links, for example https://github.com/OWNER/REPO/blob/main/")
+    .option("--audience <audience>", "site audience: all, user, developer")
     .option("--json", "print machine-readable output")
-    .action((options: { sourceBaseUrl?: string; json?: boolean }) => {
+    .action((options: { sourceBaseUrl?: string; audience?: "all" | "user" | "developer"; json?: boolean }) => {
       const root = findRepoRoot();
       if (!isInitialized(root)) {
         throw new Error("Wikiwiki is not initialized. Run `wk init` first.");
       }
 
-      const siteOptions = resolveSiteOptions(root, { sourceBaseUrl: options.sourceBaseUrl });
+      const siteOptions = resolveSiteOptions(root, { sourceBaseUrl: options.sourceBaseUrl, audience: options.audience });
       const files = renderSite(root, siteOptions);
       const result = {
         ok: true,
         site_path: reportPath(sitePath(root)),
         entrypoint: reportPath(path.join(sitePath(root), "index.html")),
         source_base_url: siteOptions.sourceBaseUrl ?? null,
+        audience: siteOptions.audience,
         rendered_files: files.map((file) => relativeReportPath(root, file))
       };
 

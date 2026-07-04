@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Hardened installer and generated site polish - Wikiwiki Wiki</title>
+  <title>Added setup and closeout automation - Wikiwiki Wiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <link rel="stylesheet" href="../../assets/project-theme.css">
   <script src="../../assets/search-index.js" defer></script>
@@ -43,8 +43,8 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Hardened installer and generated site polish</h1>
-        <p>Hardened installer and generated site polish</p>
+        <h1>Added setup and closeout automation</h1>
+        <p>Added setup and closeout automation</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -53,36 +53,43 @@
     <a href="../../devlog.html">Devlog</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Devlog</span>
+    <span class="type-badge">Devlog</span><span class="audience-badge">For everyone</span>
+    <span class="tag-list"><span>automation</span><span>milestone</span><span>closeout</span></span>
   </div>
   <section class="prose">
   <h2>What happened</h2>
-  <p>Updated wk install-agent codex to avoid deleting destination directories, added --force for explicit installs into directories with unknown files, deduped guide record cards, shortened card/search excerpts, and documented Windows manual skill installation.</p>
+  <p>Implemented wk setup for repo defaults and safe package scripts, plus wk closeout for deterministic status/spin/draft/validate/render/site closeout packets. Updated README, agent skill, protocol guidance, and CLI tests for the new automation flow.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/installAgent.ts"><code>src/cli/commands/installAgent.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/automation.ts"><code>src/core/automation.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/spin.ts"><code>src/core/spin.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/setup.ts"><code>src/cli/commands/setup.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/closeout.ts"><code>src/cli/commands/closeout.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/index.ts"><code>src/index.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li></ul>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/AGENTS.md"><code>AGENTS.md</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>event_5de1e86f-f1fd-4b23-909f-1433eba3ce10</code></dd></div>
+    <div><dt>ID</dt><dd><code>event_1d0da54d-a525-45ce-8060-592f4fece547</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T18:16:21.342Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd>None</dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/installAgent.ts"><code>src/cli/commands/installAgent.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T19:55:50.024Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>audience:all</code> <code>automation</code> <code>milestone</code> <code>closeout</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/automation.ts"><code>src/core/automation.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/spin.ts"><code>src/core/spin.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/setup.ts"><code>src/cli/commands/setup.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/closeout.ts"><code>src/cli/commands/closeout.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/index.ts"><code>src/index.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li></ul></dd></div>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/AGENTS.md"><code>AGENTS.md</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

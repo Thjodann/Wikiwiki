@@ -359,6 +359,7 @@ input[type="search"]:focus {
 }
 
 .type-badge,
+.audience-badge,
 .confidence,
 .tag-list span {
   display: inline-flex;
@@ -373,6 +374,11 @@ input[type="search"]:focus {
 .type-badge {
   background: #e5f0ed;
   color: var(--accent-strong);
+}
+
+.audience-badge {
+  background: var(--panel-soft);
+  color: var(--muted);
 }
 
 .confidence {

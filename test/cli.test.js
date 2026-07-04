@@ -128,18 +128,91 @@ test("install-agent codex refuses unknown destination files unless forced", () =
 test("init creates record files and all generated wiki pages", () => {
   const root = tempRepo();
 
-  const result = runJson(root, ["init", "--json"]);
+  const result = runJson(root, ["init", "--profile", "user", "--json"]);
 
   assert.equal(result.ok, true);
+  assert.equal(result.profile, "user");
   assert.equal(result.record_files.length, 6);
   assertPosixPaths(result.record_files);
   assertPosixPaths(result.rendered_files);
   assert.ok(result.record_files.includes(".wikiwiki/records/concepts.jsonl"));
   assert.ok(result.rendered_files.includes("wiki/index.md"));
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8")).wiki_profile, "user");
   assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/concepts.jsonl")));
   assert.ok(fs.existsSync(path.join(root, "wiki/index.md")));
   assert.ok(fs.existsSync(path.join(root, "wiki/symbols.md")));
   assert.ok(fs.existsSync(path.join(root, "wiki/links.md")));
+});
+
+test("setup initializes config and reports copy-ready scripts without package.json", () => {
+  const root = tempRepo();
+
+  const result = runJson(root, ["setup", "--json"]);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.config.wiki_profile, "mixed");
+  assert.equal(result.config.site_audience, "all");
+  assert.equal(result.package_json.present, false);
+  assert.equal(result.package_json.updated, false);
+  assert.equal(result.package_json.skipped_reason, "package.json not found");
+  assert.equal(result.package_json.copy_commands["wiki:closeout"], "wk closeout --profile mixed --audience all");
+  assert.ok(fs.existsSync(path.join(root, ".wikiwiki/config.json")));
+  assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/concepts.jsonl")));
+});
+
+test("setup persists profile and audience defaults", () => {
+  const root = tempRepo();
+
+  const result = runJson(root, [
+    "setup",
+    "--profile",
+    "user",
+    "--audience",
+    "user",
+    "--source-base-url",
+    "https://github.com/acme/project/blob/main",
+    "--json"
+  ]);
+  const config = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8"));
+
+  assert.equal(result.config.wiki_profile, "user");
+  assert.equal(result.config.site_audience, "user");
+  assert.equal(result.config.source_base_url, "https://github.com/acme/project/blob/main/");
+  assert.equal(config.wiki_profile, "user");
+  assert.equal(config.site_audience, "user");
+  assert.equal(config.source_base_url, "https://github.com/acme/project/blob/main/");
+});
+
+test("setup adds package scripts without disturbing existing scripts", () => {
+  const root = tempRepo();
+  fs.writeFileSync(path.join(root, "package.json"), `${JSON.stringify({ scripts: { test: "node --test" } }, null, 2)}\n`);
+
+  const result = runJson(root, ["setup", "--profile", "developer", "--audience", "developer", "--json"]);
+  const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+
+  assert.equal(result.package_json.present, true);
+  assert.equal(result.package_json.updated, true);
+  assert.equal(pkg.scripts.test, "node --test");
+  assert.equal(pkg.scripts["wiki:status"], "wk status --json");
+  assert.equal(pkg.scripts["wiki:spin"], "wk spin --profile developer --json");
+  assert.equal(pkg.scripts["wiki:site"], "wk validate && wk render && wk site --audience developer");
+  assert.equal(pkg.scripts["wiki:site:user"], "wk validate && wk render && wk site --audience user");
+  assert.equal(pkg.scripts["wiki:closeout"], "wk closeout --profile developer --audience developer");
+});
+
+test("setup refuses conflicting scripts unless forced", () => {
+  const root = tempRepo();
+  fs.writeFileSync(path.join(root, "package.json"), `${JSON.stringify({ scripts: { "wiki:site": "custom site" } }, null, 2)}\n`);
+
+  const failed = runFailure(root, ["setup", "--json"]);
+  assert.match(failed, /Refusing to overwrite existing package scripts: wiki:site/);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")).scripts["wiki:site"], "custom site");
+
+  const result = runJson(root, ["setup", "--force", "--json"]);
+  const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+
+  assert.equal(result.package_json.scripts_overwritten.includes("wiki:site"), true);
+  assert.equal(pkg.scripts["wiki:site"], "wk validate && wk render && wk site --audience all");
 });
 
 test("record lifecycle commands list, get, update, and delete active records", () => {
@@ -230,12 +303,56 @@ test("spin returns heuristic draft templates and command hints", () => {
 
   const result = runJson(root, ["spin", "--json"]);
 
+  assert.equal(result.profile.name, "mixed");
+  assert.equal(result.profile.target_counts.concept, 8);
+  assert.ok(result.profile.page_emphasis.some((item) => item.includes("user orientation")));
+  assert.ok(result.profile.recommended_tags.includes("audience:user"));
+  assert.ok(result.profile.recommended_tags.includes("audience:developer"));
+  assert.ok(result.profile.suggested_records.some((record) => record.title === "FAQ" && record.tags.includes("audience:user")));
+  assert.ok(result.profile.suggested_records.some((record) => record.title === "Troubleshooting" && record.tags.includes("troubleshooting")));
+  assert.ok(result.profile.suggested_records.some((record) => record.title === "Architecture overview" && record.tags.includes("audience:developer")));
   assert.ok(result.suggested_updates.length >= 5);
   for (const update of result.suggested_updates) {
     assert.ok(update.draft);
     assert.ok(update.command_hint.startsWith(`wk ${update.type} add --json`));
     assert.equal(update.confidence, "medium");
   }
+
+  const userProfile = runJson(root, ["spin", "--profile", "user", "--json"]);
+  assert.equal(userProfile.profile.name, "user");
+  assert.equal(userProfile.profile.target_counts.symbol, 0);
+  assert.equal(userProfile.profile.suggested_records.some((record) => record.type === "symbol"), false);
+});
+
+test("closeout creates reviewable drafts and does not append records automatically", () => {
+  const root = tempRepo();
+  run(root, ["setup", "--profile", "mixed", "--audience", "all", "--json"]);
+  fs.mkdirSync(path.join(root, "src/core"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src/core/store.ts"), "export const store = true;\n");
+
+  const before = runJson(root, ["status", "--json"]).records;
+  const result = runJson(root, ["closeout", "--audience", "user", "--json"]);
+  const after = runJson(root, ["status", "--json"]).records;
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, result.manifest_path), "utf8"));
+  const siteManifest = JSON.parse(fs.readFileSync(path.join(root, "wiki-site/site-manifest.json"), "utf8"));
+
+  assert.equal(result.ok, true);
+  assert.equal(result.profile, "mixed");
+  assert.equal(result.audience, "user");
+  assert.equal(result.manifest_path.endsWith("/manifest.json"), true);
+  assert.equal(manifest.type, "closeout-draft");
+  assert.equal(manifest.id, result.id);
+  assert.equal(manifest.audience, "user");
+  assert.deepEqual(after, before);
+  assert.ok(fs.existsSync(path.join(root, result.draft_path, "commands.md")));
+  assert.ok(fs.existsSync(path.join(root, result.draft_path, "summary.md")));
+  assert.ok(result.drafts.length > 0);
+  assert.ok(result.drafts.every((draft) => draft.draft_path.includes("/record-drafts/")));
+  assertPosixPaths([result.draft_path, result.manifest_path, ...result.rendered_files, ...result.site_files]);
+  assertPosixPaths(result.drafts.map((draft) => draft.draft_path));
+  assert.ok(result.rendered_files.includes("wiki/index.md"));
+  assert.ok(result.site_files.includes("wiki-site/index.html"));
+  assert.equal(siteManifest.audience, "user");
 });
 
 test("compile draft and apply create role-oriented human wiki pages", () => {
@@ -358,10 +475,13 @@ test("site command creates a browseable static wiki", () => {
     "site",
     "--source-base-url",
     "https://github.com/acme/project/blob/main/",
+    "--audience",
+    "user",
     "--json"
   ]);
   assert.equal(result.ok, true);
   assert.equal(result.source_base_url, "https://github.com/acme/project/blob/main/");
+  assert.equal(result.audience, "user");
   assertPosixPaths(result.rendered_files);
   assert.ok(result.rendered_files.includes("wiki-site/index.html"));
   assert.ok(result.rendered_files.includes("wiki-site/assets/wikiwiki.css"));

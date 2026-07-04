@@ -47,7 +47,8 @@ export const eventSchema = timestampedSchema.extend({
   type: z.literal("event"),
   summary: z.string().min(1),
   details: z.string(),
-  files: stringArraySchema
+  files: stringArraySchema,
+  tags: stringArraySchema.default([])
 });
 
 export const noteSchema = timestampedSchema.extend({
@@ -62,6 +63,7 @@ export const symbolSchema = updatableSchema.extend({
   kind: z.string().min(1),
   file: z.string().min(1),
   summary: z.string(),
+  tags: stringArraySchema.default([])
 });
 
 export const linkSchema = timestampedSchema.extend({

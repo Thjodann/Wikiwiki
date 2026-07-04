@@ -1,8 +1,10 @@
 import { Command } from "commander";
 import {
   addCommonRecordOptions,
+  arrayValue,
   commonRecordFields,
   parseJsonInput,
+  parseList,
   printAdded,
   stringValue,
   timestampPair,
@@ -36,6 +38,7 @@ export function registerSymbolCommand(program: Command): void {
       kind: options.kind ?? stringValue(payload, "kind"),
       file: options.file ?? stringValue(payload, "file"),
       summary: options.summary ?? stringValue(payload, "summary"),
+      tags: parseList(options.tags).length ? parseList(options.tags) : arrayValue(payload, "tags"),
       ...commonRecordFields(options, payload),
       created_at: timestamps.created_at,
       updated_at: timestamps.updated_at

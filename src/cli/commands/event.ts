@@ -33,6 +33,7 @@ export function registerEventCommand(program: Command): void {
       summary: options.summary ?? stringValue(payload, "summary"),
       details: options.details ?? stringValue(payload, "details"),
       files: parseList(options.files).length ? parseList(options.files) : arrayValue(payload, "files"),
+      tags: parseList(options.tags).length ? parseList(options.tags) : arrayValue(payload, "tags"),
       ...commonRecordFields(options, payload),
       created_at: stringValue(payload, "created_at", new Date().toISOString())
     };

@@ -13,6 +13,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/concept/concept_17ca8065-a8d3-4373-9afe-b47b51a424d3.html",
     "text": "concept_17ca8065-a8d3-4373-9afe-b47b51a424d3 agent agent high 2026-07-04T01:12:44.179Z 2026-07-04T01:12:44.179Z concept Append-only record revisions Record updates append a new JSONL revision with the same logical id, while deletes append a tombstone that active reads, rendering, and search exclude. Validation accepts repeated ids only as ordered revisions. Status, render, search, and record list/get use the latest non-deleted revision. src/core/schemas.ts src/core/store.ts src/core/validator.ts src/cli/commands/record.ts records v1 architecture"
   },
@@ -28,6 +29,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/concept/concept_650e0409-9414-4667-8b40-f36c406a1cb0.html",
     "text": "concept_650e0409-9414-4667-8b40-f36c406a1cb0 agent agent high 2026-07-03T23:04:27.857Z 2026-07-03T23:04:27.857Z concept CLI-first knowledge store Wikiwiki stores repo knowledge as validated JSONL records and renders deterministic Markdown pages. The MVP keeps the source of truth in .wikiwiki/records and treats wiki/ as generated output. src/core/store.ts src/core/renderer.ts mvp architecture"
   },
@@ -44,6 +46,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/concept/concept_4fde0906-d53a-4b9f-b977-3fe964a9d447.html",
     "text": "concept_4fde0906-d53a-4b9f-b977-3fe964a9d447 agent agent high 2026-07-04T01:12:44.193Z 2026-07-04T01:12:44.193Z concept Daily agent loop Wikiwiki V1 supports a CLI-first loop for status, spin, structured capture, revision, validation, rendering, and local search. The loop remains model-agnostic. Spin emits heuristic draft templates and command hints rather than AI-generated prose. src/cli/commands/spin.ts src/cli/commands/search.ts src/cli/commands/symbol.ts src/core/renderer.ts cli v1 agent-workflow"
   },
@@ -61,6 +64,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/concept/concept_9014ffe0-3948-4333-b6c9-f02896f81f84.html",
     "text": "concept_9014ffe0-3948-4333-b6c9-f02896f81f84 agent agent high 2026-07-04T15:45:08.067Z 2026-07-04T15:45:08.067Z concept Human-facing static wiki site Wikiwiki generates a first-class static HTML site for humans while preserving Markdown and JSONL artifacts for agents. The site is generated from active structured records into wiki-site/, uses plain .html links, includes a sidebar and client-side search, and avoids Jekyll-only routes or raw front matter. src/core/site.ts src/cli/commands/site.ts README.md site ux dx human-wiki"
   },
@@ -78,6 +82,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/concept/concept_2f7f15b0-5a10-4097-9d78-93a24c060f39.html",
     "text": "concept_2f7f15b0-5a10-4097-9d78-93a24c060f39 agent agent high 2026-07-04T16:28:13.023Z 2026-07-04T16:28:13.023Z concept Portable reporting paths Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally. CLI outputs normalize rendered_files, generated_files, generated_site_files, file_matches, compile paths, and related file metadata so Windows runs do not leak backslashes into agent-facing reports. src/core/paths.ts src/cli/commands/render.ts src/cli/commands/site.ts src/cli/commands/status.ts src/cli/commands/search.ts windows paths dx agent-workflow"
   },
@@ -95,6 +100,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/concept/concept_4e17c000-edc9-4895-9da1-85cde9756eab.html",
     "text": "concept_4e17c000-edc9-4895-9da1-85cde9756eab agent agent high 2026-07-04T02:49:53.773Z 2026-07-04T02:50:19.623Z concept Role-oriented human wiki compiler Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose. The compiler keeps records as the source of truth, stores draft packets under .wikiwiki/drafts/compile, and publishes validated human pages under wiki/human. src/core/compiler.ts src/cli/commands/compile.ts compile ux dx agent-workflow"
   },
@@ -110,8 +116,27 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/concept/concept_26478291-0b15-4363-b661-436bab183226.html",
     "text": "concept_26478291-0b15-4363-b661-436bab183226 agent agent high 2026-07-03T23:05:14.108Z 2026-07-03T23:05:14.108Z concept Spin heuristics The spin command turns git working tree changes into structured update suggestions without AI summarization. The MVP reads git status and diff stats, groups changed files by simple path patterns, and returns JSON that an external agent can interpret. src/cli/commands/spin.ts src/core/git.ts git cli"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
+    "id": "decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517",
+    "title": "Add setup and closeout automation commands",
+    "summary": "Add wk setup to persist profile/audience defaults and safe package scripts, and add wk closeout to create reviewable draft packets before validating...",
+    "tags": [
+      "automation",
+      "setup",
+      "closeout",
+      "agents"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For everyone",
+    "url": "records/decision/decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517.html",
+    "text": "decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517 agent agent high 2026-07-04T19:55:42.774Z 2026-07-04T19:55:42.774Z decision Add setup and closeout automation commands Wikiwiki needs a portable automation layer that works for non-AI users while giving agentic IDEs a deterministic closeout workflow. Add wk setup to persist profile/audience defaults and safe package scripts, and add wk closeout to create reviewable draft packets before validating and regenerating the wiki outputs. Projects get a cross-machine adoption step and an objective-closeout command without hooks, watch mode, or automatic record mutation. Closeout drafts remain prompts until a user or agent deliberately applies them. src/core/automation.ts src/cli/commands/setup.ts src/cli/commands/closeout.ts README.md skills/wk/SKILL.md audience:all automation setup closeout agents"
   },
   {
     "type": "decision",
@@ -128,6 +153,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "user",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_5ad8c2cf-266c-4824-8833-1d40103933b9.html",
     "text": "decision_5ad8c2cf-266c-4824-8833-1d40103933b9 manual user high 2026-07-04T02:50:03.431Z 2026-07-04T02:50:03.431Z decision Compile UX and DX human wikis through agent-mediated drafts The project should eventually derive procedurally created human-readable wikis while integrating naturally with modern agentic IDE frameworks. Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply. wk stays provider-agnostic while becoming useful as repo memory middleware for Codex, Cursor, Claude Code, and similar agentic IDEs. src/core/compiler.ts README.md AGENTS.md compile ux dx agent-workflow agentic-ide"
   },
@@ -146,6 +172,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "user",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html",
     "text": "decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574 manual user high 2026-07-04T15:45:16.457Z 2026-07-04T15:45:16.457Z decision Generate a static HTML site for human wiki browsing Testing in PRISM showed that raw Markdown previews expose front matter, Jekyll-style routes break outside GitHub Pages builds, and record-shaped pages do not feel like a normal wiki experience. Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/ folder with .html links, navigation, subtle metadata, responsive CSS, and local search data. Agents keep deterministic JSONL and Markdown artifacts, while humans get a first-class local/static wiki that works without a backend or Jekyll. The generated site folder is owned by Wikiwiki and should be regenerated from records. src/core/site.ts src/cli/commands/site.ts src/index.ts README.md AGENTS.md site ux dx human-wiki static"
   },
@@ -163,6 +190,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f.html",
     "text": "decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f agent agent high 2026-07-04T18:16:14.191Z 2026-07-04T18:16:14.191Z decision Make agent skill installation safe by default The Codex skill installer writes outside a project repo and may target an existing user skill directory. Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a non-empty destination with unknown files. wk install-agent codex avoids blind recursive deletion, preserves unknown files when forced, and keeps agent setup safer for dogfood paths like PRISM. src/cli/commands/installAgent.ts test/cli.test.js README.md skills/wk/SKILL.md cli safety agents install"
   },
@@ -181,6 +209,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html",
     "text": "decision_364c44ff-012c-4d15-b978-5e91adf73521 agent agent high 2026-07-04T17:51:59.006Z 2026-07-04T17:51:59.006Z decision Make generated sites project-first PRISM dogfooding showed the generated site was mechanically sound but still felt like a Wikiwiki-branded record browser, with generator branding, raw IDs, visible confidence badges, empty categories, and implementation churn on the homepage. Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer credit, add a curated Guides page and homepage ranking, hide empty categories from primary navigation, move record metadata into agent details, support .wikiwiki/site-theme.json, and add print/mobile polish. Humans get a clearer reader journey while agents retain JSONL records, generated Markdown, searchable record pages, metadata, and deterministic static output. src/core/site.ts src/core/config.ts test/site.test.js README.md site ux human-wiki theme homepage"
   },
@@ -198,6 +227,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "user",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html",
     "text": "decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5 manual user high 2026-07-04T16:28:13.055Z 2026-07-04T16:28:13.055Z decision Make generated sites publishable without adjacent repo files PRISM dogfooding showed wiki-site source links worked in a full checkout but would break when only wiki-site/ is deployed to GitHub Pages. Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise. Generated sites remain useful locally, while published Pages sites can link back to GitHub source files and directories without relying on the full repository being deployed beside wiki-site/. src/core/config.ts src/core/site.ts src/cli/commands/site.ts .wikiwiki/config.json README.md site github-pages source-links dx"
   },
@@ -215,8 +245,26 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_e5333a83-7321-4a65-b040-12c1487f60e7.html",
     "text": "decision_e5333a83-7321-4a65-b040-12c1487f60e7 agent agent high 2026-07-04T01:12:44.175Z 2026-07-04T02:00:09.037Z decision Prepare scoped npm package without publishing V1 should be package-ready without forcing a publish step; after naming discussion, the package identity is shortened for agent ergonomics. Use @thjodann/wk as the scoped npm package name, expose wk as the primary binary, keep wikiwiki as a compatibility alias, and verify package contents with npm pack --dry-run. Agents get the short wk command while existing wikiwiki usage keeps working; actual npm publishing remains an explicit manual release action. package.json package-lock.json .github/workflows/ci.yml README.md package ci v1 rename"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
+    "id": "decision_aea0762f-b222-4ea3-971d-bfba768255a7",
+    "title": "Render audience-focused wiki sites",
+    "summary": "Support wk site --audience user, developer, or all.",
+    "tags": [
+      "site",
+      "ux",
+      "dx"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For everyone",
+    "url": "records/decision/decision_aea0762f-b222-4ea3-971d-bfba768255a7.html",
+    "text": "decision_aea0762f-b222-4ea3-971d-bfba768255a7 agent agent high 2026-07-04T19:14:49.234Z 2026-07-04T19:14:49.234Z decision Render audience-focused wiki sites A single generated site can over-index on developer/project records and miss the standard user journey. Support wk site --audience user, developer, or all. User sites keep shared/user records and hide developer-only symbols, links, and records; developer sites keep shared/developer records. Projects can publish or inspect a standard user wiki without losing developer and agent records from the underlying source of truth. src/core/site.ts src/cli/commands/site.ts test/site.test.js test/cli.test.js audience:all site ux dx"
   },
   {
     "type": "decision",
@@ -231,6 +279,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_45f2d29a-3140-40f6-b62c-8e299621419b.html",
     "text": "decision_45f2d29a-3140-40f6-b62c-8e299621419b agent agent high 2026-07-04T16:41:01.726Z 2026-07-04T16:41:01.726Z decision Ship a lean npm package Before PRISM depends on Wikiwiki, the @thjodann/wk tarball should contain the CLI runtime and package documentation without generated dogfood output or large decorative assets. Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL. The package stays small and intentional while installed users can still run wk render and wk site to generate Markdown and static wiki output inside their own repos. package.json README.md LICENSE test/cli.test.js package release npm"
   },
@@ -248,6 +297,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747.html",
     "text": "decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747 agent agent high 2026-07-04T17:38:24.597Z 2026-07-04T17:38:24.597Z decision Ship wk as an installable agent skill Wikiwiki is designed to assist coding agents before humans, so agentic IDEs need persistent instructions that make the wk loop automatic rather than dependent on each prompt. Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in the npm package while continuing to exclude generated wiki output and large decorative assets. Agents can discover and run wk status, spin, record, validate, render, site, and compile workflows consistently across repos; package users get the skill artifact without bloating the tarball. skills/wk/SKILL.md skills/wk/agents/openai.yaml README.md package.json test/cli.test.js agent-workflow skills package docs"
   },
@@ -265,8 +315,27 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "user",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html",
     "text": "decision_d7a1f846-57be-4c31-9fd6-27dc704622ab manual user high 2026-07-04T17:59:00.773Z 2026-07-04T17:59:00.773Z decision Support script-first wiki automation The product should work for users who do not use agentic IDEs while becoming more capable when agents are present. Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture, curation, and human-readable drafts. README setup should lead with non-AI CLI automation, then describe the optional agent-led install path. Agents should lean on wk commands and scripts for repeatable work to avoid unnecessary LLM calls. README.md skills/wk/SKILL.md product automation agents docs"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
+    "id": "decision_4054b35e-c388-4e72-b116-c7efdb7e2d77",
+    "title": "Use deterministic wiki profiles for first-pass seeding",
+    "summary": "Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates.",
+    "tags": [
+      "product",
+      "dogfood",
+      "profiles",
+      "docs"
+    ],
+    "authority": "user",
+    "confidence": "high",
+    "audienceLabel": "For everyone",
+    "url": "records/decision/decision_4054b35e-c388-4e72-b116-c7efdb7e2d77.html",
+    "text": "decision_4054b35e-c388-4e72-b116-c7efdb7e2d77 manual user high 2026-07-04T19:14:41.158Z 2026-07-04T19:14:41.158Z decision Use deterministic wiki profiles for first-pass seeding Dogfood against the same PRISM repo produced materially different record counts, page emphasis, and audience coverage across runs. Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates. Keep mixed as the default profile. Agents and scripts get a shared initialization recipe, first-pass wikis should converge across machines, and user-facing material such as getting started, FAQ, privacy, and troubleshooting becomes part of the default mixed shape. src/core/profiles.ts src/cli/commands/spin.ts src/cli/commands/init.ts README.md skills/wk/SKILL.md audience:all product dogfood profiles docs"
   },
   {
     "type": "decision",
@@ -280,6 +349,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd.html",
     "text": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd agent agent high 2026-07-03T23:04:27.960Z 2026-07-03T23:04:27.960Z decision Use JSONL for MVP storage The first milestone needs storage that agents can inspect, append, validate, and repair with simple tools. Store each record type in an append-only JSONL file under .wikiwiki/records. The MVP stays simple and repo-native; update and compaction commands can be added later. src/core/store.ts src/core/schemas.ts storage mvp"
   },
@@ -296,8 +366,27 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "user",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html",
     "text": "decision_e28e5351-dd00-4ba1-841d-278b639ae1c8 manual user high 2026-07-04T02:00:17.018Z 2026-07-04T02:00:17.018Z decision Use wk as primary CLI identity Wikiwiki is built for agent loops, and agents benefit from a short command while humans still need a friendly product name. Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve wikiwiki as a compatibility alias. Agent setup snippets and command hints should prefer wk; .wikiwiki storage, wiki output, and the Thjodann/Wikiwiki GitHub repo remain unchanged for this pass. package.json package-lock.json src/index.ts src/cli/commands/spin.ts README.md test/cli.test.js cli rename agent-workflow"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_d58eb17b-7bd3-4d80-8d1d-5904aa7323ea",
+    "title": "Added deterministic wiki profiles and audience rendering",
+    "summary": "Added deterministic wiki profiles and audience rendering",
+    "tags": [
+      "devlog",
+      "dogfood",
+      "profiles",
+      "site"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_d58eb17b-7bd3-4d80-8d1d-5904aa7323ea.html",
+    "text": "event_d58eb17b-7bd3-4d80-8d1d-5904aa7323ea agent agent high 2026-07-04T19:14:58.121Z event Added deterministic wiki profiles and audience rendering Implemented first-pass wiki profiles for user, developer, and mixed runs; added audience tags to spin suggestions and rendered views; supported wk site --audience; surfaced FAQ/getting-started/troubleshooting records in Guides; and added theme contrast guardrails for common overrides. src/core/profiles.ts src/cli/commands/spin.ts src/cli/commands/init.ts src/cli/commands/site.ts src/core/site.ts src/core/config.ts src/core/schemas.ts README.md skills/wk/SKILL.md test/cli.test.js test/site.test.js audience:developer devlog dogfood profiles site"
   },
   {
     "type": "event",
@@ -308,8 +397,26 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_e116aa8a-281e-4d85-a8be-abca622110e6.html",
     "text": "event_e116aa8a-281e-4d85-a8be-abca622110e6 agent agent high 2026-07-04T17:38:24.698Z event Added installable wk agent skill Created skills/wk/SKILL.md with the daily agent loop, closeout protocol, install guidance, and Codex UI metadata; updated README with an agentic IDE setup section; included skills/wk in package files; and adjusted the package hygiene test. skills/wk/SKILL.md skills/wk/agents/openai.yaml README.md package.json test/cli.test.js"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_1d0da54d-a525-45ce-8060-592f4fece547",
+    "title": "Added setup and closeout automation",
+    "summary": "Added setup and closeout automation",
+    "tags": [
+      "automation",
+      "milestone",
+      "closeout"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For everyone",
+    "url": "records/event/event_1d0da54d-a525-45ce-8060-592f4fece547.html",
+    "text": "event_1d0da54d-a525-45ce-8060-592f4fece547 agent agent high 2026-07-04T19:55:50.024Z event Added setup and closeout automation Implemented wk setup for repo defaults and safe package scripts, plus wk closeout for deterministic status/spin/draft/validate/render/site closeout packets. Updated README, agent skill, protocol guidance, and CLI tests for the new automation flow. src/core/automation.ts src/core/spin.ts src/cli/commands/setup.ts src/cli/commands/closeout.ts src/index.ts test/cli.test.js README.md skills/wk/SKILL.md AGENTS.md audience:all automation milestone closeout"
   },
   {
     "type": "event",
@@ -320,6 +427,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_da489cef-22d6-46db-989d-25eb52891c37.html",
     "text": "event_da489cef-22d6-46db-989d-25eb52891c37 agent agent high 2026-07-04T02:41:57.014Z event Aligned agent protocol with wk command Updated the agent protocol to prefer wk over the compatibility wikiwiki alias and fixed the README generated-page list to include symbols and links. AGENTS.md README.md wiki/devlog.md"
   },
@@ -332,6 +440,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86.html",
     "text": "event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86 agent agent high 2026-07-04T17:59:07.939Z event Documented script-first Wikiwiki automation Updated the README and bundled wk skill to clarify that Wikiwiki works without AI through deterministic CLI scripts, while agentic IDE setup remains an optional enhancement for richer record capture and curation. README.md skills/wk/SKILL.md"
   },
@@ -344,6 +453,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_410942e4-5e5f-445a-88be-db5aa7cfa176.html",
     "text": "event_410942e4-5e5f-445a-88be-db5aa7cfa176 agent agent high 2026-07-04T00:43:03.660Z event Drafted aspirational README Replaced the README banner with the supplied image and rewrote README.md as an idealistic, GitHub-facing project draft while keeping the current MVP status visible. README.md assets/wikiwiki-banner.png"
   },
@@ -356,6 +466,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_5de1e86f-f1fd-4b23-909f-1433eba3ce10.html",
     "text": "event_5de1e86f-f1fd-4b23-909f-1433eba3ce10 agent agent high 2026-07-04T18:16:21.342Z event Hardened installer and generated site polish Updated wk install-agent codex to avoid deleting destination directories, added --force for explicit installs into directories with unknown files, deduped guide record cards, shortened card/search excerpts, and documented Windows manual skill installation. src/cli/commands/installAgent.ts src/core/site.ts test/cli.test.js test/site.test.js README.md skills/wk/SKILL.md"
   },
@@ -368,6 +479,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_77558856-112d-4c41-9003-696a8c1e3dda.html",
     "text": "event_77558856-112d-4c41-9003-696a8c1e3dda agent agent high 2026-07-04T16:28:13.055Z event Hardened static site portability for PRISM dogfooding Normalized JSON/report paths to POSIX separators, added source_base_url config and wk site --source-base-url, switched configured source links to GitHub blob/tree URLs, expanded tests for Windows-style path safety and Pages-safe source links, and documented the deployment flow. src/core/paths.ts src/core/config.ts src/core/site.ts src/cli/commands/site.ts src/cli/commands/status.ts src/cli/commands/render.ts src/cli/commands/search.ts test/site.test.js test/cli.test.js README.md"
   },
@@ -380,6 +492,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_dddc9fc5-611a-4902-b27c-8ee455c6832a.html",
     "text": "event_dddc9fc5-611a-4902-b27c-8ee455c6832a agent agent high 2026-07-04T15:45:27.894Z event Implemented static human wiki site generation Added wk site, the core static site generator, generated wiki-site output with sidebar navigation, record pages, client-side search data, .html link rewriting, responsive CSS, docs, and tests for local link behavior. src/core/site.ts src/cli/commands/site.ts src/index.ts test/site.test.js test/cli.test.js README.md AGENTS.md wiki-site/index.html"
   },
@@ -392,6 +505,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8.html",
     "text": "event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8 agent agent high 2026-07-04T02:50:10.328Z event Implemented UX/DX human wiki compile pilot Added wk compile draft/apply, role routing for UX and DX records, compile draft manifests, provenance validation, human wiki publishing, tests, and docs for agent-mediated IDE workflows. src/core/compiler.ts src/cli/commands/compile.ts src/core/validator.ts src/index.ts test/compiler.test.js test/cli.test.js README.md AGENTS.md"
   },
@@ -404,6 +518,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_bc62fab0-ba40-4a0e-8d3a-b816ea356345.html",
     "text": "event_bc62fab0-ba40-4a0e-8d3a-b816ea356345 agent agent high 2026-07-04T01:12:55.540Z event Implemented Wikiwiki V1 CLI loop Added append-only record revisions and tombstones, generic record lifecycle commands, symbol add, local search, richer spin draft templates, symbols and links rendering, package-ready metadata, CI, and Node test coverage. src/core/schemas.ts src/core/store.ts src/core/validator.ts src/cli/commands/record.ts src/cli/commands/search.ts src/cli/commands/symbol.ts src/cli/commands/spin.ts src/core/renderer.ts package.json .github/workflows/ci.yml test/cli.test.js test/store.test.js"
   },
@@ -416,6 +531,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_2c53f001-eb63-4e55-82d3-fc9df43b53f2.html",
     "text": "event_2c53f001-eb63-4e55-82d3-fc9df43b53f2 agent agent high 2026-07-04T17:51:59.099Z event Improved generated site product UX Used the PRISM PDF dogfood export as evidence to reduce visible Wikiwiki branding, add project-first titles and footer credit, introduce guides.html, curate homepage records, hide raw IDs and confidence badges from listing/search cards, add .wikiwiki/site-theme.json support, improve mobile navigation and print behavior, and add wk install-agent codex. src/core/site.ts src/core/config.ts src/cli/commands/installAgent.ts src/index.ts test/site.test.js test/cli.test.js README.md skills/wk/SKILL.md"
   },
@@ -428,6 +544,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_6c360d34-0e2b-414e-9445-af1fe597103a.html",
     "text": "event_6c360d34-0e2b-414e-9445-af1fe597103a agent agent high 2026-07-03T23:04:28.065Z event Initialized Wikiwiki CLI MVP Created the TypeScript package, schemas, JSONL store, CLI commands, validation, spin heuristics, and Markdown renderer. src/index.ts src/cli/commands src/core src/templates"
   },
@@ -440,6 +557,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_d67ebd8e-e9f4-4c08-a011-72295a6e7210.html",
     "text": "event_d67ebd8e-e9f4-4c08-a011-72295a6e7210 agent agent high 2026-07-04T00:07:16.435Z event Refreshed README with hero banner Added a project-local Wikiwiki README banner asset and updated the README for GitHub-facing installation, usage, storage, agent workflow, development, limitations, and roadmap docs. README.md assets/wikiwiki-banner.png"
   },
@@ -452,6 +570,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html",
     "text": "event_1222a170-521f-476b-bd83-7359a4ba66c2 agent agent high 2026-07-04T02:00:24.667Z event Renamed CLI identity to wk Changed package identity to @thjodann/wk, added wk as the primary binary while keeping wikiwiki as a compatibility alias, updated Commander help, spin command hints, README examples, tests, and generated-page command guidance, and preserved .wikiwiki and wiki paths. package.json package-lock.json src/index.ts src/cli/commands/spin.ts src/core/renderer.ts src/core/validator.ts src/cli/commands/render.ts README.md test/cli.test.js"
   },
@@ -464,6 +583,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/event/event_495227ea-a813-41fa-b7a6-910f338a518f.html",
     "text": "event_495227ea-a813-41fa-b7a6-910f338a518f agent agent high 2026-07-04T16:41:01.840Z event Trimmed npm package contents for release readiness Added LICENSE, switched the README banner to a GitHub-hosted URL, narrowed package.json files to dist, README.md, and LICENSE, and added a package-hygiene regression test so generated wiki output and the large banner asset stay out of the tarball. package.json README.md LICENSE test/cli.test.js"
   },
@@ -476,6 +596,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/link/link_f1dadf17-2e61-4024-bb02-d237e43ea911.html",
     "text": "link_f1dadf17-2e61-4024-bb02-d237e43ea911 agent agent high 2026-07-03T23:05:55.877Z link decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd src/core/store.ts chooses-storage"
   },
@@ -488,6 +609,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/link/link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0.html",
     "text": "link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0 agent agent high 2026-07-04T00:07:23.753Z link README.md assets/wikiwiki-banner.png embeds"
   },
@@ -503,6 +625,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/note/note_482c1563-27d5-48b3-a8f7-81075cc69b28.html",
     "text": "note_482c1563-27d5-48b3-a8f7-81075cc69b28 agent agent high 2026-07-03T23:05:55.774Z note Generated wiki pages are owned by Wikiwiki; edit structured records instead. renderer docs"
   },
@@ -519,6 +642,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "user",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/note/note_e237de63-0391-4d81-8a69-f47666a6dfd7.html",
     "text": "note_e237de63-0391-4d81-8a69-f47666a6dfd7 manual user high 2026-07-04T00:42:54.319Z note User chose the supplied Wikiwiki banner image for the README and explicitly allowed an idealistic README draft, including future-facing product language for capabilities that may not exist yet. readme product-direction banner"
   },
@@ -534,6 +658,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     ],
     "authority": "user",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/note/note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92.html",
     "text": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92 manual user high 2026-07-04T01:12:44.175Z note User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata. v1 user-intent"
   },
@@ -546,6 +671,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/symbol/symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652.html",
     "text": "symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652 agent agent high 2026-07-04T01:13:10.951Z 2026-07-04T01:13:10.951Z symbol activeRecords function src/core/store.ts Filters raw record revisions down to latest non-deleted records for status, rendering, search, and record reads."
   },
@@ -558,6 +684,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/symbol/symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c.html",
     "text": "symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c agent agent high 2026-07-04T16:28:22.677Z 2026-07-04T16:28:22.677Z symbol readWikiwikiConfig function src/core/config.ts Reads optional .wikiwiki/config.json settings such as source_base_url for generated site source links."
   },
@@ -570,6 +697,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/symbol/symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98.html",
     "text": "symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98 agent agent high 2026-07-04T01:13:11.002Z 2026-07-04T01:13:11.002Z symbol registerRecordCommand function src/cli/commands/record.ts Registers generic record list, get, update, and delete commands for append-only record lifecycle management."
   },
@@ -582,6 +710,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/symbol/symbol_fa848524-5a78-4fc0-9781-cf7673acae13.html",
     "text": "symbol_fa848524-5a78-4fc0-9781-cf7673acae13 agent agent high 2026-07-04T01:13:11.064Z 2026-07-04T01:13:11.064Z symbol registerSearchCommand function src/cli/commands/search.ts Registers local search across active records and rendered Markdown wiki pages."
   },
@@ -594,6 +723,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/symbol/symbol_766a4f0e-54ee-44cc-a9f3-62faac669612.html",
     "text": "symbol_766a4f0e-54ee-44cc-a9f3-62faac669612 agent agent high 2026-07-04T15:45:27.912Z 2026-07-04T15:45:27.912Z symbol registerSiteCommand function src/cli/commands/site.ts Registers wk site, which generates the human-facing static Wikiwiki frontend into wiki-site/."
   },
@@ -606,6 +736,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/symbol/symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959.html",
     "text": "symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959 agent agent high 2026-07-04T15:45:27.902Z 2026-07-04T15:45:27.902Z symbol renderSite function src/core/site.ts Builds and writes the generated wiki-site/ static HTML frontend from active Wikiwiki records."
   },
@@ -618,6 +749,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "tags": [],
     "authority": "agent",
     "confidence": "high",
+    "audienceLabel": "",
     "url": "records/symbol/symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5.html",
     "text": "symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5 agent agent high 2026-07-04T16:28:22.677Z 2026-07-04T16:28:22.677Z symbol resolveSiteOptions function src/core/site.ts Resolves wk site options by combining .wikiwiki/config.json with CLI overrides, including sourceBaseUrl."
   }

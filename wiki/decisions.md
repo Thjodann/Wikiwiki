@@ -155,3 +155,45 @@ Files: `src/cli/commands/installAgent.ts`, `test/cli.test.js`, `README.md`, `ski
 Tags: `cli`, `safety`, `agents`, `install`
 
 Record: `decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f` | Authority: agent | Confidence: high
+
+## Use deterministic wiki profiles for first-pass seeding
+
+Context: Dogfood against the same PRISM repo produced materially different record counts, page emphasis, and audience coverage across runs.
+
+Decision: Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates. Keep mixed as the default profile.
+
+Consequences: Agents and scripts get a shared initialization recipe, first-pass wikis should converge across machines, and user-facing material such as getting started, FAQ, privacy, and troubleshooting becomes part of the default mixed shape.
+
+Files: `src/core/profiles.ts`, `src/cli/commands/spin.ts`, `src/cli/commands/init.ts`, `README.md`, `skills/wk/SKILL.md`
+
+Tags: `audience:all`, `product`, `dogfood`, `profiles`, `docs`
+
+Record: `decision_4054b35e-c388-4e72-b116-c7efdb7e2d77` | Authority: user | Confidence: high
+
+## Render audience-focused wiki sites
+
+Context: A single generated site can over-index on developer/project records and miss the standard user journey.
+
+Decision: Support wk site --audience user, developer, or all. User sites keep shared/user records and hide developer-only symbols, links, and records; developer sites keep shared/developer records.
+
+Consequences: Projects can publish or inspect a standard user wiki without losing developer and agent records from the underlying source of truth.
+
+Files: `src/core/site.ts`, `src/cli/commands/site.ts`, `test/site.test.js`, `test/cli.test.js`
+
+Tags: `audience:all`, `site`, `ux`, `dx`
+
+Record: `decision_aea0762f-b222-4ea3-971d-bfba768255a7` | Authority: agent | Confidence: high
+
+## Add setup and closeout automation commands
+
+Context: Wikiwiki needs a portable automation layer that works for non-AI users while giving agentic IDEs a deterministic closeout workflow.
+
+Decision: Add wk setup to persist profile/audience defaults and safe package scripts, and add wk closeout to create reviewable draft packets before validating and regenerating the wiki outputs.
+
+Consequences: Projects get a cross-machine adoption step and an objective-closeout command without hooks, watch mode, or automatic record mutation. Closeout drafts remain prompts until a user or agent deliberately applies them.
+
+Files: `src/core/automation.ts`, `src/cli/commands/setup.ts`, `src/cli/commands/closeout.ts`, `README.md`, `skills/wk/SKILL.md`
+
+Tags: `audience:all`, `automation`, `setup`, `closeout`, `agents`
+
+Record: `decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517` | Authority: agent | Confidence: high

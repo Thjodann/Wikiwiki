@@ -33,8 +33,8 @@
 <a class="nav-link" href="search.html">Search</a>
 <p class="nav-heading">Agent records</p>
 <a class="nav-link" href="concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="decisions.html">Decisions<span>11</span></a>
-<a class="nav-link" href="devlog.html">Devlog<span>14</span></a>
+<a class="nav-link" href="decisions.html">Decisions<span>14</span></a>
+<a class="nav-link" href="devlog.html">Devlog<span>16</span></a>
 <a class="nav-link" href="notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="links.html">Links<span>2</span></a>
@@ -59,6 +59,15 @@
   <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer...</p>
   <footer>
     <span class="tag-list"><span>site</span><span>ux</span><span>human-wiki</span><span>theme</span><span>homepage</span></span></footer>
+</article>
+<article class="record-card" data-search-card>
+  <div class="record-card-top">
+    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
+  </div>
+  <h3><a href="records/decision/decision_4054b35e-c388-4e72-b116-c7efdb7e2d77.html">Use deterministic wiki profiles for first-pass seeding</a></h3>
+  <p>Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates.</p>
+  <footer>
+    <span class="tag-list"><span>product</span><span>dogfood</span><span>profiles</span><span>docs</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
@@ -95,15 +104,6 @@
   <p>Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture...</p>
   <footer>
     <span class="tag-list"><span>product</span><span>automation</span><span>agents</span><span>docs</span></span></footer>
-</article>
-<article class="record-card" data-search-card>
-  <div class="record-card-top">
-    <span class="type-badge">Decision</span>
-  </div>
-  <h3><a href="records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html">Use wk as primary CLI identity</a></h3>
-  <p>Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve...</p>
-  <footer>
-    <span class="tag-list"><span>cli</span><span>rename</span><span>agent-workflow</span></span></footer>
 </article></div>
 </section>
 
@@ -177,6 +177,33 @@
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
+  <h3><a href="records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html">Use wk as primary CLI identity</a></h3>
+  <p>Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve...</p>
+  <footer>
+    <span class="tag-list"><span>cli</span><span>rename</span><span>agent-workflow</span></span></footer>
+</article>
+<article class="record-card" data-search-card>
+  <div class="record-card-top">
+    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
+  </div>
+  <h3><a href="records/decision/decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517.html">Add setup and closeout automation commands</a></h3>
+  <p>Add wk setup to persist profile/audience defaults and safe package scripts, and add wk closeout to create reviewable draft packets before validating...</p>
+  <footer>
+    <span class="tag-list"><span>automation</span><span>setup</span><span>closeout</span><span>agents</span></span></footer>
+</article>
+<article class="record-card" data-search-card>
+  <div class="record-card-top">
+    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
+  </div>
+  <h3><a href="records/decision/decision_aea0762f-b222-4ea3-971d-bfba768255a7.html">Render audience-focused wiki sites</a></h3>
+  <p>Support wk site --audience user, developer, or all.</p>
+  <footer>
+    <span class="tag-list"><span>site</span><span>ux</span><span>dx</span></span></footer>
+</article>
+<article class="record-card" data-search-card>
+  <div class="record-card-top">
+    <span class="type-badge">Decision</span>
+  </div>
   <h3><a href="records/decision/decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f.html">Make agent skill installation safe by default</a></h3>
   <p>Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a...</p>
   <footer>
@@ -199,24 +226,6 @@
   <p>Use @thjodann/wk as the scoped npm package name, expose wk as the primary binary, keep wikiwiki as a compatibility alias, and verify package contents...</p>
   <footer>
     <span class="tag-list"><span>package</span><span>ci</span><span>v1</span><span>rename</span></span></footer>
-</article>
-<article class="record-card" data-search-card>
-  <div class="record-card-top">
-    <span class="type-badge">Decision</span>
-  </div>
-  <h3><a href="records/decision/decision_45f2d29a-3140-40f6-b62c-8e299621419b.html">Ship a lean npm package</a></h3>
-  <p>Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of...</p>
-  <footer>
-    <span class="tag-list"><span>package</span><span>release</span><span>npm</span></span></footer>
-</article>
-<article class="record-card" data-search-card>
-  <div class="record-card-top">
-    <span class="type-badge">Decision</span>
-  </div>
-  <h3><a href="records/decision/decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747.html">Ship wk as an installable agent skill</a></h3>
-  <p>Add a Codex-compatible wk skill under skills/wk, document a copy/paste agentic IDE install flow in README, and include the tiny skills/wk folder in...</p>
-  <footer>
-    <span class="tag-list"><span>agent-workflow</span><span>skills</span><span>package</span><span>docs</span></span></footer>
 </article></div>
 </section>
 
@@ -231,12 +240,12 @@
   <p>Durable explanations, domain terms, product ideas, and system concepts.</p>
 </a>
 <a class="section-card" href="decisions.html">
-  <span>11 records</span>
+  <span>14 records</span>
   <strong>Decisions</strong>
   <p>Product, architecture, workflow, and implementation decisions with rationale.</p>
 </a>
 <a class="section-card" href="devlog.html">
-  <span>14 records</span>
+  <span>16 records</span>
   <strong>Devlog</strong>
   <p>Meaningful changes and development milestones in chronological context.</p>
 </a>

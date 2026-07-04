@@ -113,3 +113,19 @@ Updated wk install-agent codex to avoid deleting destination directories, added 
 Files: `src/cli/commands/installAgent.ts`, `src/core/site.ts`, `test/cli.test.js`, `test/site.test.js`, `README.md`, `skills/wk/SKILL.md`
 
 Recorded: 2026-07-04T18:16:21.342Z | Record: `event_5de1e86f-f1fd-4b23-909f-1433eba3ce10` | Confidence: high
+
+## Added deterministic wiki profiles and audience rendering
+
+Implemented first-pass wiki profiles for user, developer, and mixed runs; added audience tags to spin suggestions and rendered views; supported wk site --audience; surfaced FAQ/getting-started/troubleshooting records in Guides; and added theme contrast guardrails for common overrides.
+
+Files: `src/core/profiles.ts`, `src/cli/commands/spin.ts`, `src/cli/commands/init.ts`, `src/cli/commands/site.ts`, `src/core/site.ts`, `src/core/config.ts`, `src/core/schemas.ts`, `README.md`, `skills/wk/SKILL.md`, `test/cli.test.js`, `test/site.test.js`
+
+Recorded: 2026-07-04T19:14:58.121Z | Record: `event_d58eb17b-7bd3-4d80-8d1d-5904aa7323ea` | Confidence: high
+
+## Added setup and closeout automation
+
+Implemented wk setup for repo defaults and safe package scripts, plus wk closeout for deterministic status/spin/draft/validate/render/site closeout packets. Updated README, agent skill, protocol guidance, and CLI tests for the new automation flow.
+
+Files: `src/core/automation.ts`, `src/core/spin.ts`, `src/cli/commands/setup.ts`, `src/cli/commands/closeout.ts`, `src/index.ts`, `test/cli.test.js`, `README.md`, `skills/wk/SKILL.md`, `AGENTS.md`
+
+Recorded: 2026-07-04T19:55:50.024Z | Record: `event_1d0da54d-a525-45ce-8060-592f4fece547` | Confidence: high

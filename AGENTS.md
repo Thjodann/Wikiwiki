@@ -5,7 +5,7 @@ This repo uses Wikiwiki for agent-readable project knowledge.
 ## Before Starting Work
 
 1. Run `wk status --json`.
-2. Run `wk spin --json` to inspect current repo changes.
+2. Run `wk spin --profile mixed --json` to inspect current repo changes unless config or the user specifies another profile.
 3. Review relevant records if available.
 
 ## During Work
@@ -15,16 +15,16 @@ This repo uses Wikiwiki for agent-readable project knowledge.
 - Use `authority: "agent"` and an appropriate confidence level for inferred records.
 - Use `authority: "user"` only when directly recording explicit user intent.
 - Keep generated wiki files deterministic and plainly marked as generated.
+- Use `wk setup --profile mixed --audience all` when adopting Wikiwiki in a repo.
 - Use `wk compile draft` and `wk compile apply` for human-readable UX/DX wiki pages.
 
 ## After Making Changes
 
-1. Run `wk spin --json`.
-2. Add or update concepts, decisions, notes, events, or links as needed.
-3. Run `wk validate`.
-4. Run `wk render`.
-5. Run `wk site` when human-facing wiki output should be refreshed.
-6. Summarize knowledge updates in the final response.
+1. Run `wk closeout --profile mixed --audience all --json` unless config or the user specifies another profile/audience.
+2. Review `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`.
+3. Add or update concepts, decisions, notes, events, symbols, or links only when drafts are true and useful.
+4. Run `wk validate`, `wk render`, and `wk site` when records or human-facing wiki output changed.
+5. Summarize knowledge updates and closeout draft path in the final response.
 
 ## Generated Files
 

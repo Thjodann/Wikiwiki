@@ -37,12 +37,14 @@ Docs that keep up, in other words.
 Wikiwiki is built around a small, repeatable workflow:
 
 ```sh
+wk setup --profile mixed --audience all
 wk status --json
-wk spin --json
+wk spin --profile mixed --json
 wk note add "Renderer owns generated wiki files." --tags renderer,docs
 wk validate
 wk render
-wk site
+wk site --audience all
+wk closeout --profile mixed --audience all
 ```
 
 That loop can run from a terminal, package script, Git hook, CI job, or agentic
@@ -54,6 +56,7 @@ IDE. It lets a project:
 4. Validate the records.
 5. Render Markdown into `wiki/`.
 6. Render a browseable static site into `wiki-site/`.
+7. Create a closeout draft packet when a meaningful objective is done.
 
 The structured records are the source of truth. Markdown stays simple and
 deterministic for agents. The static site is the first-class human wiki.
@@ -66,16 +69,30 @@ Wikiwiki has two layers.
 repo, and run scripts that validate, render Markdown, and build the static site.
 This path works without AI tools and should stay useful for any project.
 
+Use `wk setup` to create `.wikiwiki/config.json` and add package scripts when a
+`package.json` exists:
+
+```sh
+wk setup --profile mixed --audience all
+```
+
 ```json
 {
   "scripts": {
+    "wiki:status": "wk status --json",
+    "wiki:spin": "wk spin --profile mixed --json",
     "wiki:check": "wk validate",
     "wiki:render": "wk validate && wk render",
-    "wiki:site": "wk validate && wk render && wk site",
-    "wiki:publish": "wk validate && wk render && wk site --source-base-url https://github.com/OWNER/REPO/blob/main/"
+    "wiki:site": "wk validate && wk render && wk site --audience all",
+    "wiki:site:user": "wk validate && wk render && wk site --audience user",
+    "wiki:closeout": "wk closeout --profile mixed --audience all"
   }
 }
 ```
+
+`wk setup` will not create a `package.json`. In repos without one, it reports
+copy-ready commands. It also refuses to overwrite existing conflicting scripts
+unless `--force` is explicit.
 
 **Agent-enhanced layer:** install the optional agent instructions so Codex,
 Cursor, Claude Code, or another coding agent knows when to run `wk spin`, when
@@ -86,6 +103,78 @@ Use scripts for repeatable work. Use agents for judgment: deciding what changed,
 capturing why it mattered, curating homepage-worthy knowledge, writing UX/DX
 draft prose, and adjusting the project theme. That keeps unnecessary LLM calls
 out of the loop while preserving the upside of agentic development.
+
+`wk closeout` is the portable "I finished Objective B" command:
+
+```sh
+wk closeout --profile mixed --audience all --json
+```
+
+It runs status, spin, validation, Markdown rendering, and site generation. It
+also writes a review packet under `.wikiwiki/drafts/closeout/` containing
+record draft JSON files, command hints, a summary, and a manifest. Closeout
+drafts are deterministic prompts, not automatic truth: Wikiwiki never appends
+records from closeout unless a user or agent deliberately applies them. The
+default `.gitignore` treats closeout packets as local review artifacts.
+
+## Wiki Profiles
+
+First-pass wikis should be consistent across machines and agents. `wk spin`
+therefore emits a deterministic seeding recipe with target counts, page
+emphasis, audience tags, and copy-ready draft commands.
+
+```sh
+wk init --profile mixed
+wk spin --profile mixed --json
+```
+
+Available profiles:
+
+| Profile | Use it when | Default emphasis |
+| --- | --- | --- |
+| `mixed` | The wiki should serve users and maintainers | product promise, getting started, FAQ, troubleshooting, architecture, data model |
+| `user` | The first wiki should read like product/user help | getting started, modes/features, privacy, FAQ, troubleshooting |
+| `developer` | The first wiki is mainly for maintainers and agents | architecture, data model, workflow, decisions, symbols |
+
+`mixed` is the default. You can store the default in `.wikiwiki/config.json`:
+
+```json
+{
+  "wiki_profile": "mixed"
+}
+```
+
+The profile is guidance, not a generic content generator. It tells humans and
+agents what shape to create so separate runs against the same repo converge on
+similar record counts and page emphasis.
+
+## Audience Tags
+
+Use audience tags on records so Wikiwiki can render the same knowledge base for
+different readers:
+
+- `audience:user`
+- `audience:developer`
+- `audience:all`
+
+Use these conventional topic tags for user-facing material:
+
+- `getting-started`
+- `instructions`
+- `faq`
+- `troubleshooting`
+
+Example:
+
+```sh
+wk concept add \
+  --name "Getting started" \
+  --summary "How a new user gets from install to first useful session." \
+  --tags audience:user,getting-started,instructions
+```
+
+For developer records, prefer tags such as `audience:developer`,
+`architecture`, `data-model`, `generated-files`, `maintenance`, and `symbol`.
 
 ## What It Stores
 
@@ -166,7 +255,7 @@ By default, source file links point back to files beside `wiki-site/` in a local
 checkout. For published sites, pass a source base URL so links point to GitHub:
 
 ```sh
-wk site --source-base-url https://github.com/OWNER/REPO/blob/main/
+wk site --audience all --source-base-url https://github.com/OWNER/REPO/blob/main/
 ```
 
 You can also save that default in `.wikiwiki/config.json`:
@@ -179,6 +268,27 @@ You can also save that default in `.wikiwiki/config.json`:
 
 CLI options win over config. Directory links use GitHub `/tree/` URLs when the
 base URL uses `/blob/`.
+
+Render a reader-specific site when needed:
+
+```sh
+wk site --audience user
+wk site --audience developer
+wk site --audience all
+```
+
+`--audience user` keeps shared records and user-facing records while hiding
+developer-only symbols/links and records tagged `audience:developer`.
+`--audience developer` keeps shared and developer records while hiding
+user-only records. `all` is the default.
+
+You can also save a default:
+
+```json
+{
+  "site_audience": "user"
+}
+```
 
 ## Project Theme
 
@@ -205,6 +315,12 @@ layout. Add `.wikiwiki/site-theme.json`, then run `wk site`:
 
 Wikiwiki writes those values into `wiki-site/assets/project-theme.css`. Keep
 this file generated; edit `.wikiwiki/site-theme.json` instead.
+
+Wikiwiki applies basic contrast guardrails for common hex-color themes. For
+example, if a dark `bg` or `panel` would leave text unreadable, generated theme
+CSS adjusts dependent text/surface variables and comments why. For safest
+results, set `bg`, `panel`, `panel_soft`, `text`, `muted`, `border`, and
+`code_bg` together.
 
 ## What It Compiles
 
@@ -257,20 +373,20 @@ Wikiwiki does not require an AI tool. The smallest useful setup is a CLI install
 plus scripts that keep generated docs current:
 
 ```sh
-wk init
-wk validate
-wk render
-wk site
+wk setup --profile mixed --audience all
+npm run wiki:check
+npm run wiki:site
 ```
 
-Add repo scripts for the commands your team wants to run manually, in CI, or
-before publishing docs:
+If the repo does not have `package.json`, `wk setup` still creates
+`.wikiwiki/config.json` and prints copy-ready commands. You can also add only
+the scripts your team wants to run manually, in CI, or before publishing docs:
 
 ```json
 {
   "scripts": {
     "wiki:check": "wk validate",
-    "wiki:site": "wk validate && wk render && wk site"
+    "wiki:site": "wk validate && wk render && wk site --audience all"
   }
 }
 ```
@@ -281,8 +397,12 @@ Markdown in `wiki/` without asking a model to summarize anything.
 ## Agentic IDE Setup
 
 Agentic IDE setup is optional. It is for teams that want their coding agent to
-maintain the wiki while development is happening. Install the CLI first, then
-install the bundled `wk` skill into your agentic IDE.
+maintain the wiki while development is happening. Install the CLI first, run
+the repo setup, then install the bundled `wk` skill into your agentic IDE.
+
+```sh
+wk setup --profile mixed --audience all
+```
 
 For Codex-compatible skills, preview the destination:
 
@@ -333,9 +453,10 @@ Invoke-WebRequest `
 
 For other agentic IDEs, copy [skills/wk/SKILL.md](skills/wk/SKILL.md) into the
 IDE's persistent agent instructions or skill system. The important behavior is
-the same everywhere: start with `wk status --json` and `wk spin --json`, then
-close meaningful work with records, `wk validate`, `wk render`, and `wk site`
-when the human wiki should be refreshed.
+the same everywhere: start with `wk status --json` and `wk spin --json`, update
+structured records when there is durable knowledge, and run `wk closeout` after
+meaningful work. The closeout packet is reviewable; it does not silently append
+records.
 
 The npm package also includes the skill folder at `skills/wk/` for local
 copy/install flows. The skill is not a separate product surface; it teaches an
@@ -346,7 +467,7 @@ agent to use the same deterministic CLI that non-AI users can run themselves.
 Initialize Wikiwiki in a repo:
 
 ```sh
-wk init
+wk setup --profile mixed --audience all
 ```
 
 Check status:
@@ -358,7 +479,7 @@ wk status --json
 Ask Wikiwiki to inspect the current working tree:
 
 ```sh
-wk spin --json
+wk spin --profile mixed --json
 ```
 
 Add a concept:
@@ -368,7 +489,7 @@ wk concept add \
   --name "Structured records" \
   --summary "JSONL records are the source of truth for repo knowledge." \
   --files .wikiwiki/records/concepts.jsonl \
-  --tags architecture,docs
+  --tags audience:developer,architecture,docs
 ```
 
 Add a decision:
@@ -391,14 +512,27 @@ wk render
 Generate the human-facing site:
 
 ```sh
-wk site
+wk site --audience all
+open wiki-site/index.html
+```
+
+Generate a user-focused site:
+
+```sh
+wk site --audience user
 open wiki-site/index.html
 ```
 
 Generate a publish-ready site with source links back to GitHub:
 
 ```sh
-wk site --source-base-url https://github.com/OWNER/REPO/blob/main/
+wk site --audience all --source-base-url https://github.com/OWNER/REPO/blob/main/
+```
+
+Close out a completed objective with a deterministic review packet:
+
+```sh
+wk closeout --profile mixed --audience all --json
 ```
 
 Search active records and rendered docs:
@@ -406,6 +540,41 @@ Search active records and rendered docs:
 ```sh
 wk search renderer --json
 ```
+
+## Recommended Dogfood Workflow
+
+For a first real repo pass, use the profile recipe instead of free-form
+recording:
+
+```sh
+wk setup --profile mixed --audience all
+wk status --json
+wk spin --profile mixed --json
+```
+
+Then add structured records from the recipe and current repo evidence:
+
+- user-facing concepts: product promise, getting started, modes/features,
+  privacy, FAQ, troubleshooting
+- developer-facing concepts: architecture, data model, generated-file workflow
+- decisions: key product, architecture, publishing, and workflow decisions
+- devlog: only meaningful milestones, not every implementation detail
+- notes: caveats, documentation drift, generated-file reminders
+- symbols: developer-only source anchors
+
+After adding deliberate records, close the pass:
+
+```sh
+wk closeout --profile mixed --audience all --json
+```
+
+Review `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/` for suggested
+records. Apply only the drafts that are true and useful, then rerun
+`wk validate`, `wk render`, and `wk site` or run another closeout.
+
+Inspect the generated home page, guides page, search, mobile layout, and a few
+record detail pages before committing or publishing. If a theme is customized,
+inspect contrast on cards, panels, code blocks, and mobile navigation.
 
 ## JSON-First Agent Workflows
 
@@ -416,7 +585,7 @@ wk concept add --json '{
   "name": "Spin",
   "summary": "Inspects repo changes and suggests knowledge updates.",
   "files": ["src/cli/commands/spin.ts"],
-  "tags": ["cli"],
+  "tags": ["audience:developer", "cli"],
   "source": "agent",
   "authority": "agent",
   "confidence": "high"
@@ -446,12 +615,14 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 
 | Command | Purpose |
 | --- | --- |
-| `wk init` | Create the knowledge store and generated wiki folder |
+| `wk init [--profile mixed\|user\|developer]` | Create the knowledge store and choose a first-pass wiki profile |
+| `wk setup [--profile mixed\|user\|developer] [--audience all\|user\|developer]` | Create repo defaults and safe package scripts for portable wiki automation |
+| `wk closeout [--profile mixed\|user\|developer] [--audience all\|user\|developer] --json` | Create a deterministic closeout draft packet, then validate and render docs |
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
 | `wk install-agent codex [--yes] [--force]` | Install the bundled wk skill for Codex-compatible agents |
-| `wk spin --json` | Inspect current repo changes and suggest knowledge updates |
+| `wk spin [--profile mixed\|user\|developer] --json` | Inspect repo changes and emit a deterministic first-pass wiki recipe |
 | `wk search <query> --json` | Search active records and rendered Markdown |
-| `wk site [--source-base-url <url>]` | Render a browseable static HTML wiki into `wiki-site/` |
+| `wk site [--audience all\|user\|developer] [--source-base-url <url>]` | Render a browseable static HTML wiki into `wiki-site/` |
 | `wk compile draft --role all --json` | Create UX/DX human wiki drafts for an IDE agent |
 | `wk compile apply <draft-id> --json` | Validate and publish a human wiki draft |
 | `wk concept add` | Add a durable project concept |
@@ -495,7 +666,7 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npx @thjodann/wk render
-      - run: npx @thjodann/wk site --source-base-url https://github.com/OWNER/REPO/blob/main/
+      - run: npx @thjodann/wk site --audience all --source-base-url https://github.com/OWNER/REPO/blob/main/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: wiki-site
@@ -524,15 +695,19 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - JSONL record storage
 - append-only record revisions and deletion tombstones
 - Zod validation
-- Git-aware `spin` with draft templates
+- Git-aware `spin` with deterministic `user`, `developer`, and `mixed` profile recipes
+- audience tagging with `audience:user`, `audience:developer`, and `audience:all`
 - Markdown rendering for concepts, decisions, events, notes, symbols, and links
 - static HTML site generation into `wiki-site/`
+- audience-focused site rendering with `wk site --audience user|developer|all`
 - project-first generated site UX with curated `guides.html`
 - project theme overrides through `.wikiwiki/site-theme.json`
+- basic contrast guardrails for common theme overrides
 - agent-mediated UX/DX human wiki compilation
 - local search across active records and rendered docs
 - Agent-readable JSON output
-- scriptable non-AI setup through plain CLI commands and repo scripts
+- scriptable non-AI setup through `wk setup` and repo scripts
+- deterministic closeout draft packets through `wk closeout`
 - CI, tests, and package metadata for `@thjodann/wk`
 
 Some planned pieces are not built yet:

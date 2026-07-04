@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
+import { registerCloseoutCommand } from "./cli/commands/closeout";
 import { registerCompileCommand } from "./cli/commands/compile";
 import { registerConceptCommand } from "./cli/commands/concept";
 import { registerDecisionCommand } from "./cli/commands/decision";
@@ -11,6 +12,7 @@ import { registerNoteCommand } from "./cli/commands/note";
 import { registerRecordCommand } from "./cli/commands/record";
 import { registerRenderCommand } from "./cli/commands/render";
 import { registerSearchCommand } from "./cli/commands/search";
+import { registerSetupCommand } from "./cli/commands/setup";
 import { registerSiteCommand } from "./cli/commands/site";
 import { registerSpinCommand } from "./cli/commands/spin";
 import { registerStatusCommand } from "./cli/commands/status";
@@ -26,6 +28,8 @@ export function createProgram(): Command {
     .version("1.0.0");
 
   registerInitCommand(program);
+  registerSetupCommand(program);
+  registerCloseoutCommand(program);
   registerInstallAgentCommand(program);
   registerStatusCommand(program);
   registerNoteCommand(program);
