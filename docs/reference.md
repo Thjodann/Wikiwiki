@@ -87,6 +87,10 @@ wk site --audience developer
 wk site --audience all
 ```
 
+Each render replaces the same `wiki-site/` folder. Run the audience variant you
+want to inspect or publish last, or copy `wiki-site/` elsewhere before rendering
+another audience.
+
 `--audience user` keeps shared records and user-facing records while hiding
 developer-only symbols/links and records tagged `audience:developer`.
 `--audience developer` keeps shared and developer records while hiding
@@ -99,6 +103,39 @@ You can also save a default:
   "site_audience": "user"
 }
 ```
+
+## Optional Beads Integration
+
+If a repo contains `.beads/`, Wikiwiki automatically reads Beads context when
+`bd` is available. The integration is best-effort and read-only. It never
+creates, edits, claims, closes, or imports Beads issues.
+
+The integration appears in JSON reports for `wk setup`, `wk status`,
+`wk spin`, and `wk closeout`. Closeout manifests include the same Beads context
+so an agent can relate durable wiki updates to active work without treating
+tasks as records.
+
+`wk site --audience all` and `wk site --audience developer` generate
+`work.html` with ready work, in-progress work, and recently closed work.
+`wk site --audience user` hides Beads entirely.
+
+Disable the integration in `.wikiwiki/config.json` when needed:
+
+```json
+{
+  "integrations": {
+    "beads": {
+      "enabled": false
+    }
+  }
+}
+```
+
+Fallback behavior is intentionally calm:
+
+- no `.beads/`: no Beads output
+- `.beads/` plus `bd`: combined task/wiki context
+- `.beads/` without `bd`: Wikiwiki reports that Beads context is unavailable
 
 ## Project Theme
 
@@ -191,6 +228,7 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - agent-readable JSON output
 - scriptable non-AI setup through `wk setup` and repo scripts
 - deterministic closeout draft packets through `wk closeout`
+- optional read-only Beads integration with developer-only `work.html`
 - CI, tests, and package metadata for `@thjodann/wk`
 
 Some planned pieces are not built yet:

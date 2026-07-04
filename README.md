@@ -18,7 +18,15 @@ store, or hidden memory layer is required.
 ## Quick Start
 
 Wikiwiki is package-ready as `@thjodann/wk`; publishing is still a manual
-release step. For now, install and run from source:
+release step. Until the npm package is published, install it from GitHub in a
+target repo:
+
+```sh
+npm install --save-dev github:Thjodann/Wikiwiki
+npx wk --help
+```
+
+For local development on Wikiwiki itself, install and run from source:
 
 ```sh
 npm install
@@ -58,11 +66,18 @@ wk site --audience all
 open wiki-site/index.html
 ```
 
+Each `wk site` run replaces `wiki-site/`, so render only the audience you want
+to inspect or publish last.
+
 Close out meaningful work with a review packet:
 
 ```sh
 wk closeout --profile mixed --audience all --json
 ```
+
+If a repo already uses Beads, Wikiwiki detects `.beads/` automatically and
+adds read-only developer work context to status, spin, closeout, and the
+developer-facing site. If Beads is absent, the normal flow is unchanged.
 
 ## Docs
 
@@ -88,6 +103,7 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - scriptable non-AI setup through `wk setup`
 - deterministic closeout draft packets through `wk closeout`
 - installable Codex-compatible `wk` agent skill
+- optional read-only Beads integration for developer work context
 - CI, tests, and package metadata for `@thjodann/wk`
 
 Some planned pieces are not built yet: richer symbol extraction, draft review

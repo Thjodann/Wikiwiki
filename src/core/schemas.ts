@@ -54,6 +54,7 @@ export const eventSchema = timestampedSchema.extend({
 export const noteSchema = timestampedSchema.extend({
   type: z.literal("note"),
   body: z.string().min(1),
+  files: stringArraySchema.default([]),
   tags: stringArraySchema
 });
 

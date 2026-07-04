@@ -197,3 +197,17 @@ Files: `src/core/automation.ts`, `src/cli/commands/setup.ts`, `src/cli/commands/
 Tags: `audience:all`, `automation`, `setup`, `closeout`, `agents`
 
 Record: `decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517` | Authority: agent | Confidence: high
+
+## Integrate Beads as optional developer work context
+
+Context: Some repos use Beads for task state and agent work memory. Wikiwiki should cooperate with that workflow without requiring Beads, duplicating task data, or exposing developer task state to user-facing wikis.
+
+Decision: Wikiwiki detects .beads/ automatically, reads Beads with bd --readonly --json when available, reports best-effort context in setup/status/spin/closeout, and renders a developer-only Project Work page for all/developer site audiences. Beads remains the owner of tasks, blockers, dependencies, ownership, and follow-ups; Wikiwiki remains the owner of durable knowledge and generated wiki output.
+
+Consequences: Repos without Beads behave unchanged. Repos with Beads get richer developer context without new required wk commands. User-focused sites hide Beads work, and Wikiwiki never mutates Beads issues.
+
+Files: `src/core/beads.ts`, `src/core/automation.ts`, `src/core/site.ts`, `src/cli/commands/status.ts`, `docs/concepts.md`, `docs/reference.md`, `docs/setup.md`, `docs/workflows.md`, `skills/wk/SKILL.md`
+
+Tags: `audience:developer`, `beads`, `integration`, `workflow`
+
+Record: `decision_e439798d-6980-44d3-9f91-500c0cc31abe` | Authority: user | Confidence: high

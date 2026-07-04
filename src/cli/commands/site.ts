@@ -24,6 +24,7 @@ export function registerSiteCommand(program: Command): void {
         ok: true,
         site_path: reportPath(sitePath(root)),
         entrypoint: reportPath(path.join(sitePath(root), "index.html")),
+        output_behavior: "replaces wiki-site/",
         source_base_url: siteOptions.sourceBaseUrl ?? null,
         audience: siteOptions.audience,
         rendered_files: files.map((file) => relativeReportPath(root, file))
@@ -37,5 +38,6 @@ export function registerSiteCommand(program: Command): void {
       console.log("Rendered Wikiwiki site:");
       console.log(`- ${relativeReportPath(root, path.join(sitePath(root), "index.html"))}`);
       console.log(`- ${result.rendered_files.length} generated files`);
+      console.log("- Existing wiki-site/ contents were replaced");
     });
 }

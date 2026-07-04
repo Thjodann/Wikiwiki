@@ -136,6 +136,7 @@ wiki-site/
   notes.html
   symbols.html
   links.html
+  work.html        # optional, developer-only when Beads is detected
   search.html
   assets/
     wikiwiki.css
@@ -157,6 +158,26 @@ There are four generated or structured project surfaces:
 | `wiki/*.md` | Agents and code review | Deterministic Markdown |
 | `wiki-site/*.html` | Humans | Browseable project wiki |
 | `wiki/human/` | Humans and editors | Compiled UX/DX narrative drafts |
+
+## Working With Beads
+
+Wikiwiki and Beads can live in the same repo without either tool absorbing the
+other.
+
+Beads owns the work graph: tasks, blockers, dependencies, ownership, ready
+work, in-progress work, closed work, and agent work memory. Wikiwiki owns the
+knowledge graph: durable concepts, decisions, notes, events, symbols, links,
+generated Markdown, and the human wiki.
+
+When `.beads/` exists, Wikiwiki automatically tries to read Beads through
+`bd --readonly --json`. That context appears in JSON reports and closeout
+drafts, and `wk site --audience all` or `wk site --audience developer` adds a
+developer-only `work.html` page. User-focused sites hide Beads so task state
+does not leak into standard user documentation.
+
+If Beads is absent, nothing changes. If `.beads/` exists but `bd` is not
+available, Wikiwiki keeps running and shows an unavailable state instead of
+failing the wiki build.
 
 ## Audience Tags
 

@@ -31,6 +31,7 @@ export function registerNoteCommand(program: Command): void {
       type: "note",
       id: stringValue(payload, "id", createId("note")),
       body,
+      files: parseList(options.files).length ? parseList(options.files) : arrayValue(payload, "files"),
       tags: parseList(options.tags).length ? parseList(options.tags) : arrayValue(payload, "tags"),
       ...commonRecordFields(options, payload),
       created_at: createdAt

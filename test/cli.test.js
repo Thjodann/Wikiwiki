@@ -13,6 +13,19 @@ function tempRepo() {
   return root;
 }
 
+function commitAll(root, message) {
+  execFileSync("git", ["add", "."], { cwd: root, stdio: "ignore" });
+  execFileSync("git", [
+    "-c",
+    "user.name=Wikiwiki Test",
+    "-c",
+    "user.email=wikiwiki@example.test",
+    "commit",
+    "-m",
+    message
+  ], { cwd: root, stdio: "ignore" });
+}
+
 function run(root, args, options = {}) {
   return execFileSync(process.execPath, [cli, ...args], {
     cwd: root,
@@ -112,6 +125,14 @@ test("package publishes runtime build files, package docs, and the wk skill", ()
   assert.equal(pkg.files.includes("assets/wikiwiki-banner.png"), false);
 });
 
+test("bundled wk skill includes Beads coordination rules", () => {
+  const skill = fs.readFileSync(path.join(process.cwd(), "skills/wk/SKILL.md"), "utf8");
+
+  assert.match(skill, /bd prime/);
+  assert.match(skill, /Use Beads for task state, blockers, dependencies, ownership, and follow-ups/);
+  assert.match(skill, /Use Wikiwiki for durable knowledge, decisions, generated Markdown/);
+});
+
 test("install-agent codex previews and installs the bundled wk skill", () => {
   const root = tempRepo();
   const destination = path.join(root, "codex-skills/wk");
@@ -187,6 +208,8 @@ test("init creates record files and all generated wiki pages", () => {
   assertPosixPaths(result.rendered_files);
   assert.ok(result.record_files.includes(".wikiwiki/records/concepts.jsonl"));
   assert.ok(result.rendered_files.includes("wiki/index.md"));
+  assert.match(fs.readFileSync(path.join(root, "wiki/index.md"), "utf8"), new RegExp(`# ${path.basename(root)} Wiki`));
+  assert.doesNotMatch(fs.readFileSync(path.join(root, "wiki/index.md"), "utf8"), /^# Wikiwiki$/m);
   assert.equal(JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8")).wiki_profile, "user");
   assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/concepts.jsonl")));
   assert.ok(fs.existsSync(path.join(root, "wiki/index.md")));
@@ -265,6 +288,40 @@ test("setup refuses conflicting scripts unless forced", () => {
   assert.equal(pkg.scripts["wiki:site"], "wk validate && wk render && wk site --audience all");
 });
 
+test("setup, status, spin, and closeout report Beads context when .beads exists", () => {
+  const root = tempRepo();
+  fs.mkdirSync(path.join(root, ".beads"));
+  const fakeBd = createFakeBd(root);
+
+  const setup = runJson(root, ["setup", "--json"], { env: fakeBd.env });
+  const config = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8"));
+  assert.equal(setup.integrations.beads.detected, true);
+  assert.equal(setup.integrations.beads.available, true);
+  assert.equal(config.integrations.beads.enabled, true);
+
+  const status = runJson(root, ["status", "--json"], { env: fakeBd.env });
+  assert.equal(status.integrations.beads.counts.ready, 2);
+  assert.deepEqual(status.integrations.beads.issue_ids, ["PRISM-a1", "PRISM-b2", "PRISM-c3"]);
+
+  const spin = runJson(root, ["spin", "--json"], { env: fakeBd.env });
+  assert.equal(spin.integrations.beads.ready[0].id, "PRISM-a1");
+
+  fs.mkdirSync(path.join(root, "src/core"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src/core/store.ts"), "export const store = true;\n");
+  const before = runJson(root, ["status", "--json"], { env: fakeBd.env }).records;
+  const closeout = runJson(root, ["closeout", "--json"], { env: fakeBd.env });
+  const after = runJson(root, ["status", "--json"], { env: fakeBd.env }).records;
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, closeout.manifest_path), "utf8"));
+  const summary = fs.readFileSync(path.join(root, closeout.draft_path, "summary.md"), "utf8");
+  const calls = fs.readFileSync(fakeBd.log, "utf8");
+
+  assert.equal(closeout.integrations.beads.in_progress[0].id, "PRISM-b2");
+  assert.equal(manifest.integrations.beads.issue_ids.includes("PRISM-c3"), true);
+  assert.match(summary, /Beads Work Context/);
+  assert.deepEqual(after, before);
+  assert.doesNotMatch(calls, /\b(create|update|close|claim|dep)\b/);
+});
+
 test("record lifecycle commands list, get, update, and delete active records", () => {
   const root = tempRepo();
   run(root, ["init", "--json"]);
@@ -301,6 +358,7 @@ test("record lifecycle commands list, get, update, and delete active records", (
     "--json",
     payload({
       body: "Renderer owns generated wiki files.",
+      files: ["README.md"],
       tags: ["renderer"],
       source: "agent",
       authority: "agent",
@@ -317,6 +375,7 @@ test("record lifecycle commands list, get, update, and delete active records", (
   ]);
   const noteResult = runJson(root, ["record", "get", "note", note.id, "--json"]).record;
   assert.equal(noteResult.body, "Renderer owns generated Markdown files.");
+  assert.deepEqual(noteResult.files, ["README.md"]);
 
   const link = runJson(root, [
     "link",
@@ -372,6 +431,26 @@ test("spin returns heuristic draft templates and command hints", () => {
   assert.equal(userProfile.profile.name, "user");
   assert.equal(userProfile.profile.target_counts.symbol, 0);
   assert.equal(userProfile.profile.suggested_records.some((record) => record.type === "symbol"), false);
+});
+
+test("spin and closeout suppress setup-only Wikiwiki artifacts", () => {
+  const root = tempRepo();
+  fs.writeFileSync(
+    path.join(root, "package.json"),
+    `${JSON.stringify({ scripts: { test: "node --test" } }, null, 2)}\n`
+  );
+  commitAll(root, "seed package");
+
+  run(root, ["setup", "--json"]);
+
+  const spin = runJson(root, ["spin", "--json"]);
+  assert.ok(spin.changed_files.includes("package.json"));
+  assert.ok(spin.changed_files.some((file) => file.startsWith(".wikiwiki/")));
+  assert.deepEqual(spin.suggested_updates, []);
+
+  const closeout = runJson(root, ["closeout", "--json"]);
+  assert.equal(closeout.drafts.length, 0);
+  assert.deepEqual(closeout.spin.suggested_updates, []);
 });
 
 test("closeout creates reviewable drafts and does not append records automatically", () => {
@@ -532,8 +611,10 @@ test("site command creates a browseable static wiki", () => {
   assert.equal(result.ok, true);
   assert.equal(result.source_base_url, "https://github.com/acme/project/blob/main/");
   assert.equal(result.audience, "user");
+  assert.equal(result.output_behavior, "replaces wiki-site/");
   assertPosixPaths(result.rendered_files);
   assert.ok(result.rendered_files.includes("wiki-site/index.html"));
+  assert.ok(result.rendered_files.includes("wiki-site/favicon.svg"));
   assert.ok(result.rendered_files.includes("wiki-site/assets/wikiwiki.css"));
   assert.ok(result.rendered_files.some((file) => file.startsWith("wiki-site/records/concept/")));
   assert.ok(fs.existsSync(path.join(root, "wiki-site/index.html")));

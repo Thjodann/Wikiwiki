@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { readWikiwikiSiteTheme } from "./config";
 import { decisionsPage } from "../templates/decisionsPage";
 import { conceptsPage } from "../templates/conceptsPage";
 import { devlogPage } from "../templates/devlogPage";
@@ -30,10 +31,13 @@ export type RenderedPage = {
 
 export function buildWikiPages(root: string): RenderedPage[] {
   const records = readAllRecords(root);
+  const theme = readWikiwikiSiteTheme(root);
+  const repoName = theme.project_name?.trim() || path.basename(root);
+  const description = theme.project_description?.trim() || "A project wiki generated from durable repo knowledge.";
   return [
     {
       fileName: "index.md",
-      content: withNotice(indexPage(records))
+      content: withNotice(indexPage(records, { repoName, description }))
     },
     {
       fileName: "concepts.md",

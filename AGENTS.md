@@ -6,7 +6,8 @@ This repo uses Wikiwiki for agent-readable project knowledge.
 
 1. Run `wk status --json`.
 2. Run `wk spin --profile mixed --json` to inspect current repo changes unless config or the user specifies another profile.
-3. Review relevant records if available.
+3. If `.beads/` exists, run `bd prime` before wiki work when `bd` is available.
+4. Review relevant records if available.
 
 ## During Work
 
@@ -17,11 +18,14 @@ This repo uses Wikiwiki for agent-readable project knowledge.
 - Keep generated wiki files deterministic and plainly marked as generated.
 - Use `wk setup --profile mixed --audience all` when adopting Wikiwiki in a repo.
 - Use `wk compile draft` and `wk compile apply` for human-readable UX/DX wiki pages.
+- If `.beads/` exists, use Beads for task state, blockers, dependencies, ownership, and follow-ups.
+- Use Wikiwiki for durable knowledge, decisions, generated Markdown, static site generation, and human wiki drafts.
+- Do not import Beads issues as Wikiwiki records unless they contain lasting project knowledge.
 
 ## After Making Changes
 
 1. Run `wk closeout --profile mixed --audience all --json` unless config or the user specifies another profile/audience.
-2. Review `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`.
+2. Review `.wikiwiki/drafts/closeout/<closeout-id>/summary.md` and `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`. In Beads repos, closeout includes read-only Beads context.
 3. Add or update concepts, decisions, notes, events, symbols, or links only when drafts are true and useful.
 4. Run `wk validate`, `wk render`, and `wk site` when records or human-facing wiki output changed.
 5. Summarize knowledge updates and closeout draft path in the final response.

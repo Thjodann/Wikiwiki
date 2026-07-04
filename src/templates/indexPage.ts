@@ -1,14 +1,21 @@
 import type { AnyRecord, RecordType } from "../core/schemas";
 import { recordTypes } from "../core/schemas";
 
-export function indexPage(records: Record<RecordType, AnyRecord[]>): string {
+export type IndexPageOptions = {
+  repoName: string;
+  description: string;
+};
+
+export function indexPage(records: Record<RecordType, AnyRecord[]>, options: IndexPageOptions): string {
   const counts = recordTypes
     .map((type) => `- ${label(type)}: ${records[type].length}`)
     .join("\n");
 
-  return `# Wikiwiki
+  return `# ${options.repoName} Wiki
 
-Wikiwiki is the generated human-readable view of this repo's structured project knowledge.
+${options.description}
+
+This is the generated human-readable view of ${options.repoName}'s structured project knowledge.
 
 ## Pages
 

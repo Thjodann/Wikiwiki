@@ -6,7 +6,15 @@ same deterministic CLI commands as the non-AI path.
 ## Install From Source
 
 Wikiwiki is package-ready as `@thjodann/wk`; publishing is still a manual
-release step. For now, install from source:
+release step. Until the npm package is published, install it from GitHub in the
+repo that should use Wikiwiki:
+
+```sh
+npm install --save-dev github:Thjodann/Wikiwiki
+npx wk --help
+```
+
+For local development on Wikiwiki itself, install from source:
 
 ```sh
 npm install
@@ -86,6 +94,16 @@ then install the bundled `wk` skill into your agentic IDE.
 wk setup --profile mixed --audience all
 ```
 
+If the repo also uses Beads, keep Beads as the task graph and Wikiwiki as the
+knowledge graph. Initialize or preserve Beads in its own flow:
+
+```sh
+bd init
+bd setup codex
+```
+
+Then install the Wikiwiki agent instructions:
+
 For Codex-compatible skills, preview the destination:
 
 ```sh
@@ -143,3 +161,18 @@ not silently append records.
 The npm package includes the skill folder at `skills/wk/` for local
 copy/install flows. The skill is not a separate product surface; it teaches an
 agent to use the same deterministic CLI that non-AI users can run themselves.
+
+## Optional Beads Coordination
+
+Wikiwiki's Beads integration is automatic and read-only:
+
+- No `.beads/`: Wikiwiki behaves normally.
+- `.beads/` plus `bd`: `wk status`, `wk spin`, `wk closeout`, and the
+  developer-facing site include task context.
+- `.beads/` without `bd`: Wikiwiki still works and reports that Beads context
+  is unavailable.
+
+Beads owns tasks, blockers, dependencies, ownership, and follow-ups. Wikiwiki
+owns durable concepts, decisions, notes, events, symbols, links, generated
+Markdown, and the static human wiki. Wikiwiki never creates, edits, claims, or
+closes Beads issues.

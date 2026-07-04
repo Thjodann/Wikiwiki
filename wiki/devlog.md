@@ -137,3 +137,11 @@ Replaced the long README with a compact overview and quick start, moved detailed
 Files: `README.md`, `docs/concepts.md`, `docs/setup.md`, `docs/workflows.md`, `docs/reference.md`, `package.json`, `test/cli.test.js`
 
 Recorded: 2026-07-04T20:23:06.856Z | Record: `event_e38dffad-d6eb-4d9b-9833-967ed2a947b6` | Confidence: high
+
+## Added optional Beads coordination for Wikiwiki
+
+Wikiwiki now documents and tests a zero-friction Beads integration: status, spin, setup, closeout, and the developer-facing site can include read-only Beads context when .beads/ and bd are present. The bundled wk skill and README setup flow now explain how agents should coordinate Beads task state with Wikiwiki durable knowledge.
+
+Files: `README.md`, `docs/concepts.md`, `docs/reference.md`, `docs/setup.md`, `docs/workflows.md`, `skills/wk/SKILL.md`, `test/cli.test.js`, `test/site.test.js`
+
+Recorded: 2026-07-04T20:31:26.533Z | Record: `event_4683be8c-c419-472d-b2fe-c7ef2456b713` | Confidence: high

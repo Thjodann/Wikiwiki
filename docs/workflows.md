@@ -88,6 +88,27 @@ then writes a deterministic draft packet under `.wikiwiki/drafts/closeout/`.
 Closeout drafts are review artifacts. They should be read before any records
 are added, and they should only become records when they are true and useful.
 
+## With Beads
+
+When a repo has `.beads/`, Wikiwiki treats Beads as the developer work graph
+and stays out of the task database. If `bd` is available, `wk status`,
+`wk spin`, and `wk closeout` include a read-only Beads summary with ready work,
+in-progress work, recent closed work, and related issue IDs.
+
+Recommended agent flow in a Beads repo:
+
+```sh
+bd prime
+wk status --json
+wk spin --profile mixed --json
+```
+
+Use Beads for task state, blockers, dependencies, ownership, and follow-ups.
+Use Wikiwiki for durable concepts, decisions, notes, events, symbols, links,
+generated Markdown, and the human wiki. During closeout, review the Beads
+context in `.wikiwiki/drafts/closeout/<closeout-id>/summary.md`, but only add
+Wikiwiki records for knowledge that should outlive the task.
+
 ## Search
 
 Search active records and rendered docs:

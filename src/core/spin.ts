@@ -1,5 +1,6 @@
+import fs from "fs";
 import { readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
-import { readGitDiffStat, readGitStatus, type GitStatusEntry } from "./git";
+import { readGitDiffStat, readGitStatus, runGit, type GitStatusEntry } from "./git";
 import { readWikiwikiConfig } from "./config";
 import { profileRecipes, type ProfileSeed, type SiteAudience, type WikiProfile } from "./profiles";
 
@@ -44,6 +45,7 @@ export type SpinResult = {
 export function createSpinResult(root: string, profile: WikiProfile): SpinResult {
   const status = readGitStatus(root);
   const changedFiles = status.map((entry) => entry.path);
+  const suggestionFiles = filterSuggestionFiles(root, changedFiles);
   const integrations = readIntegrations(root, readWikiwikiConfig(root));
 
   const result: SpinResult = {
@@ -51,13 +53,17 @@ export function createSpinResult(root: string, profile: WikiProfile): SpinResult
     file_status: status,
     diff_stat: readGitDiffStat(root),
     profile: firstPassRecipe(profile),
-    suggested_updates: suggestUpdates(changedFiles)
+    suggested_updates: suggestUpdates(suggestionFiles)
   };
   if (shouldReportIntegrations(integrations)) {
     result.integrations = integrations;
   }
 
   return result;
+}
+
+export function filterSuggestionFiles(root: string, files: string[]): string[] {
+  return files.filter((file) => !isWikiwikiManagedPath(file) && !isWikiwikiSetupOnlyPackageChange(root, file));
 }
 
 export function suggestUpdates(files: string[]): SuggestedUpdate[] {
@@ -203,6 +209,50 @@ function firstPassSuggestion(seed: ProfileSeed): FirstPassSuggestion {
     draft,
     command_hint: `wk ${seed.type} add --json '${JSON.stringify(draft)}'`
   };
+}
+
+function isWikiwikiManagedPath(file: string): boolean {
+  return file.startsWith(".wikiwiki/") ||
+    file.startsWith("wiki/") ||
+    file.startsWith("wiki-site/");
+}
+
+function isWikiwikiSetupOnlyPackageChange(root: string, file: string): boolean {
+  if (file !== "package.json") {
+    return false;
+  }
+
+  let previous: unknown;
+  let current: unknown;
+  try {
+    previous = JSON.parse(runGit(root, ["show", "HEAD:package.json"]));
+    current = JSON.parse(fs.readFileSync(`${root}/package.json`, "utf8"));
+  } catch {
+    return false;
+  }
+
+  return JSON.stringify(withoutWikiwikiScripts(previous)) === JSON.stringify(withoutWikiwikiScripts(current));
+}
+
+function withoutWikiwikiScripts(value: unknown): unknown {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return value;
+  }
+
+  const copy = { ...(value as Record<string, unknown>) };
+  const scripts = copy.scripts;
+  if (scripts && typeof scripts === "object" && !Array.isArray(scripts)) {
+    const nextScripts = Object.fromEntries(
+      Object.entries(scripts as Record<string, unknown>).filter(([name]) => !name.startsWith("wiki:"))
+    );
+    if (Object.keys(nextScripts).length > 0) {
+      copy.scripts = nextScripts;
+    } else {
+      delete copy.scripts;
+    }
+  }
+
+  return copy;
 }
 
 function seedDraftPayload(seed: ProfileSeed): Record<string, unknown> {

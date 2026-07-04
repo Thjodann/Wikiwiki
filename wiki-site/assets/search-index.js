@@ -179,6 +179,23 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "decision",
     "typeLabel": "Decision",
+    "id": "decision_e439798d-6980-44d3-9f91-500c0cc31abe",
+    "title": "Integrate Beads as optional developer work context",
+    "summary": "Wikiwiki detects .beads/ automatically, reads Beads with bd --readonly --json when available, reports best-effort context in...",
+    "tags": [
+      "beads",
+      "integration",
+      "workflow"
+    ],
+    "authority": "user",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/decision/decision_e439798d-6980-44d3-9f91-500c0cc31abe.html",
+    "text": "decision_e439798d-6980-44d3-9f91-500c0cc31abe agent user high 2026-07-04T20:31:26.520Z 2026-07-04T20:31:26.520Z decision Integrate Beads as optional developer work context Some repos use Beads for task state and agent work memory. Wikiwiki should cooperate with that workflow without requiring Beads, duplicating task data, or exposing developer task state to user-facing wikis. Wikiwiki detects .beads/ automatically, reads Beads with bd --readonly --json when available, reports best-effort context in setup/status/spin/closeout, and renders a developer-only Project Work page for all/developer site audiences. Beads remains the owner of tasks, blockers, dependencies, ownership, and follow-ups; Wikiwiki remains the owner of durable knowledge and generated wiki output. Repos without Beads behave unchanged. Repos with Beads get richer developer context without new required wk commands. User-focused sites hide Beads work, and Wikiwiki never mutates Beads issues. src/core/beads.ts src/core/automation.ts src/core/site.ts src/cli/commands/status.ts docs/concepts.md docs/reference.md docs/setup.md docs/workflows.md skills/wk/SKILL.md audience:developer beads integration workflow"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f",
     "title": "Make agent skill installation safe by default",
     "summary": "Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a...",
@@ -400,6 +417,23 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "audienceLabel": "",
     "url": "records/event/event_e116aa8a-281e-4d85-a8be-abca622110e6.html",
     "text": "event_e116aa8a-281e-4d85-a8be-abca622110e6 agent agent high 2026-07-04T17:38:24.698Z event Added installable wk agent skill Created skills/wk/SKILL.md with the daily agent loop, closeout protocol, install guidance, and Codex UI metadata; updated README with an agentic IDE setup section; included skills/wk in package files; and adjusted the package hygiene test. skills/wk/SKILL.md skills/wk/agents/openai.yaml README.md package.json test/cli.test.js"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_4683be8c-c419-472d-b2fe-c7ef2456b713",
+    "title": "Added optional Beads coordination for Wikiwiki",
+    "summary": "Added optional Beads coordination for Wikiwiki",
+    "tags": [
+      "devlog",
+      "beads",
+      "agentic-ide"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_4683be8c-c419-472d-b2fe-c7ef2456b713.html",
+    "text": "event_4683be8c-c419-472d-b2fe-c7ef2456b713 agent agent high 2026-07-04T20:31:26.533Z event Added optional Beads coordination for Wikiwiki Wikiwiki now documents and tests a zero-friction Beads integration: status, spin, setup, closeout, and the developer-facing site can include read-only Beads context when .beads/ and bd are present. The bundled wk skill and README setup flow now explain how agents should coordinate Beads task state with Wikiwiki durable knowledge. README.md docs/concepts.md docs/reference.md docs/setup.md docs/workflows.md skills/wk/SKILL.md test/cli.test.js test/site.test.js audience:developer devlog beads agentic-ide"
   },
   {
     "type": "event",

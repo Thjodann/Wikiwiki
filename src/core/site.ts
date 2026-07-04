@@ -225,6 +225,7 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
   }
 
   files.push(
+    { fileName: "favicon.svg", content: faviconSvg(model) },
     { fileName: "assets/wikiwiki.css", content: siteCss() },
     { fileName: "assets/project-theme.css", content: projectThemeCss(model.options.theme) },
     { fileName: "assets/search-index.js", content: searchIndexJs(model) },
@@ -303,6 +304,7 @@ function renderLayout(options: LayoutOptions): string {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
   <title>${escapeHtml(htmlTitle)}</title>
+  <link rel="icon" href="${prefix}favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="${prefix}assets/wikiwiki.css">
   <link rel="stylesheet" href="${prefix}assets/project-theme.css">
   <script src="${prefix}assets/search-index.js" defer></script>
@@ -1507,6 +1509,16 @@ function readableTextFor(background: Rgb): string {
 
 function cssValue(value: string): string {
   return value.replace(/[;\n\r]/g, "").trim();
+}
+
+function faviconSvg(model: SiteModel): string {
+  const initials = escapeHtml(model.projectInitials.slice(0, 2));
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#111827"/>
+  <circle cx="46" cy="18" r="8" fill="#38bdf8"/>
+  <text x="32" y="41" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700" fill="#f8fafc">${initials}</text>
+</svg>
+`;
 }
 
 function siteCss(): string {

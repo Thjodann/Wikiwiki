@@ -19,9 +19,10 @@ Prefer JSON output, preserve user work, and treat structured records as the sour
    - `npm run dev -- <command>` when the repo has Wikiwiki source installed.
    - `npx @thjodann/wk <command>` when the package is available.
 3. If the repo is not initialized and the user wants Wikiwiki adopted, run `wk setup --profile mixed --audience all` unless the user clearly wants `user`, `developer`, or a narrower site audience.
-4. Run `wk status --json`.
-5. Run `wk spin --profile mixed --json` unless the repo config or user request specifies another profile.
-6. Read relevant existing records before adding new ones.
+4. If `.beads/` exists, run `bd prime` before wiki work when `bd` is available.
+5. Run `wk status --json`.
+6. Run `wk spin --profile mixed --json` unless the repo config or user request specifies another profile.
+7. Read relevant existing records before adding new ones.
 
 ## During Work
 
@@ -31,6 +32,9 @@ Prefer JSON output, preserve user work, and treat structured records as the sour
 - Prefer CLI commands over hand-editing JSONL records.
 - Prefer existing project scripts such as `npm run wiki:site` when they exist.
 - Avoid unnecessary LLM calls for deterministic work that `wk` or repo scripts can do directly.
+- If `.beads/` exists, use Beads for task state, blockers, dependencies, ownership, and follow-ups.
+- Use Wikiwiki for durable knowledge, decisions, generated Markdown, static wiki sites, and human-facing wiki drafts.
+- Do not import Beads issues as Wikiwiki records unless they contain lasting knowledge worth recording separately.
 - Use audience tags consistently: `audience:user`, `audience:developer`, or `audience:all`.
 - For user-facing first-pass material, prefer tags such as `getting-started`, `instructions`, `faq`, `troubleshooting`, `privacy`, and `features`.
 - For developer-facing material, prefer tags such as `architecture`, `data-model`, `generated-files`, `maintenance`, `tests`, and `symbol`.
@@ -42,6 +46,7 @@ Prefer JSON output, preserve user work, and treat structured records as the sour
 Inspect:
 
 ```sh
+bd prime # only when .beads/ exists and bd is available
 wk setup --profile mixed --audience all
 wk status --json
 wk spin --profile mixed --json
@@ -105,7 +110,7 @@ wk closeout --profile mixed --audience all --json
 After meaningful repo changes:
 
 1. Run `wk closeout --profile mixed --audience all --json` unless the repo config or user request specifies another profile/audience.
-2. Review `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`.
+2. Review `.wikiwiki/drafts/closeout/<closeout-id>/summary.md` and `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`. In Beads repos, the summary includes read-only Beads context.
 3. Apply only the record drafts that are true, useful, and properly sourced.
 4. If records changed, run `wk validate`, `wk render`, and `wk site --audience all`; also run `wk site --audience user` when checking the standard user experience.
 5. Summarize any knowledge updates and closeout draft path in the final response.
@@ -121,6 +126,7 @@ When a user asks how to set up Wikiwiki for an agentic IDE:
 - Explain that Wikiwiki works without AI through the CLI and repo scripts.
 - Recommend installing the `wk` CLI first.
 - Recommend `wk setup --profile mixed --audience all` before adding agent-specific instructions.
+- If the repo uses Beads, recommend keeping `bd init` / `bd setup codex` as Beads' own setup and then installing Wikiwiki's skill. Do not overwrite or duplicate Beads' agent instructions.
 - Explain that `wk setup` creates `.wikiwiki/config.json`, adds safe package scripts when `package.json` exists, and refuses conflicting scripts unless `--force` is explicit.
 - Recommend `wk spin --profile mixed --json` for first-pass dogfood, then audience tags on every durable user/developer record.
 - Recommend `wk closeout --profile mixed --audience all --json` after meaningful work; clarify that it creates reviewable drafts and does not append records automatically.
@@ -130,6 +136,19 @@ When a user asks how to set up Wikiwiki for an agentic IDE:
 - For other agentic IDEs, copy the body of this file into the IDE's persistent agent instructions and keep the start/closeout loops intact.
 
 Keep setup advice local-first, script-first, and provider-agnostic.
+
+## Beads Coordination
+
+When `.beads/` exists, treat Beads as the repo's task and work-memory layer:
+
+- Run `bd prime` before wiki work when `bd` is available.
+- Use Beads for task state, blockers, dependencies, ownership, and follow-ups.
+- Use Wikiwiki for durable knowledge, decisions, generated Markdown, static site generation, and human wiki drafts.
+- Let `wk closeout` include Beads-linked context, then update Wikiwiki records only for lasting knowledge.
+- Do not mutate Beads through Wikiwiki. Use `bd` directly for Beads task changes.
+
+The same skill is safe in non-Beads repos. If `.beads/` is absent, skip Beads
+steps and use the normal Wikiwiki flow.
 
 ## Site Theme Guidance
 
