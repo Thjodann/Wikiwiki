@@ -506,10 +506,13 @@ function renderWorkPage(model: SiteModel): string {
   }
 
   if (!beads.available) {
+    const message = beads.error === "beads_auto_read_skipped"
+      ? "Detailed Beads reads were skipped to avoid dirtying .beads. Set integrations.beads.enabled to true only after checking that local bd reads are clean."
+      : `Wikiwiki could not read Beads with <code>bd --readonly --json</code>. ${escapeHtml(beads.error ?? "Install bd or check the Beads workspace, then rerun wk site.")}`;
     return `<section class="section">
   <div class="empty-state">
     <strong>Beads workspace detected.</strong>
-    <p>Wikiwiki could not read Beads with <code>bd --readonly --json</code>. ${escapeHtml(beads.error ?? "Install bd or check the Beads workspace, then rerun wk site.")}</p>
+    <p>${message}</p>
   </div>
 </section>`;
   }

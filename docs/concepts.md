@@ -169,13 +169,15 @@ work, in-progress work, closed work, and agent work memory. Wikiwiki owns the
 knowledge graph: durable concepts, decisions, notes, events, symbols, links,
 generated Markdown, and the human wiki.
 
-When `.beads/` exists, Wikiwiki automatically tries to read Beads through
-`bd --readonly --json`. That context appears in JSON reports and closeout
-drafts. Site publishing is stricter: `work.html` is only generated for
-developer/all audiences when `.wikiwiki/config.json` explicitly sets
-`integrations.beads.enabled` to `true`. User-focused sites hide Beads from
-pages, manifests, and search data so task state does not leak into standard
-user documentation.
+When `.beads/` exists, Wikiwiki automatically detects it. Detailed reads
+through `bd --readonly --json` are opt-in because some Beads versions can touch
+internal storage while serving read commands. With
+`integrations.beads.enabled: true`, clean Beads context appears in JSON reports
+and closeout drafts. Site publishing uses the same explicit opt-in: `work.html`
+is only generated for developer/all audiences when `.wikiwiki/config.json`
+sets `integrations.beads.enabled` to `true`. User-focused sites hide Beads
+from pages, manifests, and search data so task state does not leak into
+standard user documentation.
 
 If Beads is absent, nothing changes. If `.beads/` exists but `bd` is not
 available, Wikiwiki keeps running and shows an unavailable state instead of

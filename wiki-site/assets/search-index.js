@@ -181,17 +181,19 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "typeLabel": "Decision",
     "id": "decision_e439798d-6980-44d3-9f91-500c0cc31abe",
     "title": "Integrate Beads as optional developer work context",
-    "summary": "Wikiwiki detects .beads/ automatically, reads Beads with bd --readonly --json when available, reports best-effort context in...",
+    "summary": "Detect .beads automatically, but skip detailed bd reads in auto mode.",
     "tags": [
       "beads",
       "integration",
-      "workflow"
+      "workflow",
+      "dogfood",
+      "safety"
     ],
-    "authority": "user",
+    "authority": "agent",
     "confidence": "high",
     "audienceLabel": "For developers",
     "url": "records/decision/decision_e439798d-6980-44d3-9f91-500c0cc31abe.html",
-    "text": "decision_e439798d-6980-44d3-9f91-500c0cc31abe agent user high 2026-07-04T20:31:26.520Z 2026-07-04T20:31:26.520Z decision Integrate Beads as optional developer work context Some repos use Beads for task state and agent work memory. Wikiwiki should cooperate with that workflow without requiring Beads, duplicating task data, or exposing developer task state to user-facing wikis. Wikiwiki detects .beads/ automatically, reads Beads with bd --readonly --json when available, reports best-effort context in setup/status/spin/closeout, and renders a developer-only Project Work page for all/developer site audiences. Beads remains the owner of tasks, blockers, dependencies, ownership, and follow-ups; Wikiwiki remains the owner of durable knowledge and generated wiki output. Repos without Beads behave unchanged. Repos with Beads get richer developer context without new required wk commands. User-focused sites hide Beads work, and Wikiwiki never mutates Beads issues. src/core/beads.ts src/core/automation.ts src/core/site.ts src/cli/commands/status.ts docs/concepts.md docs/reference.md docs/setup.md docs/workflows.md skills/wk/SKILL.md audience:developer beads integration workflow"
+    "text": "decision_e439798d-6980-44d3-9f91-500c0cc31abe agent agent high 2026-07-04T20:31:26.520Z 2026-07-04T22:41:24.722Z decision Integrate Beads as optional developer work context Some repos use Beads for task state and agent work memory. PaneRelief dogfooding showed that bd --readonly can still dirty .beads internals during setup/status/spin/closeout, so Wikiwiki needs to cooperate with Beads without mutating or flooding the host worktree. Detect .beads automatically, but skip detailed bd reads in auto mode. Read detailed Beads context only when .wikiwiki/config.json explicitly sets integrations.beads.enabled to true, guard those reads with a .beads git-status snapshot, report Beads as unavailable if bd mutates storage, and suppress dependency/generated/low-level Beads paths from spin and closeout source files. Beads repos avoid dirty worktrees by default while still getting clear detected/skipped status. Internal developer sites and JSON reports can opt into detailed Beads context after checking local bd reads. Spin and closeout stay focused on first-party source changes instead of node_modules, generated drafts, wiki output, or Beads storage internals. src/core/beads.ts src/core/git.ts src/core/spin.ts src/core/automation.ts src/core/site.ts src/cli/commands/status.ts src/cli/commands/setup.ts src/cli/commands/closeout.ts docs/concepts.md docs/reference.md docs/setup.md docs/workflows.md skills/wk/SKILL.md audience:developer beads integration workflow dogfood safety"
   },
   {
     "type": "decision",

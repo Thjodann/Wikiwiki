@@ -10,13 +10,22 @@ release step. Until the npm package is published, install it from GitHub in the
 repo that should use Wikiwiki:
 
 ```sh
-npm install --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
+test "$(npm prefix)" = "$PWD" || npm init -y
+npm install --prefix "$PWD" --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
 ./node_modules/.bin/wk --help
 ```
 
-`--package-lock=false` avoids committing npm's current `git+ssh` lockfile
-normalization for GitHub source dependencies. Once `@thjodann/wk` is published
-to npm, install the package normally and keep your lockfile.
+The `npm prefix` check matters in Swift, Rust, Python, and other non-JavaScript
+repos. If the repo has no local `package.json`, npm may otherwise climb to a
+parent project and install Wikiwiki there. `npm init -y` creates the local
+manifest first, and `--prefix "$PWD"` keeps the install rooted in the repo you
+are setting up.
+
+Expect npm to create or update `package.json` and `node_modules/`. In non-JS
+repos, add `node_modules/` to `.gitignore` if it is not already ignored. The
+temporary `--package-lock=false` flag avoids committing npm's current `git+ssh`
+lockfile normalization for GitHub source dependencies. Once `@thjodann/wk` is
+published to npm, install the package normally and keep your lockfile.
 
 For local development on Wikiwiki itself, install from source:
 
@@ -70,8 +79,9 @@ npm run wiki:site
 ```
 
 `wk setup` will not create a `package.json`. In repos without one, it reports
-copy-ready commands. It also refuses to overwrite existing conflicting scripts
-unless `--force` is explicit.
+copy-ready commands. Run the safe install sequence above first when you want
+package scripts in a non-JS repo. Setup also refuses to overwrite existing
+conflicting scripts unless `--force` is explicit.
 
 You can also add only the scripts your team wants to run manually, in CI, or
 before publishing docs:
@@ -168,17 +178,23 @@ agent to use the same deterministic CLI that non-AI users can run themselves.
 
 ## Optional Beads Coordination
 
-Wikiwiki's Beads integration is automatic and read-only for internal command
-output:
+Wikiwiki's Beads detection is automatic, but detailed `bd` reads are opt-in for
+internal command output. This keeps `wk status`, `wk spin`, and `wk closeout`
+from dirtying `.beads/` in environments where `bd --readonly` still touches
+internal storage.
 
 - No `.beads/`: Wikiwiki behaves normally.
-- `.beads/` plus `bd`: `wk status`, `wk spin`, `wk closeout`, and the
-  developer-facing JSON outputs include task context.
+- `.beads/` plus auto config: Wikiwiki reports that Beads was detected and
+  skips detailed reads.
+- `.beads/` plus `integrations.beads.enabled: true`: `wk status`, `wk spin`,
+  `wk closeout`, and developer-facing JSON outputs include task context when
+  `bd` can read without changing `.beads/`.
 - `.beads/` without `bd`: Wikiwiki still works and reports that Beads context
   is unavailable.
 
-Publishing Beads task data into `wiki-site/work.html` is explicit opt-in. Add
-this only for internal developer sites:
+Detailed Beads task data and `wiki-site/work.html` are explicit opt-in. Add
+this only for internal developer sites or repos where the local `bd` read path
+has been checked:
 
 ```json
 {

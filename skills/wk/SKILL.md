@@ -110,7 +110,7 @@ wk closeout --profile mixed --audience all --json
 After meaningful repo changes:
 
 1. Run `wk closeout --profile mixed --audience all --json` unless the repo config or user request specifies another profile/audience.
-2. Review `.wikiwiki/drafts/closeout/<closeout-id>/summary.md` and `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`. In Beads repos, the summary includes read-only Beads context.
+2. Review `.wikiwiki/drafts/closeout/<closeout-id>/summary.md` and `.wikiwiki/drafts/closeout/<closeout-id>/record-drafts/`. In Beads repos, the summary reports detected Beads state; detailed Beads context appears only when the repo explicitly enables it and `bd` reads cleanly.
 3. Apply only the record drafts that are true, useful, and properly sourced.
 4. If records changed, run `wk validate`, `wk render`, and `wk site --audience all`; also run `wk site --audience user` when checking the standard user experience.
 5. Summarize any knowledge updates and closeout draft path in the final response.
@@ -144,7 +144,7 @@ When `.beads/` exists, treat Beads as the repo's task and work-memory layer:
 - Run `bd prime` before wiki work when `bd` is available.
 - Use Beads for task state, blockers, dependencies, ownership, and follow-ups.
 - Use Wikiwiki for durable knowledge, decisions, generated Markdown, static site generation, and human wiki drafts.
-- Let `wk closeout` include Beads-linked context, then update Wikiwiki records only for lasting knowledge.
+- Let `wk closeout` report Beads detection, and include detailed Beads-linked context only when `.wikiwiki/config.json` explicitly sets `integrations.beads.enabled` to `true` and the read does not dirty `.beads/`.
 - Do not mutate Beads through Wikiwiki. Use `bd` directly for Beads task changes.
 
 The same skill is safe in non-Beads repos. If `.beads/` is absent, skip Beads

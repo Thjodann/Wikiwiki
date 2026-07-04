@@ -353,8 +353,9 @@ test("buildSiteFiles redacts Beads issue details when site output is not opted i
 
   assert.equal(files.some((item) => item.fileName === "work.html"), false);
   assert.equal(manifest.pages.includes("work.html"), false);
-  assert.equal(manifest.integrations.beads.available, true);
-  assert.equal(manifest.integrations.beads.counts.ready, 2);
+  assert.equal(manifest.integrations.beads.available, false);
+  assert.equal(manifest.integrations.beads.error, "beads_auto_read_skipped");
+  assert.equal(manifest.integrations.beads.counts.ready, 0);
   assert.deepEqual(manifest.integrations.beads.issue_ids, []);
   assert.deepEqual(manifest.integrations.beads.ready, []);
   assert.deepEqual(manifest.integrations.beads.in_progress, []);

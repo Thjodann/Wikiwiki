@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
 import { configPath, normalizeSourceBaseUrl, readWikiwikiConfig, writeWikiwikiConfig, type WikiwikiConfig } from "./config";
-import { changedFiles } from "./git";
+import { changedFiles, suppressedGitStatusSummary, type SuppressedGitStatusSummary } from "./git";
 import { relativeReportPath, reportPath, sitePath, wikiPath, wikiwikiPath } from "./paths";
 import { parseSiteAudience, parseWikiProfile, type SiteAudience, type WikiProfile } from "./profiles";
 import { renderWiki, wikiPageFileNames } from "./renderer";
@@ -101,6 +101,7 @@ type AutomationStatus = {
   generated_site_files: string[];
   git: {
     changed_files: string[];
+    suppressed_changed_files: SuppressedGitStatusSummary;
   };
   integrations?: IntegrationSummary;
 };
@@ -348,7 +349,8 @@ function automationStatus(root: string): AutomationStatus {
     generated_files: generatedFiles.map((file) => relativeReportPath(root, file)),
     generated_site_files: generatedSiteFiles.map((file) => relativeReportPath(root, file)),
     git: {
-      changed_files: changedFiles(root)
+      changed_files: changedFiles(root),
+      suppressed_changed_files: suppressedGitStatusSummary(root)
     }
   };
   if (shouldReportIntegrations(integrations)) {
@@ -483,6 +485,8 @@ function writeCloseoutSummary(
     lines.push("", "## Beads Work Context", "");
     if (!beads.enabled) {
       lines.push("- Beads is detected but disabled in Wikiwiki config.");
+    } else if (beads.error === "beads_auto_read_skipped") {
+      lines.push("- Beads is detected; detailed reads were skipped to avoid dirtying `.beads/`.");
     } else if (!beads.available) {
       lines.push(`- Beads is detected but unavailable: ${beads.error ?? "bd unavailable"}`);
     } else {

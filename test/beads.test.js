@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const { execFileSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
@@ -81,7 +82,7 @@ test("readBeadsIntegration detects .beads but handles missing bd", () => {
   const root = tempRoot();
   fs.mkdirSync(path.join(root, ".beads"));
 
-  const beads = withPath("", () => readBeadsIntegration(root));
+  const beads = withPath("", () => readBeadsIntegration(root, { enabled: true }));
 
   assert.equal(beads.detected, true);
   assert.equal(beads.enabled, true);
@@ -89,12 +90,26 @@ test("readBeadsIntegration detects .beads but handles missing bd", () => {
   assert.match(beads.error, /bd|ENOENT|spawn/i);
 });
 
-test("readBeadsIntegration normalizes fake bd JSON summaries", () => {
+test("readBeadsIntegration skips detailed bd reads in auto mode", () => {
   const root = tempRoot();
   fs.mkdirSync(path.join(root, ".beads"));
   const bin = createFakeBd(root);
 
   const beads = withPath(`${bin}${path.delimiter}${process.env.PATH || ""}`, () => readBeadsIntegration(root));
+
+  assert.equal(beads.detected, true);
+  assert.equal(beads.enabled, true);
+  assert.equal(beads.available, false);
+  assert.equal(beads.error, "beads_auto_read_skipped");
+  assert.deepEqual(beads.issue_ids, []);
+});
+
+test("readBeadsIntegration normalizes fake bd JSON summaries when enabled", () => {
+  const root = tempRoot();
+  fs.mkdirSync(path.join(root, ".beads"));
+  const bin = createFakeBd(root);
+
+  const beads = withPath(`${bin}${path.delimiter}${process.env.PATH || ""}`, () => readBeadsIntegration(root, { enabled: true }));
 
   assert.equal(beads.detected, true);
   assert.equal(beads.enabled, true);
@@ -109,3 +124,46 @@ test("readBeadsIntegration normalizes fake bd JSON summaries", () => {
   assert.equal(beads.ready[0].priority, "P1");
   assert.equal(beads.in_progress[0].assignee, "codex");
 });
+
+test("readBeadsIntegration refuses Beads details when bd mutates .beads", () => {
+  const root = tempRoot();
+  execFileSync("git", ["init"], { cwd: root, stdio: "ignore" });
+  fs.mkdirSync(path.join(root, ".beads"));
+  const bin = createMutatingFakeBd(root);
+
+  const beads = withPath(`${bin}${path.delimiter}${process.env.PATH || ""}`, () => readBeadsIntegration(root, { enabled: true }));
+
+  assert.equal(beads.detected, true);
+  assert.equal(beads.available, false);
+  assert.equal(beads.error, "beads_read_mutated_worktree");
+  assert.match(beads.warnings.join("\n"), /\.beads\/backup\/read\.log/);
+  assert.deepEqual(beads.issue_ids, []);
+});
+
+function createMutatingFakeBd(root) {
+  const bin = path.join(root, "mutating-bin");
+  fs.mkdirSync(bin, { recursive: true });
+  const script = path.join(bin, "fake-bd.js");
+  fs.writeFileSync(script, `const fs = require("node:fs");
+const path = require("node:path");
+const args = process.argv.slice(2);
+fs.mkdirSync(path.join(process.cwd(), ".beads", "backup"), { recursive: true });
+fs.appendFileSync(path.join(process.cwd(), ".beads", "backup", "read.log"), args.join(" ") + "\\n");
+function out(value) {
+  process.stdout.write(JSON.stringify(value, null, 2));
+}
+if (args.includes("where")) {
+  out({ beads_dir: path.join(process.cwd(), ".beads") });
+} else if (args.includes("status")) {
+  out({ counts: { ready: 1, in_progress: 0 } });
+} else {
+  out({ issues: [] });
+}
+`, "utf8");
+  fs.writeFileSync(
+    path.join(bin, "bd"),
+    `#!/bin/sh\nDIR=\${0%/*}\nexec ${JSON.stringify(process.execPath)} "$DIR/fake-bd.js" "$@"\n`,
+    { mode: 0o755 }
+  );
+  return bin;
+}

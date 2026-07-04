@@ -106,14 +106,17 @@ You can also save a default:
 
 ## Optional Beads Integration
 
-If a repo contains `.beads/`, Wikiwiki automatically reads Beads context when
-`bd` is available. The integration is best-effort and read-only. It never
+If a repo contains `.beads/`, Wikiwiki automatically detects it. Detailed
+Beads reads are opt-in because some `bd --readonly` commands can still touch
+internal storage in `.beads/`. The integration is best-effort and never
 creates, edits, claims, closes, or imports Beads issues.
 
-The integration appears in JSON reports for `wk setup`, `wk status`,
-`wk spin`, and `wk closeout`. Closeout manifests include the same Beads context
-so an agent can relate durable wiki updates to active work without treating
-tasks as records.
+The detection appears in JSON reports for `wk setup`, `wk status`, `wk spin`,
+and `wk closeout`. When `.wikiwiki/config.json` explicitly sets
+`integrations.beads.enabled: true`, those reports include detailed Beads
+context if `bd` can read without changing `.beads/`. Closeout manifests include
+the same Beads context so an agent can relate durable wiki updates to active
+work without treating tasks as records.
 
 Site publishing is explicit opt-in for task details. `wk site --audience all`
 and `wk site --audience developer` generate `work.html` with ready work,
@@ -150,8 +153,12 @@ Disable the integration in `.wikiwiki/config.json` when needed:
 Fallback behavior is intentionally calm:
 
 - no `.beads/`: no Beads output
-- `.beads/` plus `bd`: combined task/wiki context
+- `.beads/` with auto config: detected, with detailed reads skipped
+- `.beads/` plus explicit `enabled: true`: combined task/wiki context when
+  `bd` reads cleanly
 - `.beads/` without `bd`: Wikiwiki reports that Beads context is unavailable
+- `.beads/` that changes during a `bd` read: Wikiwiki reports Beads as
+  unavailable for that run instead of using potentially mutating context
 
 ## Project Theme
 

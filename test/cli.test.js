@@ -129,8 +129,12 @@ test("README documents GitHub source install before npm publish", () => {
   const readme = fs.readFileSync(path.join(process.cwd(), "README.md"), "utf8");
   const setupDoc = fs.readFileSync(path.join(process.cwd(), "docs/setup.md"), "utf8");
 
-  assert.match(readme, /npm install --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
-  assert.match(setupDoc, /npm install --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.match(readme, /test "\$\(npm prefix\)" = "\$PWD" \|\| npm init -y/);
+  assert.match(setupDoc, /test "\$\(npm prefix\)" = "\$PWD" \|\| npm init -y/);
+  assert.match(readme, /npm install --prefix "\$PWD" --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.match(setupDoc, /npm install --prefix "\$PWD" --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.match(setupDoc, /no local `package\.json`/);
+  assert.match(setupDoc, /add `node_modules\/` to `\.gitignore`/);
   assert.match(readme, /git\+ssh/);
   assert.match(setupDoc, /git\+ssh/);
   assert.doesNotMatch(readme, /npm install --save-dev github:Thjodann\/Wikiwiki/);
@@ -309,7 +313,7 @@ test("setup refuses conflicting scripts unless forced", () => {
   assert.equal(pkg.scripts["wiki:site"], "wk validate && wk render && wk site --audience all");
 });
 
-test("setup, status, spin, and closeout report Beads context when .beads exists", () => {
+test("setup, status, and spin skip detailed Beads reads in auto mode", () => {
   const root = tempRepo();
   fs.mkdirSync(path.join(root, ".beads"));
   const fakeBd = createFakeBd(root);
@@ -317,8 +321,34 @@ test("setup, status, spin, and closeout report Beads context when .beads exists"
   const setup = runJson(root, ["setup", "--json"], { env: fakeBd.env });
   const config = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8"));
   assert.equal(setup.integrations.beads.detected, true);
-  assert.equal(setup.integrations.beads.available, true);
+  assert.equal(setup.integrations.beads.available, false);
+  assert.equal(setup.integrations.beads.error, "beads_auto_read_skipped");
   assert.equal(config.integrations, undefined);
+
+  const status = runJson(root, ["status", "--json"], { env: fakeBd.env });
+  assert.equal(status.integrations.beads.available, false);
+  assert.deepEqual(status.integrations.beads.issue_ids, []);
+
+  const spin = runJson(root, ["spin", "--json"], { env: fakeBd.env });
+  assert.equal(spin.integrations.beads.error, "beads_auto_read_skipped");
+  assert.equal(fs.existsSync(fakeBd.log), false);
+});
+
+test("setup, status, spin, and closeout report Beads context when explicitly enabled", () => {
+  const root = tempRepo();
+  fs.mkdirSync(path.join(root, ".beads"));
+  fs.mkdirSync(path.join(root, ".wikiwiki"), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, ".wikiwiki/config.json"),
+    `${JSON.stringify({ integrations: { beads: { enabled: true } } }, null, 2)}\n`
+  );
+  const fakeBd = createFakeBd(root);
+
+  const setup = runJson(root, ["setup", "--json"], { env: fakeBd.env });
+  const config = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8"));
+  assert.equal(setup.integrations.beads.detected, true);
+  assert.equal(setup.integrations.beads.available, true);
+  assert.equal(config.integrations.beads.enabled, true);
 
   const status = runJson(root, ["status", "--json"], { env: fakeBd.env });
   assert.equal(status.integrations.beads.counts.ready, 2);
@@ -357,9 +387,12 @@ test("setup does not make Beads site output implicit", () => {
   assert.equal(config.integrations, undefined);
   assert.equal(fs.existsSync(path.join(root, "wiki-site/work.html")), false);
   assert.equal(manifest.pages.includes("work.html"), false);
-  assert.equal(manifest.integrations.beads.counts.ready, 2);
+  assert.equal(manifest.integrations.beads.available, false);
+  assert.equal(manifest.integrations.beads.error, "beads_auto_read_skipped");
+  assert.equal(manifest.integrations.beads.counts.ready, 0);
   assert.deepEqual(manifest.integrations.beads.issue_ids, []);
   assert.deepEqual(manifest.integrations.beads.ready, []);
+  assert.equal(fs.existsSync(fakeBd.log), false);
   assert.doesNotMatch(JSON.stringify(manifest), /Ready task|Active task|codex|PRISM-a1/);
   assert.doesNotMatch(searchIndex, /beads:|Ready task|Active task|codex|PRISM-a1/);
 });
@@ -521,6 +554,43 @@ test("spin and closeout suppress setup-only Wikiwiki artifacts", () => {
   const closeout = runJson(root, ["closeout", "--json"]);
   assert.equal(closeout.drafts.length, 0);
   assert.deepEqual(closeout.spin.suggested_updates, []);
+});
+
+test("spin and closeout suppress dependency, generated, draft, and Beads internal noise", () => {
+  const root = tempRepo();
+  run(root, ["setup", "--json"]);
+  commitAll(root, "seed wikiwiki");
+
+  fs.mkdirSync(path.join(root, "src/core"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src/core/store.ts"), "export const store = true;\n");
+  fs.mkdirSync(path.join(root, "node_modules/commander"), { recursive: true });
+  fs.writeFileSync(path.join(root, "node_modules/commander/README.md"), "# Commander\n");
+  fs.mkdirSync(path.join(root, ".wikiwiki/drafts/closeout/test"), { recursive: true });
+  fs.writeFileSync(path.join(root, ".wikiwiki/drafts/closeout/test/summary.md"), "# Closeout\n");
+  fs.mkdirSync(path.join(root, "wiki"), { recursive: true });
+  fs.writeFileSync(path.join(root, "wiki/index.md"), "# Generated\n");
+  fs.mkdirSync(path.join(root, "wiki-site"), { recursive: true });
+  fs.writeFileSync(path.join(root, "wiki-site/index.html"), "<!doctype html>\n");
+  fs.mkdirSync(path.join(root, ".beads/backup"), { recursive: true });
+  fs.writeFileSync(path.join(root, ".beads/backup/backup.jsonl"), "{}\n");
+  fs.mkdirSync(path.join(root, ".beads/embeddeddolt/data"), { recursive: true });
+  fs.writeFileSync(path.join(root, ".beads/embeddeddolt/data/log"), "dolt\n");
+
+  const spin = runJson(root, ["spin", "--json"]);
+
+  assert.deepEqual(spin.changed_files, ["src/core/store.ts"]);
+  assert.equal(spin.suppressed_changed_files.total, 6);
+  assert.deepEqual(
+    spin.suppressed_changed_files.groups.map((group) => group.name).sort(),
+    ["beads_internals", "dependencies", "generated_site", "generated_wiki", "wikiwiki_drafts"]
+  );
+  assert.equal(spin.suggested_updates.some((update) => update.files.some((file) => file.startsWith("node_modules/"))), false);
+  assert.equal(spin.suggested_updates.some((update) => update.files.some((file) => file.startsWith(".wikiwiki/drafts/"))), false);
+
+  const closeout = runJson(root, ["closeout", "--json"]);
+  assert.deepEqual(closeout.changed_files, ["src/core/store.ts"]);
+  assert.deepEqual(closeout.spin.changed_files, ["src/core/store.ts"]);
+  assert.equal(closeout.drafts.every((draft) => !draft.draft_path.includes("node_modules")), true);
 });
 
 test("closeout creates reviewable drafts and does not append records automatically", () => {

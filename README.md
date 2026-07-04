@@ -22,14 +22,17 @@ release step. Until the npm package is published, install it from GitHub in a
 target repo:
 
 ```sh
-npm install --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
+test "$(npm prefix)" = "$PWD" || npm init -y
+npm install --prefix "$PWD" --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
 ./node_modules/.bin/wk --help
 ```
 
-`--package-lock=false` is intentional for this temporary GitHub source install:
-npm currently writes GitHub git dependencies into `package-lock.json` as
-`git+ssh` URLs. Once `@thjodann/wk` is published to npm, use the package name
-and your normal lockfile workflow.
+The `npm prefix` check prevents npm from climbing into an ancestor project
+when the target repo has no local `package.json`. `--package-lock=false` is
+intentional for this temporary GitHub source install: npm currently writes
+GitHub git dependencies into `package-lock.json` as `git+ssh` URLs. Once
+`@thjodann/wk` is published to npm, use the package name and your normal
+lockfile workflow.
 
 For local development on Wikiwiki itself, install and run from source:
 
@@ -80,11 +83,12 @@ Close out meaningful work with a review packet:
 wk closeout --profile mixed --audience all --json
 ```
 
-If a repo already uses Beads, Wikiwiki detects `.beads/` automatically and
-adds read-only developer work context to status, spin, and closeout. Publishing
-the Beads-powered `work.html` site page is explicit opt-in through
-`.wikiwiki/config.json`; user-audience sites omit Beads data entirely. If Beads
-is absent, the normal flow is unchanged.
+If a repo already uses Beads, Wikiwiki detects `.beads/` automatically. Detailed
+`bd` reads are opt-in through `.wikiwiki/config.json` because some Beads
+versions can touch internal storage during read commands. Publishing the
+Beads-powered `work.html` site page is also explicit opt-in; user-audience
+sites omit Beads data entirely. If Beads is absent, the normal flow is
+unchanged.
 
 ## Docs
 

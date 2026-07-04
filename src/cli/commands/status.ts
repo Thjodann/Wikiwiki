@@ -4,7 +4,7 @@ import { Command } from "commander";
 import { printJson } from "../helpers";
 import { readIntegrations, shouldReportIntegrations } from "../../core/beads";
 import { readWikiwikiConfig } from "../../core/config";
-import { changedFiles } from "../../core/git";
+import { changedFiles, suppressedGitStatusSummary } from "../../core/git";
 import { findRepoRoot, relativeReportPath, reportPath, sitePath, wikiPath, wikiwikiPath } from "../../core/paths";
 import { siteStaticPageFileNames } from "../../core/site";
 import { wikiPageFileNames } from "../../core/renderer";
@@ -38,7 +38,8 @@ export function registerStatusCommand(program: Command): void {
         generated_files: generatedFiles.map((file) => relativeReportPath(root, file)),
         generated_site_files: generatedSiteFiles.map((file) => relativeReportPath(root, file)),
         git: {
-          changed_files: changedFiles(root)
+          changed_files: changedFiles(root),
+          suppressed_changed_files: suppressedGitStatusSummary(root)
         },
         ...(shouldReportIntegrations(integrations) ? { integrations } : {})
       };

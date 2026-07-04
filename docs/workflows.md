@@ -91,9 +91,25 @@ are added, and they should only become records when they are true and useful.
 ## With Beads
 
 When a repo has `.beads/`, Wikiwiki treats Beads as the developer work graph
-and stays out of the task database. If `bd` is available, `wk status`,
-`wk spin`, and `wk closeout` include a read-only Beads summary with ready work,
-in-progress work, recent closed work, and related issue IDs.
+and stays out of the task database. By default, `wk status`, `wk spin`, and
+`wk closeout` report that Beads was detected but skip detailed `bd` reads so
+read-only wiki commands do not dirty `.beads/`.
+
+If a repo has verified that local `bd` reads are clean, opt in to detailed
+context with `.wikiwiki/config.json`:
+
+```json
+{
+  "integrations": {
+    "beads": {
+      "enabled": true
+    }
+  }
+}
+```
+
+With that opt-in, Wikiwiki includes ready work, in-progress work, recent closed
+work, and related issue IDs when `bd` can read without changing `.beads/`.
 
 Recommended agent flow in a Beads repo:
 
@@ -109,10 +125,9 @@ generated Markdown, and the human wiki. During closeout, review the Beads
 context in `.wikiwiki/drafts/closeout/<closeout-id>/summary.md`, but only add
 Wikiwiki records for knowledge that should outlive the task.
 
-Generated sites do not publish Beads task details unless
-`.wikiwiki/config.json` explicitly sets `integrations.beads.enabled` to `true`.
-Use that only for internal developer sites; user-audience sites omit Beads from
-pages, manifests, and search data.
+Generated sites also do not publish Beads task details unless
+`integrations.beads.enabled` is `true`. Use that only for internal developer
+sites; user-audience sites omit Beads from pages, manifests, and search data.
 
 ## Search
 

@@ -1,6 +1,14 @@
 import fs from "fs";
 import { readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
-import { readGitDiffStat, readGitStatus, runGit, type GitStatusEntry } from "./git";
+import {
+  isSuppressedGitPath,
+  readGitDiffStat,
+  readGitStatus,
+  runGit,
+  summarizeSuppressedGitStatus,
+  type GitStatusEntry,
+  type SuppressedGitStatusSummary
+} from "./git";
 import { readWikiwikiConfig } from "./config";
 import { profileRecipes, type ProfileSeed, type SiteAudience, type WikiProfile } from "./profiles";
 
@@ -35,6 +43,7 @@ export type FirstPassRecipe = {
 
 export type SpinResult = {
   changed_files: string[];
+  suppressed_changed_files: SuppressedGitStatusSummary;
   file_status: GitStatusEntry[];
   diff_stat: string;
   profile: FirstPassRecipe;
@@ -44,13 +53,15 @@ export type SpinResult = {
 
 export function createSpinResult(root: string, profile: WikiProfile): SpinResult {
   const status = readGitStatus(root);
-  const changedFiles = status.map((entry) => entry.path);
+  const fileStatus = status.filter((entry) => !isSuppressedGitPath(entry.path));
+  const changedFiles = fileStatus.map((entry) => entry.path);
   const suggestionFiles = filterSuggestionFiles(root, changedFiles);
   const integrations = readIntegrations(root, readWikiwikiConfig(root));
 
   const result: SpinResult = {
     changed_files: changedFiles,
-    file_status: status,
+    suppressed_changed_files: summarizeSuppressedGitStatus(status),
+    file_status: fileStatus,
     diff_stat: readGitDiffStat(root),
     profile: firstPassRecipe(profile),
     suggested_updates: suggestUpdates(suggestionFiles)
@@ -63,7 +74,11 @@ export function createSpinResult(root: string, profile: WikiProfile): SpinResult
 }
 
 export function filterSuggestionFiles(root: string, files: string[]): string[] {
-  return files.filter((file) => !isWikiwikiManagedPath(file) && !isWikiwikiSetupOnlyPackageChange(root, file));
+  return files.filter((file) =>
+    !isWikiwikiManagedPath(file) &&
+    !isWikiwikiSetupOnlyPackageChange(root, file) &&
+    !isWikiwikiSetupOnlyConfigChange(root, file)
+  );
 }
 
 export function suggestUpdates(files: string[]): SuggestedUpdate[] {
@@ -71,7 +86,7 @@ export function suggestUpdates(files: string[]): SuggestedUpdate[] {
   const coreFiles = files.filter((file) => file.startsWith("src/core/"));
   const cliFiles = files.filter((file) => file.startsWith("src/cli/"));
   const docsFiles = files.filter((file) => file.endsWith(".md") || file.startsWith("docs/") || file.startsWith("wiki/"));
-  const configFiles = files.filter((file) => ["package.json", "tsconfig.json"].includes(file) || file.startsWith(".github/"));
+  const configFiles = files.filter((file) => ["package.json", "tsconfig.json", ".wikiwiki/config.json", ".wikiwiki/site-theme.json"].includes(file) || file.startsWith(".github/"));
 
   if (coreFiles.length > 0) {
     suggestions.push({
@@ -212,7 +227,8 @@ function firstPassSuggestion(seed: ProfileSeed): FirstPassSuggestion {
 }
 
 function isWikiwikiManagedPath(file: string): boolean {
-  return file.startsWith(".wikiwiki/") ||
+  return file.startsWith(".wikiwiki/drafts/") ||
+    file.startsWith(".wikiwiki/records/") ||
     file.startsWith("wiki/") ||
     file.startsWith("wiki-site/");
 }
@@ -232,6 +248,19 @@ function isWikiwikiSetupOnlyPackageChange(root: string, file: string): boolean {
   }
 
   return JSON.stringify(withoutWikiwikiScripts(previous)) === JSON.stringify(withoutWikiwikiScripts(current));
+}
+
+function isWikiwikiSetupOnlyConfigChange(root: string, file: string): boolean {
+  if (file !== ".wikiwiki/config.json") {
+    return false;
+  }
+
+  try {
+    runGit(root, ["show", "HEAD:.wikiwiki/config.json"]);
+    return false;
+  } catch {
+    return true;
+  }
 }
 
 function withoutWikiwikiScripts(value: unknown): unknown {

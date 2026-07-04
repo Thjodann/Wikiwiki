@@ -34,6 +34,7 @@ export function registerCloseoutCommand(program: Command): void {
       if (result.integrations?.beads?.detected) {
         const state = result.integrations.beads.available
           ? `${result.integrations.beads.issue_ids.length} related issue ids`
+          : result.integrations.beads.error === "beads_auto_read_skipped" ? "detected; detailed reads skipped"
           : result.integrations.beads.enabled ? "detected but unavailable" : "disabled";
         console.log(`Beads: ${state}`);
       }

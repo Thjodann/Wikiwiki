@@ -2,6 +2,7 @@ import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { type WikiwikiConfig } from "./config";
+import { readGitStatus } from "./git";
 import { reportPath, toPosixPath } from "./paths";
 
 export type BeadsIntegrationConfig = {
@@ -86,6 +87,17 @@ export function readBeadsIntegration(
     };
   }
 
+  if (configured === "auto") {
+    return {
+      ...base,
+      error: "beads_auto_read_skipped",
+      warnings: [
+        "Beads workspace detected; detailed bd reads are skipped in auto mode to avoid dirtying .beads. Set integrations.beads.enabled to true to opt in."
+      ]
+    };
+  }
+
+  const before = beadsGitStatusSnapshot(root);
   const where = runBdJson(root, ["where"]);
   if (!where.ok) {
     return {
@@ -94,10 +106,23 @@ export function readBeadsIntegration(
     };
   }
 
-  const status = runBdJson(root, ["status"]);
+  const status = runBdJson(root, ["status", "--no-activity"]);
   const ready = runBdJson(root, ["ready", "--limit", "10"]);
   const inProgress = runBdJson(root, ["list", "--status", "in_progress", "--limit", "10"]);
   const recentClosed = runBdJson(root, ["list", "--status", "closed", "--limit", "10", "--sort", "updated", "--reverse"]);
+  const after = beadsGitStatusSnapshot(root);
+  const mutated = changedSnapshotEntries(before, after);
+  if (mutated.length > 0) {
+    return {
+      ...base,
+      error: "beads_read_mutated_worktree",
+      warnings: [
+        "bd read commands changed .beads; Wikiwiki ignored Beads details for this run.",
+        `Changed .beads entries: ${mutated.slice(0, 5).join(", ")}${mutated.length > 5 ? `, and ${mutated.length - 5} more` : ""}`
+      ]
+    };
+  }
+
   const readyIssues = extractIssues(ready.value);
   const inProgressIssues = extractIssues(inProgress.value);
   const recentClosedIssues = extractIssues(recentClosed.value);
@@ -166,7 +191,7 @@ function emptySummary(options: {
 
 function runBdJson(root: string, args: string[]): BdResult {
   try {
-    const output = execFileSync("bd", ["--readonly", "--json", ...args], {
+    const output = execFileSync("bd", ["--readonly", "--json", "--dolt-auto-commit", "off", ...args], {
       cwd: root,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"]
@@ -210,6 +235,19 @@ function commandError(error: unknown): string {
   }
 
   return String(error);
+}
+
+function beadsGitStatusSnapshot(root: string): string[] {
+  return readGitStatus(root, [".beads"]).map((entry) => `${entry.status} ${entry.path}`).sort();
+}
+
+function changedSnapshotEntries(before: string[], after: string[]): string[] {
+  const beforeSet = new Set(before);
+  const afterSet = new Set(after);
+  return [
+    ...after.filter((entry) => !beforeSet.has(entry)),
+    ...before.filter((entry) => !afterSet.has(entry))
+  ].sort();
 }
 
 function beadsPathFromWhere(value: unknown): string | undefined {
