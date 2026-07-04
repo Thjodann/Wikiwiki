@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Compile UX and DX human wikis through agent-mediated drafts - Wikiwiki</title>
+  <title>Make generated sites publishable without adjacent repo files - Wikiwiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <script src="../../assets/search-index.js" defer></script>
   <script src="../../assets/wikiwiki.js" defer></script>
@@ -41,8 +41,8 @@
     <main id="content" class="content">
       <header class="page-header">
         <p class="eyebrow">Generated Wikiwiki site</p>
-        <h1>Compile UX and DX human wikis through agent-mediated drafts</h1>
-        <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.</p>
+        <h1>Make generated sites publishable without adjacent repo files</h1>
+        <p>Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -52,29 +52,31 @@
   </nav>
   <div class="record-title-row">
     <span class="type-badge">Decision</span>
-    <span class="tag-list"><span>compile</span><span>ux</span><span>dx</span><span>agent-workflow</span><span>agentic-ide</span></span>
+    <span class="tag-list"><span>site</span><span>github-pages</span><span>source-links</span><span>dx</span></span>
   </div>
   <section class="prose">
   <h2>Context</h2>
-  <p>The project should eventually derive procedurally created human-readable wikis while integrating naturally with modern agentic IDE frameworks.</p>
+  <p>PRISM dogfooding showed wiki-site source links worked in a full checkout but would break when only wiki-site/ is deployed to GitHub Pages.</p>
   <h2>Decision</h2>
-  <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.</p>
+  <p>Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.</p>
   <h2>Consequences</h2>
-  <p>wk stays provider-agnostic while becoming useful as repo memory middleware for Codex, Cursor, Claude Code, and similar agentic IDEs.</p>
+  <p>Generated sites remain useful locally, while published Pages sites can link back to GitHub source files and directories without relying on the full repository being deployed beside wiki-site/.</p>
 </section>
   <details class="record-meta">
   <summary>Record details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>decision_5ad8c2cf-266c-4824-8833-1d40103933b9</code></dd></div>
+    <div><dt>ID</dt><dd><code>decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5</code></dd></div>
     <div><dt>Source</dt><dd>manual</dd></div>
     <div><dt>Authority</dt><dd>user</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T02:50:03.431Z">2026-07-04</time></dd></div>
-    <div><dt>Updated</dt><dd><time datetime="2026-07-04T02:50:03.431Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd><code>compile</code> <code>ux</code> <code>dx</code> <code>agent-workflow</code> <code>agentic-ide</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/compiler.ts"><code>src/core/compiler.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/AGENTS.md"><code>AGENTS.md</code></a></li></ul></dd></div>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T16:28:13.055Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T16:28:13.055Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>site</code> <code>github-pages</code> <code>source-links</code> <code>dx</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/config.ts"><code>src/core/config.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/.wikiwiki/config.json"><code>.wikiwiki/config.json</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

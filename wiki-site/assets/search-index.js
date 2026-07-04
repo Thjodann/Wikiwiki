@@ -62,6 +62,22 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "concept",
+    "id": "concept_2f7f15b0-5a10-4097-9d78-93a24c060f39",
+    "title": "Portable reporting paths",
+    "summary": "Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally.",
+    "tags": [
+      "windows",
+      "paths",
+      "dx",
+      "agent-workflow"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/concept/concept_2f7f15b0-5a10-4097-9d78-93a24c060f39.html",
+    "text": "concept_2f7f15b0-5a10-4097-9d78-93a24c060f39 agent agent high 2026-07-04T16:28:13.023Z 2026-07-04T16:28:13.023Z concept Portable reporting paths Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally. CLI outputs normalize rendered_files, generated_files, generated_site_files, file_matches, compile paths, and related file metadata so Windows runs do not leak backslashes into agent-facing reports. src/core/paths.ts src/cli/commands/render.ts src/cli/commands/site.ts src/cli/commands/status.ts src/cli/commands/search.ts windows paths dx agent-workflow"
+  },
+  {
+    "type": "concept",
     "id": "concept_4e17c000-edc9-4895-9da1-85cde9756eab",
     "title": "Role-oriented human wiki compiler",
     "summary": "Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose.",
@@ -123,6 +139,22 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "confidence": "high",
     "url": "records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html",
     "text": "decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574 manual user high 2026-07-04T15:45:16.457Z 2026-07-04T15:45:16.457Z decision Generate a static HTML site for human wiki browsing Testing in PRISM showed that raw Markdown previews expose front matter, Jekyll-style routes break outside GitHub Pages builds, and record-shaped pages do not feel like a normal wiki experience. Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/ folder with .html links, navigation, subtle metadata, responsive CSS, and local search data. Agents keep deterministic JSONL and Markdown artifacts, while humans get a first-class local/static wiki that works without a backend or Jekyll. The generated site folder is owned by Wikiwiki and should be regenerated from records. src/core/site.ts src/cli/commands/site.ts src/index.ts README.md AGENTS.md site ux dx human-wiki static"
+  },
+  {
+    "type": "decision",
+    "id": "decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5",
+    "title": "Make generated sites publishable without adjacent repo files",
+    "summary": "Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.",
+    "tags": [
+      "site",
+      "github-pages",
+      "source-links",
+      "dx"
+    ],
+    "authority": "user",
+    "confidence": "high",
+    "url": "records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html",
+    "text": "decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5 manual user high 2026-07-04T16:28:13.055Z 2026-07-04T16:28:13.055Z decision Make generated sites publishable without adjacent repo files PRISM dogfooding showed wiki-site source links worked in a full checkout but would break when only wiki-site/ is deployed to GitHub Pages. Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise. Generated sites remain useful locally, while published Pages sites can link back to GitHub source files and directories without relying on the full repository being deployed beside wiki-site/. src/core/config.ts src/core/site.ts src/cli/commands/site.ts .wikiwiki/config.json README.md site github-pages source-links dx"
   },
   {
     "type": "decision",
@@ -190,6 +222,17 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "confidence": "high",
     "url": "records/event/event_410942e4-5e5f-445a-88be-db5aa7cfa176.html",
     "text": "event_410942e4-5e5f-445a-88be-db5aa7cfa176 agent agent high 2026-07-04T00:43:03.660Z event Drafted aspirational README Replaced the README banner with the supplied image and rewrote README.md as an idealistic, GitHub-facing project draft while keeping the current MVP status visible. README.md assets/wikiwiki-banner.png"
+  },
+  {
+    "type": "event",
+    "id": "event_77558856-112d-4c41-9003-696a8c1e3dda",
+    "title": "Hardened static site portability for PRISM dogfooding",
+    "summary": "Hardened static site portability for PRISM dogfooding",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/event/event_77558856-112d-4c41-9003-696a8c1e3dda.html",
+    "text": "event_77558856-112d-4c41-9003-696a8c1e3dda agent agent high 2026-07-04T16:28:13.055Z event Hardened static site portability for PRISM dogfooding Normalized JSON/report paths to POSIX separators, added source_base_url config and wk site --source-base-url, switched configured source links to GitHub blob/tree URLs, expanded tests for Windows-style path safety and Pages-safe source links, and documented the deployment flow. src/core/paths.ts src/core/config.ts src/core/site.ts src/cli/commands/site.ts src/cli/commands/status.ts src/cli/commands/render.ts src/cli/commands/search.ts test/site.test.js test/cli.test.js README.md"
   },
   {
     "type": "event",
@@ -335,6 +378,17 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "symbol",
+    "id": "symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c",
+    "title": "readWikiwikiConfig",
+    "summary": "Reads optional .wikiwiki/config.json settings such as source_base_url for generated site source links.",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/symbol/symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c.html",
+    "text": "symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c agent agent high 2026-07-04T16:28:22.677Z 2026-07-04T16:28:22.677Z symbol readWikiwikiConfig function src/core/config.ts Reads optional .wikiwiki/config.json settings such as source_base_url for generated site source links."
+  },
+  {
+    "type": "symbol",
     "id": "symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98",
     "title": "registerRecordCommand",
     "summary": "Registers generic record list, get, update, and delete commands for append-only record lifecycle management.",
@@ -376,5 +430,16 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "confidence": "high",
     "url": "records/symbol/symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959.html",
     "text": "symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959 agent agent high 2026-07-04T15:45:27.902Z 2026-07-04T15:45:27.902Z symbol renderSite function src/core/site.ts Builds and writes the generated wiki-site/ static HTML frontend from active Wikiwiki records."
+  },
+  {
+    "type": "symbol",
+    "id": "symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5",
+    "title": "resolveSiteOptions",
+    "summary": "Resolves wk site options by combining .wikiwiki/config.json with CLI overrides, including sourceBaseUrl.",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/symbol/symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5.html",
+    "text": "symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5 agent agent high 2026-07-04T16:28:22.677Z 2026-07-04T16:28:22.677Z symbol resolveSiteOptions function src/core/site.ts Resolves wk site options by combining .wikiwiki/config.json with CLI overrides, including sourceBaseUrl."
   }
 ];

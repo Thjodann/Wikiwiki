@@ -1,7 +1,6 @@
-import path from "path";
 import { Command } from "commander";
 import { printJson } from "../helpers";
-import { findRepoRoot } from "../../core/paths";
+import { findRepoRoot, relativeReportPath } from "../../core/paths";
 import { renderWiki } from "../../core/renderer";
 import { isInitialized } from "../../core/store";
 
@@ -19,7 +18,7 @@ export function registerRenderCommand(program: Command): void {
       const files = renderWiki(root);
       const result = {
         ok: true,
-        rendered_files: files.map((file) => path.relative(root, file))
+        rendered_files: files.map((file) => relativeReportPath(root, file))
       };
 
       if (options.json) {

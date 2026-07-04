@@ -29,6 +29,12 @@ function payload(value) {
   return JSON.stringify(value);
 }
 
+function assertPosixPaths(paths) {
+  for (const item of paths) {
+    assert.equal(item.includes("\\"), false, `${item} should use POSIX separators`);
+  }
+}
+
 test("package exposes wk primary binary and wikiwiki compatibility alias", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
 
@@ -44,6 +50,10 @@ test("init creates record files and all generated wiki pages", () => {
 
   assert.equal(result.ok, true);
   assert.equal(result.record_files.length, 6);
+  assertPosixPaths(result.record_files);
+  assertPosixPaths(result.rendered_files);
+  assert.ok(result.record_files.includes(".wikiwiki/records/concepts.jsonl"));
+  assert.ok(result.rendered_files.includes("wiki/index.md"));
   assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/concepts.jsonl")));
   assert.ok(fs.existsSync(path.join(root, "wiki/index.md")));
   assert.ok(fs.existsSync(path.join(root, "wiki/symbols.md")));
@@ -231,6 +241,7 @@ test("search finds active records and rendered Markdown, excluding deleted recor
   assert.equal(first.records.length, 1);
   assert.equal(first.records[0].id, note.id);
   assert.ok(first.file_matches.some((match) => match.file === "wiki/notes.md"));
+  assertPosixPaths(first.file_matches.map((match) => match.file));
 
   runJson(root, ["record", "delete", "note", note.id, "--reason", "test cleanup", "--json"]);
   run(root, ["render", "--json"]);
@@ -261,11 +272,38 @@ test("site command creates a browseable static wiki", () => {
     })
   ]);
 
-  const result = runJson(root, ["site", "--json"]);
+  const result = runJson(root, [
+    "site",
+    "--source-base-url",
+    "https://github.com/acme/project/blob/main/",
+    "--json"
+  ]);
   assert.equal(result.ok, true);
+  assert.equal(result.source_base_url, "https://github.com/acme/project/blob/main/");
+  assertPosixPaths(result.rendered_files);
   assert.ok(result.rendered_files.includes("wiki-site/index.html"));
   assert.ok(result.rendered_files.includes("wiki-site/assets/wikiwiki.css"));
   assert.ok(result.rendered_files.some((file) => file.startsWith("wiki-site/records/concept/")));
   assert.ok(fs.existsSync(path.join(root, "wiki-site/index.html")));
   assert.match(fs.readFileSync(path.join(root, "wiki-site/index.html"), "utf8"), /href="concepts\.html"/);
+  assert.match(
+    fs.readFileSync(path.join(root, "wiki-site/records/concept", `${result.rendered_files.find((file) => file.startsWith("wiki-site/records/concept/")).split("/").at(-1)}`), "utf8"),
+    /https:\/\/github\.com\/acme\/project\/blob\/main\/README\.md/
+  );
+});
+
+test("status and render JSON report POSIX-style generated paths", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+  run(root, ["site", "--json"]);
+
+  const render = runJson(root, ["render", "--json"]);
+  assertPosixPaths(render.rendered_files);
+  assert.ok(render.rendered_files.includes("wiki/index.md"));
+
+  const status = runJson(root, ["status", "--json"]);
+  assertPosixPaths(status.generated_files);
+  assertPosixPaths(status.generated_site_files);
+  assert.ok(status.generated_files.includes("wiki/index.md"));
+  assert.ok(status.generated_site_files.includes("wiki-site/index.html"));
 });

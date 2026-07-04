@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { normalizeSourceBaseUrl, readWikiwikiConfig } from "./config";
 import { sitePath } from "./paths";
 import { readAllRecords, type RecordsByType } from "./store";
 import { type AnyRecord, type RecordType, recordTypes } from "./schemas";
@@ -23,6 +24,14 @@ export type SiteFile = {
   content: string;
 };
 
+export type SiteOptions = {
+  sourceBaseUrl?: string;
+};
+
+export type ResolvedSiteOptions = {
+  sourceBaseUrl?: string;
+};
+
 type Category = {
   type: RecordType;
   title: string;
@@ -32,11 +41,13 @@ type Category = {
 };
 
 type SiteModel = {
+  root: string;
   repoName: string;
   records: RecordsByType;
   flatRecords: AnyRecord[];
   hrefById: Map<string, string>;
   counts: Record<RecordType, number>;
+  options: ResolvedSiteOptions;
 };
 
 type LayoutOptions = {
@@ -49,8 +60,10 @@ type LayoutOptions = {
 };
 
 type RenderContext = {
+  root: string;
   currentFile: string;
   hrefById: Map<string, string>;
+  sourceBaseUrl?: string;
 };
 
 type SearchEntry = {
@@ -112,9 +125,9 @@ const categories: Category[] = [
 
 const categoryByType = new Map<RecordType, Category>(categories.map((category) => [category.type, category]));
 
-export function buildSiteFiles(root: string): SiteFile[] {
+export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFile[] {
   const records = readAllRecords(root);
-  const model = createSiteModel(root, records);
+  const model = createSiteModel(root, records, resolveSiteOptions(root, options));
   const files: SiteFile[] = [];
 
   files.push({
@@ -181,8 +194,8 @@ export function buildSiteFiles(root: string): SiteFile[] {
   return files;
 }
 
-export function renderSite(root: string): string[] {
-  const files = buildSiteFiles(root);
+export function renderSite(root: string, options: SiteOptions = {}): string[] {
+  const files = buildSiteFiles(root, options);
   const outputPath = sitePath(root);
 
   fs.rmSync(outputPath, { recursive: true, force: true });
@@ -196,7 +209,14 @@ export function renderSite(root: string): string[] {
   });
 }
 
-function createSiteModel(root: string, records: RecordsByType): SiteModel {
+export function resolveSiteOptions(root: string, options: SiteOptions = {}): ResolvedSiteOptions {
+  const config = readWikiwikiConfig(root);
+  return {
+    sourceBaseUrl: normalizeSourceBaseUrl(options.sourceBaseUrl ?? config.source_base_url)
+  };
+}
+
+function createSiteModel(root: string, records: RecordsByType, options: ResolvedSiteOptions): SiteModel {
   const flatRecords: AnyRecord[] = [];
   for (const type of recordTypes) {
     flatRecords.push(...records[type]);
@@ -206,11 +226,13 @@ function createSiteModel(root: string, records: RecordsByType): SiteModel {
   const counts = Object.fromEntries(recordTypes.map((type) => [type, records[type].length])) as Record<RecordType, number>;
 
   return {
+    root,
     repoName: path.basename(root),
     records,
     flatRecords,
     hrefById,
-    counts
+    counts,
+    options
   };
 }
 
@@ -358,9 +380,16 @@ function renderSearchPage(): string {
 }
 
 function renderRecordPage(record: AnyRecord, model: SiteModel, currentFile: string): string {
-  const context: RenderContext = { currentFile, hrefById: model.hrefById };
+  const context: RenderContext = {
+    root: model.root,
+    currentFile,
+    hrefById: model.hrefById,
+    sourceBaseUrl: model.options.sourceBaseUrl
+  };
   const category = categoryByType.get(record.type);
   const backHref = category ? hrefFrom(currentFile, category.fileName) : hrefFrom(currentFile, "index.html");
+  const tagsHtml = tagList(recordTags(record));
+  const tagsLine = tagsHtml ? `\n    ${tagsHtml}` : "";
 
   return `<article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -369,11 +398,10 @@ function renderRecordPage(record: AnyRecord, model: SiteModel, currentFile: stri
     <a href="${backHref}">${escapeHtml(category?.title ?? labelForType(record.type))}</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">${escapeHtml(labelForType(record.type))}</span>
-    ${tagList(recordTags(record))}
+    <span class="type-badge">${escapeHtml(labelForType(record.type))}</span>${tagsLine}
   </div>
   ${renderRecordBody(record, context)}
-  ${renderRecordMeta(record, currentFile)}
+  ${renderRecordMeta(record, context)}
 </article>`;
 }
 
@@ -417,7 +445,7 @@ function renderRecordBody(record: AnyRecord, context: RenderContext): string {
   <h2>Purpose</h2>
   ${formatText(record.summary || "No summary recorded.", context)}
   <h2>Location</h2>
-  <p>${sourceFileLink(record.file, context.currentFile)}</p>
+  <p>${sourceFileLink(record.file, context)}</p>
 </section>`;
   }
 
@@ -429,13 +457,16 @@ function renderRecordBody(record: AnyRecord, context: RenderContext): string {
 </section>`;
 }
 
-function renderRecordMeta(record: AnyRecord, currentFile: string): string {
+function renderRecordMeta(record: AnyRecord, context: RenderContext): string {
   const files = relatedFiles(record);
   const fileList = files.length
-    ? files.map((file) => `<li>${sourceFileLink(file, currentFile)}</li>`).join("\n")
+    ? files.map((file) => `<li>${sourceFileLink(file, context)}</li>`).join("\n")
     : "<li>None</li>";
   const tags = recordTags(record);
   const tagText = tags.length ? tags.map((tag) => `<code>${escapeHtml(tag)}</code>`).join(" ") : "None";
+  const updatedAt = "updated_at" in record && typeof record.updated_at === "string"
+    ? `\n    <div><dt>Updated</dt><dd><time datetime="${escapeHtml(record.updated_at)}">${escapeHtml(formatDate(record.updated_at))}</time></dd></div>`
+    : "";
 
   return `<details class="record-meta">
   <summary>Record details</summary>
@@ -444,8 +475,7 @@ function renderRecordMeta(record: AnyRecord, currentFile: string): string {
     <div><dt>Source</dt><dd>${escapeHtml(record.source)}</dd></div>
     <div><dt>Authority</dt><dd>${escapeHtml(record.authority)}</dd></div>
     <div><dt>Confidence</dt><dd>${escapeHtml(record.confidence)}</dd></div>
-    <div><dt>Created</dt><dd><time datetime="${escapeHtml(record.created_at)}">${escapeHtml(formatDate(record.created_at))}</time></dd></div>
-    ${"updated_at" in record && typeof record.updated_at === "string" ? `<div><dt>Updated</dt><dd><time datetime="${escapeHtml(record.updated_at)}">${escapeHtml(formatDate(record.updated_at))}</time></dd></div>` : ""}
+    <div><dt>Created</dt><dd><time datetime="${escapeHtml(record.created_at)}">${escapeHtml(formatDate(record.created_at))}</time></dd></div>${updatedAt}
     <div><dt>Tags</dt><dd>${tagText}</dd></div>
     <div><dt>Files</dt><dd><ul>${fileList}</ul></dd></div>
   </dl>
@@ -463,6 +493,8 @@ function sectionCard(currentFile: string, targetFile: string, title: string, des
 function recordCard(record: AnyRecord, currentFile: string, model: SiteModel): string {
   const summary = recordSummary(record);
   const tags = recordTags(record).slice(0, 5);
+  const tagsHtml = tagList(tags);
+  const tagsLine = tagsHtml ? `\n    ${tagsHtml}` : "";
 
   return `<article class="record-card" data-search-card>
   <div class="record-card-top">
@@ -471,8 +503,7 @@ function recordCard(record: AnyRecord, currentFile: string, model: SiteModel): s
   </div>
   <h3><a href="${hrefFrom(currentFile, recordHref(record))}">${escapeHtml(recordTitle(record))}</a></h3>
   <p>${escapeHtml(summary)}</p>
-  <footer>
-    ${tagList(tags)}
+  <footer>${tagsLine}
     <code>${escapeHtml(record.id)}</code>
   </footer>
 </article>`;
@@ -537,7 +568,7 @@ function endpointLink(endpoint: string, context: RenderContext): string {
     return `<a href="${escapeAttribute(siteHref)}"><code>${escapeHtml(endpoint)}</code></a>`;
   }
 
-  const sourceHref = sourceHrefForFile(endpoint, context.currentFile);
+  const sourceHref = sourceHrefForFile(endpoint, context);
   if (sourceHref) {
     return `<a class="source-link" href="${escapeAttribute(sourceHref)}"><code>${escapeHtml(endpoint)}</code></a>`;
   }
@@ -545,8 +576,8 @@ function endpointLink(endpoint: string, context: RenderContext): string {
   return `<code>${escapeHtml(endpoint)}</code>`;
 }
 
-function sourceFileLink(file: string, currentFile: string): string {
-  const href = sourceHrefForFile(file, currentFile);
+function sourceFileLink(file: string, context: RenderContext): string {
+  const href = sourceHrefForFile(file, context);
   if (!href) {
     return `<code>${escapeHtml(file)}</code>`;
   }
@@ -570,7 +601,7 @@ function normalizeContentHref(target: string, context: RenderContext): string {
     return siteHref;
   }
 
-  const sourceHref = sourceHrefForFile(trimmed.replace(/^\.\//, ""), context.currentFile);
+  const sourceHref = sourceHrefForFile(trimmed.replace(/^\.\//, ""), context);
   if (sourceHref) {
     return sourceHref;
   }
@@ -619,12 +650,35 @@ function markdownRouteToHtml(route: string): string | undefined {
   return routes.get(route);
 }
 
-function sourceHrefForFile(file: string, currentFile: string): string | undefined {
+function sourceHrefForFile(file: string, context: RenderContext): string | undefined {
   if (!file || path.isAbsolute(file) || file.startsWith("..") || file.includes("://") || file.startsWith("#")) {
     return undefined;
   }
 
-  return `${"../".repeat(depthOf(currentFile) + 1)}${encodeURI(toPosixPath(file))}`;
+  if (context.sourceBaseUrl) {
+    return remoteSourceHref(file, context.sourceBaseUrl, context.root);
+  }
+
+  return `${"../".repeat(depthOf(context.currentFile) + 1)}${encodePath(toPosixPath(file))}`;
+}
+
+function remoteSourceHref(file: string, sourceBaseUrl: string, root: string): string {
+  const normalizedFile = toPosixPath(file).replace(/^\.\//, "");
+  const isDirectory = isDirectoryPath(root, normalizedFile);
+  const baseUrl = isDirectory ? treeUrlForBase(sourceBaseUrl) : sourceBaseUrl;
+  return `${baseUrl}${encodePath(normalizedFile)}`;
+}
+
+function treeUrlForBase(sourceBaseUrl: string): string {
+  return sourceBaseUrl.replace("/blob/", "/tree/");
+}
+
+function isDirectoryPath(root: string, file: string): boolean {
+  try {
+    return fs.statSync(path.resolve(root, file)).isDirectory();
+  } catch {
+    return false;
+  }
 }
 
 function searchIndexJs(model: SiteModel): string {
@@ -650,6 +704,7 @@ function siteManifest(model: SiteModel) {
     generator: "Wikiwiki",
     generated_from: ".wikiwiki/records",
     command: "wk site",
+    source_base_url: model.options.sourceBaseUrl ?? null,
     pages: siteStaticPageFileNames,
     records: model.flatRecords.map((record) => ({
       type: record.type,
@@ -724,11 +779,11 @@ function recordTags(record: AnyRecord): string[] {
 
 function relatedFiles(record: AnyRecord): string[] {
   if ("files" in record && Array.isArray(record.files)) {
-    return record.files;
+    return record.files.map(toPosixPath);
   }
 
   if ("file" in record && typeof record.file === "string") {
-    return [record.file];
+    return [toPosixPath(record.file)];
   }
 
   return [];
@@ -791,6 +846,10 @@ function safeFileName(value: string): string {
 
 function toPosixPath(value: string): string {
   return value.replace(/\\/g, "/");
+}
+
+function encodePath(value: string): string {
+  return value.split("/").map(encodeURIComponent).join("/");
 }
 
 function escapeHtml(value: string): string {

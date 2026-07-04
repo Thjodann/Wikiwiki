@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Spin heuristics - Wikiwiki</title>
+  <title>Portable reporting paths - Wikiwiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <script src="../../assets/search-index.js" defer></script>
   <script src="../../assets/wikiwiki.js" defer></script>
@@ -41,8 +41,8 @@
     <main id="content" class="content">
       <header class="page-header">
         <p class="eyebrow">Generated Wikiwiki site</p>
-        <h1>Spin heuristics</h1>
-        <p>The spin command turns git working tree changes into structured update suggestions without AI summarization.</p>
+        <h1>Portable reporting paths</h1>
+        <p>Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -52,25 +52,28 @@
   </nav>
   <div class="record-title-row">
     <span class="type-badge">Concept</span>
-    <span class="tag-list"><span>git</span><span>cli</span></span>
+    <span class="tag-list"><span>windows</span><span>paths</span><span>dx</span><span>agent-workflow</span></span>
   </div>
   <section class="prose">
   <h2>Summary</h2>
-  <p>The spin command turns git working tree changes into structured update suggestions without AI summarization.</p>
-  <h2>Details</h2><p>The MVP reads git status and diff stats, groups changed files by simple path patterns, and returns JSON that an external agent can interpret.</p>
+  <p>Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally.</p>
+  <h2>Details</h2><p>CLI outputs normalize rendered_files, generated_files, generated_site_files, file_matches, compile paths, and related file metadata so Windows runs do not leak backslashes into agent-facing reports.</p>
 </section>
   <details class="record-meta">
   <summary>Record details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>concept_26478291-0b15-4363-b661-436bab183226</code></dd></div>
+    <div><dt>ID</dt><dd><code>concept_2f7f15b0-5a10-4097-9d78-93a24c060f39</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-03T23:05:14.108Z">2026-07-03</time></dd></div>
-    <div><dt>Updated</dt><dd><time datetime="2026-07-03T23:05:14.108Z">2026-07-03</time></dd></div>
-    <div><dt>Tags</dt><dd><code>git</code> <code>cli</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/spin.ts"><code>src/cli/commands/spin.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/git.ts"><code>src/core/git.ts</code></a></li></ul></dd></div>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T16:28:13.023Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T16:28:13.023Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>windows</code> <code>paths</code> <code>dx</code> <code>agent-workflow</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/paths.ts"><code>src/core/paths.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/render.ts"><code>src/cli/commands/render.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/status.ts"><code>src/cli/commands/status.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/search.ts"><code>src/cli/commands/search.ts</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

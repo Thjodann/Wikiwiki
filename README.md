@@ -119,6 +119,24 @@ metadata, and local browser search. It does not rely on Jekyll routes or raw
 front matter, so you can open `wiki-site/index.html` directly or serve the
 folder as static files.
 
+By default, source file links point back to files beside `wiki-site/` in a local
+checkout. For published sites, pass a source base URL so links point to GitHub:
+
+```sh
+wk site --source-base-url https://github.com/OWNER/REPO/blob/main/
+```
+
+You can also save that default in `.wikiwiki/config.json`:
+
+```json
+{
+  "source_base_url": "https://github.com/OWNER/REPO/blob/main/"
+}
+```
+
+CLI options win over config. Directory links use GitHub `/tree/` URLs when the
+base URL uses `/blob/`.
+
 ## What It Compiles
 
 Wikiwiki can also compile role-oriented human wiki drafts from the same source
@@ -218,6 +236,12 @@ wk site
 open wiki-site/index.html
 ```
 
+Generate a publish-ready site with source links back to GitHub:
+
+```sh
+wk site --source-base-url https://github.com/OWNER/REPO/blob/main/
+```
+
 Search active records and rendered docs:
 
 ```sh
@@ -267,7 +291,7 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
 | `wk spin --json` | Inspect current repo changes and suggest knowledge updates |
 | `wk search <query> --json` | Search active records and rendered Markdown |
-| `wk site` | Render a browseable static HTML wiki into `wiki-site/` |
+| `wk site [--source-base-url <url>]` | Render a browseable static HTML wiki into `wiki-site/` |
 | `wk compile draft --role all --json` | Create UX/DX human wiki drafts for an IDE agent |
 | `wk compile apply <draft-id> --json` | Validate and publish a human wiki draft |
 | `wk concept add` | Add a durable project concept |
@@ -283,8 +307,10 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 ## GitHub Pages
 
 `wk site` writes static files and a `.nojekyll` marker into `wiki-site/`, so
-GitHub Pages can publish the folder without Jekyll-specific routing. Once the
-package is published, a minimal workflow can build and upload that folder:
+GitHub Pages can publish the folder without Jekyll-specific routing. Use
+`--source-base-url` so source links work when `wiki-site/` is published by
+itself. Once the package is published, a minimal workflow can build and upload
+that folder:
 
 ```yaml
 name: Publish Wikiwiki Site
@@ -309,7 +335,7 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npx @thjodann/wk render
-      - run: npx @thjodann/wk site
+      - run: npx @thjodann/wk site --source-base-url https://github.com/OWNER/REPO/blob/main/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: wiki-site

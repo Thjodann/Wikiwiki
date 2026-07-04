@@ -47,3 +47,15 @@ export function wikiPath(root: string): string {
 export function sitePath(root: string): string {
   return path.join(root, siteDirectoryName);
 }
+
+export function toPosixPath(value: string): string {
+  return value.replace(/\\/g, "/");
+}
+
+export function reportPath(value: string): string {
+  return toPosixPath(value);
+}
+
+export function relativeReportPath(root: string, value: string): string {
+  return toPosixPath(path.relative(root, value));
+}

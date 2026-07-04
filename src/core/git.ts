@@ -1,4 +1,5 @@
 import { execFileSync } from "child_process";
+import { toPosixPath } from "./paths";
 
 export type GitStatusEntry = {
   status: string;
@@ -29,7 +30,7 @@ export function readGitStatus(root: string): GitStatusEntry[] {
 
       return {
         status,
-        path: renameTarget
+        path: toPosixPath(renameTarget)
       };
     });
   } catch {

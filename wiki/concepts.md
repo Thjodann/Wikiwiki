@@ -50,6 +50,18 @@ Tags: `site`, `ux`, `dx`, `human-wiki`
 
 Record: `concept_9014ffe0-3948-4333-b6c9-f02896f81f84` | Authority: agent | Confidence: high
 
+## Portable reporting paths
+
+Wikiwiki emits POSIX-style paths in machine-readable JSON and generated manifests while keeping native filesystem paths internally.
+
+CLI outputs normalize rendered_files, generated_files, generated_site_files, file_matches, compile paths, and related file metadata so Windows runs do not leak backslashes into agent-facing reports.
+
+Files: `src/core/paths.ts`, `src/cli/commands/render.ts`, `src/cli/commands/site.ts`, `src/cli/commands/status.ts`, `src/cli/commands/search.ts`
+
+Tags: `windows`, `paths`, `dx`, `agent-workflow`
+
+Record: `concept_2f7f15b0-5a10-4097-9d78-93a24c060f39` | Authority: agent | Confidence: high
+
 ## Role-oriented human wiki compiler
 
 Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose.

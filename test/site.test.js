@@ -8,6 +8,7 @@ const {
   buildSiteFiles,
   renderSite
 } = require("../dist/core/site.js");
+const { relativeReportPath } = require("../dist/core/paths.js");
 const { appendRecord, ensureStore } = require("../dist/core/store.js");
 
 function tempRoot() {
@@ -36,7 +37,7 @@ function seedRecords(root) {
     name: "Static wiki site",
     summary: "Wikiwiki generates a static human-facing site.",
     details: "Read the [Decisions](./decisions.md) page for rationale.",
-    files: ["README.md"],
+    files: ["README.md", "src/core"],
     tags: ["site", "ux"]
   });
   appendRecord(root, "decision", {
@@ -102,17 +103,35 @@ test("buildSiteFiles creates a navigable static wiki without front matter", () =
   assert.match(concepts, /href="records\/concept\/concept_static_site\.html"/);
   assert.match(concept, /href="..\/..\/decisions\.html"/);
   assert.match(concept, /href="..\/..\/..\/README\.md"/);
+  assert.match(concept, /href="..\/..\/..\/src\/core"/);
   assert.match(link, /href="..\/concept\/concept_static_site\.html"/);
   assert.match(link, /href="..\/decision\/decision_site_links\.html"/);
   assert.match(readmeLink, /href="..\/..\/..\/README\.md"/);
   assert.match(readmeLink, /href="..\/concept\/concept_static_site\.html"/);
 });
 
+test("buildSiteFiles uses source base URLs for publishable source links", () => {
+  const root = tempRoot();
+  seedRecords(root);
+
+  const files = buildSiteFiles(root, {
+    sourceBaseUrl: "https://github.com/acme/project/blob/main/"
+  });
+  const concept = file(files, "records/concept/concept_static_site.html");
+  const manifest = JSON.parse(file(files, "site-manifest.json"));
+
+  assert.match(concept, /href="https:\/\/github\.com\/acme\/project\/blob\/main\/README\.md"/);
+  assert.match(concept, /href="https:\/\/github\.com\/acme\/project\/tree\/main\/src\/core"/);
+  assert.doesNotMatch(concept, /href="..\/..\/..\/README\.md"/);
+  assert.equal(manifest.source_base_url, "https://github.com/acme/project/blob/main/");
+  assert.ok(manifest.records.every((record) => !record.url.includes("\\")));
+});
+
 test("renderSite writes a self-contained wiki-site folder", () => {
   const root = tempRoot();
   seedRecords(root);
 
-  const renderedFiles = renderSite(root).map((item) => path.relative(root, item));
+  const renderedFiles = renderSite(root).map((item) => relativeReportPath(root, item));
 
   assert.ok(renderedFiles.includes("wiki-site/index.html"));
   assert.ok(renderedFiles.includes("wiki-site/assets/wikiwiki.css"));

@@ -65,3 +65,11 @@ Added wk site, the core static site generator, generated wiki-site output with s
 Files: `src/core/site.ts`, `src/cli/commands/site.ts`, `src/index.ts`, `test/site.test.js`, `test/cli.test.js`, `README.md`, `AGENTS.md`, `wiki-site/index.html`
 
 Recorded: 2026-07-04T15:45:27.894Z | Record: `event_dddc9fc5-611a-4902-b27c-8ee455c6832a` | Confidence: high
+
+## Hardened static site portability for PRISM dogfooding
+
+Normalized JSON/report paths to POSIX separators, added source_base_url config and wk site --source-base-url, switched configured source links to GitHub blob/tree URLs, expanded tests for Windows-style path safety and Pages-safe source links, and documented the deployment flow.
+
+Files: `src/core/paths.ts`, `src/core/config.ts`, `src/core/site.ts`, `src/cli/commands/site.ts`, `src/cli/commands/status.ts`, `src/cli/commands/render.ts`, `src/cli/commands/search.ts`, `test/site.test.js`, `test/cli.test.js`, `README.md`
+
+Recorded: 2026-07-04T16:28:13.055Z | Record: `event_77558856-112d-4c41-9003-696a8c1e3dda` | Confidence: high

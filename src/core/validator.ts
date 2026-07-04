@@ -10,7 +10,7 @@ import {
   readAllRecordsWithIssues,
   recordTimestamp
 } from "./store";
-import { wikiwikiPath } from "./paths";
+import { reportPath, wikiwikiPath } from "./paths";
 
 export type ValidationResult = {
   valid: boolean;
@@ -36,7 +36,8 @@ export function validateWikiwiki(root: string): ValidationResult {
 
   const { records, issues } = readAllRecordsWithIssues(root);
   for (const issue of issues) {
-    const location = issue.line ? `${issue.file}:${issue.line}` : issue.file;
+    const file = reportPath(issue.file);
+    const location = issue.line ? `${file}:${issue.line}` : file;
     errors.push(`${location}: ${issue.message}`);
   }
 

@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { printJson } from "../helpers";
-import { findRepoRoot } from "../../core/paths";
+import { findRepoRoot, reportPath } from "../../core/paths";
 import {
   applyCompileDraft,
   createCompileDraft,
@@ -22,7 +22,11 @@ export function registerCompileCommand(program: Command): void {
       const result = createCompileDraft(root, options.role as CompileRoleOption);
 
       if (options.json) {
-        printJson(result);
+        printJson({
+          ...result,
+          draft_path: reportPath(result.draft_path),
+          manifest_path: reportPath(result.manifest_path)
+        });
         return;
       }
 

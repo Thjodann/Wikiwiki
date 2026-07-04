@@ -3,7 +3,7 @@ import path from "path";
 import { Command } from "commander";
 import { printJson } from "../helpers";
 import { changedFiles } from "../../core/git";
-import { findRepoRoot, sitePath, wikiPath, wikiwikiPath } from "../../core/paths";
+import { findRepoRoot, relativeReportPath, reportPath, sitePath, wikiPath, wikiwikiPath } from "../../core/paths";
 import { siteStaticPageFileNames } from "../../core/site";
 import { wikiPageFileNames } from "../../core/renderer";
 import { recordTypes } from "../../core/schemas";
@@ -26,14 +26,14 @@ export function registerStatusCommand(program: Command): void {
         .filter((file) => fs.existsSync(file));
 
       const result = {
-        repo_root: root,
+        repo_root: reportPath(root),
         initialized,
-        store_path: wikiwikiPath(root),
-        wiki_path: wikiPath(root),
-        site_path: sitePath(root),
+        store_path: reportPath(wikiwikiPath(root)),
+        wiki_path: reportPath(wikiPath(root)),
+        site_path: reportPath(sitePath(root)),
         records: counts,
-        generated_files: generatedFiles,
-        generated_site_files: generatedSiteFiles,
+        generated_files: generatedFiles.map((file) => relativeReportPath(root, file)),
+        generated_site_files: generatedSiteFiles.map((file) => relativeReportPath(root, file)),
         git: {
           changed_files: changedFiles(root)
         }

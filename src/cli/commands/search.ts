@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Command } from "commander";
 import { printJson, recordTitle } from "../helpers";
-import { findRepoRoot, wikiPath } from "../../core/paths";
+import { findRepoRoot, relativeReportPath, toPosixPath, wikiPath } from "../../core/paths";
 import { readAllRecords } from "../../core/store";
 import { type AnyRecord, recordTypes } from "../../core/schemas";
 
@@ -61,7 +61,7 @@ function searchRecords(root: string, query: string) {
         source: record.source,
         authority: record.authority,
         confidence: record.confidence,
-        files: relatedFiles(record)
+        files: relatedFiles(record).map(toPosixPath)
       });
     }
   }
@@ -88,7 +88,7 @@ function searchRenderedFiles(root: string, query: string) {
       }
 
       return [{
-        file: path.relative(root, file),
+        file: relativeReportPath(root, file),
         snippet: snippet(content, query)
       }];
     });

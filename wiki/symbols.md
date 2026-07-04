@@ -12,6 +12,16 @@ Filters raw record revisions down to latest non-deleted records for status, rend
 
 Record: `symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652` | Authority: agent | Confidence: high
 
+## readWikiwikiConfig
+
+Kind: function
+
+File: `src/core/config.ts`
+
+Reads optional .wikiwiki/config.json settings such as source_base_url for generated site source links.
+
+Record: `symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c` | Authority: agent | Confidence: high
+
 ## registerRecordCommand
 
 Kind: function
@@ -51,3 +61,13 @@ File: `src/core/site.ts`
 Builds and writes the generated wiki-site/ static HTML frontend from active Wikiwiki records.
 
 Record: `symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959` | Authority: agent | Confidence: high
+
+## resolveSiteOptions
+
+Kind: function
+
+File: `src/core/site.ts`
+
+Resolves wk site options by combining .wikiwiki/config.json with CLI overrides, including sourceBaseUrl.
+
+Record: `symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5` | Authority: agent | Confidence: high

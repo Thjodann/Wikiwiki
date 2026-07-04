@@ -2,7 +2,7 @@ import fs from "fs";
 import { Command } from "commander";
 import { printJson } from "../helpers";
 import { ensureStore, isInitialized } from "../../core/store";
-import { findRepoRoot, recordPath, wikiPath, wikiwikiPath } from "../../core/paths";
+import { findRepoRoot, recordPath, relativeReportPath, reportPath, wikiPath, wikiwikiPath } from "../../core/paths";
 import { recordTypes } from "../../core/schemas";
 import { renderWiki } from "../../core/renderer";
 
@@ -20,11 +20,11 @@ export function registerInitCommand(program: Command): void {
       const result = {
         ok: true,
         already_initialized: alreadyInitialized,
-        repo_root: root,
-        store_path: wikiwikiPath(root),
-        wiki_path: wikiPath(root),
-        record_files: recordTypes.map((type) => recordPath(root, type)),
-        rendered_files: renderedFiles
+        repo_root: reportPath(root),
+        store_path: reportPath(wikiwikiPath(root)),
+        wiki_path: reportPath(wikiPath(root)),
+        record_files: recordTypes.map((type) => relativeReportPath(root, recordPath(root, type))),
+        rendered_files: renderedFiles.map((file) => relativeReportPath(root, file))
       };
 
       if (options.json) {

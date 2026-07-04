@@ -71,3 +71,17 @@ Files: `src/core/site.ts`, `src/cli/commands/site.ts`, `src/index.ts`, `README.m
 Tags: `site`, `ux`, `dx`, `human-wiki`, `static`
 
 Record: `decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574` | Authority: user | Confidence: high
+
+## Make generated sites publishable without adjacent repo files
+
+Context: PRISM dogfooding showed wiki-site source links worked in a full checkout but would break when only wiki-site/ is deployed to GitHub Pages.
+
+Decision: Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and local relative links otherwise.
+
+Consequences: Generated sites remain useful locally, while published Pages sites can link back to GitHub source files and directories without relying on the full repository being deployed beside wiki-site/.
+
+Files: `src/core/config.ts`, `src/core/site.ts`, `src/cli/commands/site.ts`, `.wikiwiki/config.json`, `README.md`
+
+Tags: `site`, `github-pages`, `source-links`, `dx`
+
+Record: `decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5` | Authority: user | Confidence: high

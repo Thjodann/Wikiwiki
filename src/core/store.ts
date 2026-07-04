@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 import { z } from "zod";
 import {
   type AnyRecord,
@@ -8,7 +7,7 @@ import {
   recordSchemas,
   recordTypes
 } from "./schemas";
-import { recordPath, recordsPath, wikiwikiPath } from "./paths";
+import { recordPath, recordsPath, relativeReportPath, wikiwikiPath } from "./paths";
 
 export type JsonlIssue = {
   file: string;
@@ -147,7 +146,7 @@ export function recordCounts(root: string): Record<RecordType, number> {
 }
 
 export function relativePath(root: string, absolutePath: string): string {
-  return path.relative(root, absolutePath);
+  return relativeReportPath(root, absolutePath);
 }
 
 export function activeRecords<T extends AnyRecord>(records: T[]): T[] {
