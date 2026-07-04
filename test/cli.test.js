@@ -146,6 +146,70 @@ test("spin returns heuristic draft templates and command hints", () => {
   }
 });
 
+test("compile draft and apply create role-oriented human wiki pages", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+  fs.writeFileSync(path.join(root, "README.md"), "# Compile fixture\n");
+  fs.mkdirSync(path.join(root, "src/core"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src/core/store.ts"), "export {}\n");
+
+  runJson(root, [
+    "concept",
+    "add",
+    "--json",
+    payload({
+      name: "Human wiki compiler",
+      summary: "Compile turns structured records into role-oriented human wiki drafts.",
+      details: "",
+      files: ["README.md", "src/core/store.ts"],
+      tags: ["ux", "dx", "architecture"],
+      source: "agent",
+      authority: "agent",
+      confidence: "high"
+    })
+  ]);
+
+  const draft = runJson(root, ["compile", "draft", "--role", "all", "--json"]);
+  assert.deepEqual(draft.roles, ["ux", "dx"]);
+  assert.ok(draft.pages.some((page) => page.output_path === "wiki/human/ux/product-overview.md"));
+  assert.ok(draft.pages.some((page) => page.output_path === "wiki/human/dx/architecture.md"));
+
+  const applied = runJson(root, ["compile", "apply", draft.draft_id, "--json"]);
+  assert.equal(applied.ok, true);
+  assert.ok(fs.existsSync(path.join(root, "wiki/human/index.md")));
+  assert.ok(fs.existsSync(path.join(root, "wiki/human/ux/product-overview.md")));
+  assert.ok(fs.existsSync(path.join(root, "wiki/human/dx/architecture.md")));
+});
+
+test("compile role selection and apply validation are enforced", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+  fs.writeFileSync(path.join(root, "README.md"), "# Compile fixture\n");
+  runJson(root, [
+    "note",
+    "add",
+    "--json",
+    payload({
+      body: "User-facing wiki context.",
+      tags: ["ux"],
+      source: "agent",
+      authority: "agent",
+      confidence: "high"
+    })
+  ]);
+
+  const draft = runJson(root, ["compile", "draft", "--role", "ux", "--json"]);
+  assert.deepEqual(draft.roles, ["ux"]);
+  assert.ok(draft.pages.every((page) => page.role === "home" || page.role === "ux"));
+  assert.equal(draft.pages.some((page) => page.role === "dx"), false);
+
+  fs.rmSync(path.join(draft.draft_path, "ux/product-overview.md"));
+  assert.throws(
+    () => run(root, ["compile", "apply", draft.draft_id, "--json"]),
+    /Draft page is missing/
+  );
+});
+
 test("search finds active records and rendered Markdown, excluding deleted records", () => {
   const root = tempRepo();
   run(root, ["init", "--json"]);

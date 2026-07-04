@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
+import { registerCompileCommand } from "./cli/commands/compile";
 import { registerConceptCommand } from "./cli/commands/concept";
 import { registerDecisionCommand } from "./cli/commands/decision";
 import { registerEventCommand } from "./cli/commands/event";
@@ -33,6 +34,7 @@ export function createProgram(): Command {
   registerRecordCommand(program);
   registerSearchCommand(program);
   registerSpinCommand(program);
+  registerCompileCommand(program);
   registerValidateCommand(program);
   registerRenderCommand(program);
 

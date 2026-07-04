@@ -38,6 +38,18 @@ Tags: `cli`, `v1`, `agent-workflow`
 
 Record: `concept_4fde0906-d53a-4b9f-b977-3fe964a9d447` | Authority: agent | Confidence: high
 
+## Role-oriented human wiki compiler
+
+Wikiwiki can compile structured records into UX and DX human wiki drafts for IDE agents to turn into polished prose.
+
+The compiler keeps records as the source of truth, stores draft packets under .wikiwiki/drafts/compile, and publishes validated human pages under wiki/human.
+
+Files: `src/core/compiler.ts`, `src/cli/commands/compile.ts`
+
+Tags: `compile`, `ux`, `dx`, `agent-workflow`
+
+Record: `concept_4e17c000-edc9-4895-9da1-85cde9756eab` | Authority: agent | Confidence: high
+
 ## Spin heuristics
 
 The spin command turns git working tree changes into structured update suggestions without AI summarization.

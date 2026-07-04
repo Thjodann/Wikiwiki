@@ -15,9 +15,9 @@ Wikiwiki is the generated human-readable view of this repo's structured project 
 
 ## Record Counts
 
-- Concept: 4
-- Decision: 3
-- Event: 6
+- Concept: 5
+- Decision: 4
+- Event: 7
 - Note: 3
 - Symbol: 3
 - Link: 2

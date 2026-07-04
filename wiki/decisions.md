@@ -43,3 +43,17 @@ Files: `package.json`, `package-lock.json`, `src/index.ts`, `src/cli/commands/sp
 Tags: `cli`, `rename`, `agent-workflow`
 
 Record: `decision_e28e5351-dd00-4ba1-841d-278b639ae1c8` | Authority: user | Confidence: high
+
+## Compile UX and DX human wikis through agent-mediated drafts
+
+Context: The project should eventually derive procedurally created human-readable wikis while integrating naturally with modern agentic IDE frameworks.
+
+Decision: Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile apply.
+
+Consequences: wk stays provider-agnostic while becoming useful as repo memory middleware for Codex, Cursor, Claude Code, and similar agentic IDEs.
+
+Files: `src/core/compiler.ts`, `README.md`, `AGENTS.md`
+
+Tags: `compile`, `ux`, `dx`, `agent-workflow`, `agentic-ide`
+
+Record: `decision_5ad8c2cf-266c-4824-8833-1d40103933b9` | Authority: user | Confidence: high

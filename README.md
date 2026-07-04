@@ -93,6 +93,25 @@ Generated wiki files are plainly marked:
 That boundary matters. Agents should update structured records first, then run
 `wk render`.
 
+## What It Compiles
+
+Wikiwiki can also compile role-oriented human wiki drafts from the same source
+records:
+
+```sh
+wk compile draft --role all --json
+wk compile apply compile_123 --json
+```
+
+`compile draft` creates an agent-mediated work packet under
+`.wikiwiki/drafts/compile/`. Codex, Cursor, Claude Code, or another IDE agent
+can use that packet to write polished UX and DX wiki prose. `compile apply`
+then validates provenance and publishes the human-readable pages into
+`wiki/human/`.
+
+The UX wiki explains the product experience for users and stakeholders. The DX
+wiki explains the developer experience for maintainers and coding agents.
+
 ## Install From Source
 
 Wikiwiki is package-ready as `@thjodann/wk`; publishing is still a manual
@@ -215,6 +234,8 @@ wk record delete concept concept_123 --reason "Superseded by decision_456"
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
 | `wk spin --json` | Inspect current repo changes and suggest knowledge updates |
 | `wk search <query> --json` | Search active records and rendered Markdown |
+| `wk compile draft --role all --json` | Create UX/DX human wiki drafts for an IDE agent |
+| `wk compile apply <draft-id> --json` | Validate and publish a human wiki draft |
 | `wk concept add` | Add a durable project concept |
 | `wk decision add` | Add an architecture, product, or workflow decision |
 | `wk event add` | Add a development event |
@@ -249,6 +270,7 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - Zod validation
 - Git-aware `spin` with draft templates
 - Markdown rendering for concepts, decisions, events, notes, symbols, and links
+- agent-mediated UX/DX human wiki compilation
 - local search across active records and rendered docs
 - Agent-readable JSON output
 - CI, tests, and package metadata for `@thjodann/wk`

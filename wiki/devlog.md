@@ -49,3 +49,11 @@ Updated the agent protocol to prefer wk over the compatibility wikiwiki alias an
 Files: `AGENTS.md`, `README.md`, `wiki/devlog.md`
 
 Recorded: 2026-07-04T02:41:57.014Z | Record: `event_da489cef-22d6-46db-989d-25eb52891c37` | Confidence: high
+
+## Implemented UX/DX human wiki compile pilot
+
+Added wk compile draft/apply, role routing for UX and DX records, compile draft manifests, provenance validation, human wiki publishing, tests, and docs for agent-mediated IDE workflows.
+
+Files: `src/core/compiler.ts`, `src/cli/commands/compile.ts`, `src/core/validator.ts`, `src/index.ts`, `test/compiler.test.js`, `test/cli.test.js`, `README.md`, `AGENTS.md`
+
+Recorded: 2026-07-04T02:50:10.328Z | Record: `event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8` | Confidence: high

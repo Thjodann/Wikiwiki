@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { validateHumanWiki } from "./compiler";
 import { buildWikiPages } from "./renderer";
 import { type AnyRecord, type RecordType, recordTypes } from "./schemas";
 import {
@@ -45,6 +46,7 @@ export function validateWikiwiki(root: string): ValidationResult {
   }
 
   validateLinks(root, records, warnings);
+  errors.push(...validateHumanWiki(root));
 
   try {
     buildWikiPages(root);
