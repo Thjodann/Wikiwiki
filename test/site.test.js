@@ -270,6 +270,30 @@ test("buildSiteFiles filters records for a user-focused audience", () => {
   assert.ok(searchIndex.some((entry) => entry.id === "concept_user_faq" && entry.audienceLabel === "For users"));
 });
 
+test("buildSiteFiles preserves note file provenance", () => {
+  const root = tempRoot();
+  ensureStore(root);
+  appendRecord(root, "note", {
+    type: "note",
+    id: "note_files",
+    source: "agent",
+    authority: "agent",
+    confidence: "high",
+    created_at: "2026-01-01T00:00:00.000Z",
+    body: "Notes can point at source files.",
+    files: ["README.md"],
+    tags: ["audience:developer", "docs"]
+  });
+
+  const files = buildSiteFiles(root);
+  const note = file(files, "records/note/note_files.html");
+  const searchIndex = parseSearchIndex(file(files, "assets/search-index.js"));
+
+  assert.match(note, /<h2>Related files<\/h2>/);
+  assert.match(note, /href="..\/..\/..\/README\.md"/);
+  assert.ok(searchIndex.some((entry) => entry.id === "note_files" && /README\.md/.test(entry.text)));
+});
+
 test("buildSiteFiles emits developer-only Beads work page when .beads exists", () => {
   const root = tempRoot();
   seedRecords(root);

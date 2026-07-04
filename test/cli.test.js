@@ -125,6 +125,14 @@ test("package publishes runtime build files, package docs, and the wk skill", ()
   assert.equal(pkg.files.includes("assets/wikiwiki-banner.png"), false);
 });
 
+test("README documents GitHub source install before npm publish", () => {
+  const readme = fs.readFileSync(path.join(process.cwd(), "README.md"), "utf8");
+
+  assert.match(readme, /npm install --save-dev github:Thjodann\/Wikiwiki/);
+  assert.match(readme, /npx wk --help/);
+  assert.match(readme, /publishing is still a manual\s+release step/);
+});
+
 test("bundled wk skill includes Beads coordination rules", () => {
   const skill = fs.readFileSync(path.join(process.cwd(), "skills/wk/SKILL.md"), "utf8");
 
@@ -376,6 +384,8 @@ test("record lifecycle commands list, get, update, and delete active records", (
   const noteResult = runJson(root, ["record", "get", "note", note.id, "--json"]).record;
   assert.equal(noteResult.body, "Renderer owns generated Markdown files.");
   assert.deepEqual(noteResult.files, ["README.md"]);
+  run(root, ["render", "--json"]);
+  assert.match(fs.readFileSync(path.join(root, "wiki/notes.md"), "utf8"), /Files: `README\.md`/);
 
   const link = runJson(root, [
     "link",
