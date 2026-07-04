@@ -20,6 +20,7 @@ export function registerSiteCommand(program: Command): void {
 
       const siteOptions = resolveSiteOptions(root, { sourceBaseUrl: options.sourceBaseUrl, audience: options.audience });
       const files = renderSite(root, siteOptions);
+      const siteFiles = files.map((file) => relativeReportPath(root, file));
       const result = {
         ok: true,
         site_path: reportPath(sitePath(root)),
@@ -27,7 +28,8 @@ export function registerSiteCommand(program: Command): void {
         output_behavior: "replaces wiki-site/",
         source_base_url: siteOptions.sourceBaseUrl ?? null,
         audience: siteOptions.audience,
-        rendered_files: files.map((file) => relativeReportPath(root, file))
+        rendered_files: siteFiles,
+        site_files: siteFiles
       };
 
       if (options.json) {

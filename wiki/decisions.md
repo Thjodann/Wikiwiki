@@ -200,13 +200,13 @@ Record: `decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517` | Authority: agent | Con
 
 ## Integrate Beads as optional developer work context
 
-Context: Some repos use Beads for task state and agent work memory. PaneRelief dogfooding showed that bd --readonly can still dirty .beads internals during setup/status/spin/closeout, so Wikiwiki needs to cooperate with Beads without mutating or flooding the host worktree.
+Context: Some repos use Beads for task state and agent work memory. PaneRelief dogfooding showed that bd --readonly can still dirty .beads internals during setup/status/spin/closeout/site, so Wikiwiki needs to cooperate with Beads without leaving mutations or flooding the host worktree.
 
-Decision: Detect .beads automatically, but skip detailed bd reads in auto mode. Read detailed Beads context only when .wikiwiki/config.json explicitly sets integrations.beads.enabled to true, guard those reads with a .beads git-status snapshot, report Beads as unavailable if bd mutates storage, and suppress dependency/generated/low-level Beads paths from spin and closeout source files.
+Decision: Detect .beads automatically, but skip detailed bd reads in auto mode. Read detailed Beads context only when .wikiwiki/config.json explicitly sets integrations.beads.enabled to true, guard those reads with a .beads git-status snapshot, restore read-created .beads changes when the workspace was clean before the read, report Beads as unavailable if bd mutates storage, and suppress dependency/generated/low-level Beads paths from spin and closeout source files.
 
-Consequences: Beads repos avoid dirty worktrees by default while still getting clear detected/skipped status. Internal developer sites and JSON reports can opt into detailed Beads context after checking local bd reads. Spin and closeout stay focused on first-party source changes instead of node_modules, generated drafts, wiki output, or Beads storage internals.
+Consequences: Beads repos avoid dirty worktrees by default while still getting clear detected/skipped status. Internal developer sites and JSON reports can opt into detailed Beads context after checking local bd reads; mutating reads are rejected and clean pre-read .beads state is restored. If .beads was already dirty, Wikiwiki does not attempt an unsafe restore and reports that clearly. Spin and closeout stay focused on first-party source changes instead of node_modules, generated drafts, wiki output, or Beads storage internals.
 
-Files: `src/core/beads.ts`, `src/core/git.ts`, `src/core/spin.ts`, `src/core/automation.ts`, `src/core/site.ts`, `src/cli/commands/status.ts`, `src/cli/commands/setup.ts`, `src/cli/commands/closeout.ts`, `docs/concepts.md`, `docs/reference.md`, `docs/setup.md`, `docs/workflows.md`, `skills/wk/SKILL.md`
+Files: `src/core/beads.ts`, `src/core/git.ts`, `src/core/spin.ts`, `src/core/automation.ts`, `src/core/site.ts`, `src/cli/commands/status.ts`, `src/cli/commands/setup.ts`, `src/cli/commands/closeout.ts`, `src/cli/commands/site.ts`, `test/beads.test.js`, `test/cli.test.js`, `docs/concepts.md`, `docs/reference.md`, `docs/setup.md`, `docs/workflows.md`, `skills/wk/SKILL.md`
 
 Tags: `audience:developer`, `beads`, `integration`, `workflow`, `dogfood`, `safety`
 

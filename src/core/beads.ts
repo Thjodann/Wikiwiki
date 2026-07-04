@@ -2,7 +2,7 @@ import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { type WikiwikiConfig } from "./config";
-import { readGitStatus } from "./git";
+import { readGitStatus, runGit, type GitStatusEntry } from "./git";
 import { reportPath, toPosixPath } from "./paths";
 
 export type BeadsIntegrationConfig = {
@@ -110,15 +110,15 @@ export function readBeadsIntegration(
   const ready = runBdJson(root, ["ready", "--limit", "10"]);
   const inProgress = runBdJson(root, ["list", "--status", "in_progress", "--limit", "10"]);
   const recentClosed = runBdJson(root, ["list", "--status", "closed", "--limit", "10", "--sort", "updated", "--reverse"]);
-  const after = beadsGitStatusSnapshot(root);
-  const mutated = changedSnapshotEntries(before, after);
-  if (mutated.length > 0) {
+  const mutation = resolveBeadsMutation(root, before, beadsGitStatusSnapshot(root));
+  if (mutation) {
     return {
       ...base,
       error: "beads_read_mutated_worktree",
       warnings: [
         "bd read commands changed .beads; Wikiwiki ignored Beads details for this run.",
-        `Changed .beads entries: ${mutated.slice(0, 5).join(", ")}${mutated.length > 5 ? `, and ${mutated.length - 5} more` : ""}`
+        ...mutation.warnings,
+        `Changed .beads entries: ${summarizeEntries(mutation.changed_entries)}`
       ]
     };
   }
@@ -237,17 +237,102 @@ function commandError(error: unknown): string {
   return String(error);
 }
 
-function beadsGitStatusSnapshot(root: string): string[] {
-  return readGitStatus(root, [".beads"]).map((entry) => `${entry.status} ${entry.path}`).sort();
+function beadsGitStatusSnapshot(root: string): GitStatusEntry[] {
+  return readGitStatus(root, [".beads"]).sort((left, right) => entryKey(left).localeCompare(entryKey(right)));
 }
 
-function changedSnapshotEntries(before: string[], after: string[]): string[] {
-  const beforeSet = new Set(before);
-  const afterSet = new Set(after);
+function resolveBeadsMutation(
+  root: string,
+  before: GitStatusEntry[],
+  after: GitStatusEntry[]
+): { changed_entries: string[]; warnings: string[] } | undefined {
+  const changedEntries = changedSnapshotEntries(before, after);
+  if (changedEntries.length === 0) {
+    return undefined;
+  }
+
+  if (before.length > 0) {
+    return {
+      changed_entries: changedEntries,
+      warnings: ["Pre-existing .beads changes were present; automatic restore was skipped."]
+    };
+  }
+
+  const restoreWarnings = restoreBeadsChanges(root, after);
+  const restored = snapshotsEqual(before, beadsGitStatusSnapshot(root));
+  return {
+    changed_entries: changedEntries,
+    warnings: restored
+      ? ["Restored .beads to its pre-read state after rejecting Beads details.", ...restoreWarnings]
+      : ["Automatic .beads restore was incomplete; inspect git status before continuing.", ...restoreWarnings]
+  };
+}
+
+function restoreBeadsChanges(root: string, changed: GitStatusEntry[]): string[] {
+  const warnings: string[] = [];
+  const trackedPaths = changed
+    .filter((entry) => entry.status !== "??")
+    .map((entry) => entry.path)
+    .filter((file) => isSafeBeadsPath(root, file));
+  const untrackedPaths = changed
+    .filter((entry) => entry.status === "??")
+    .map((entry) => entry.path)
+    .filter((file) => isSafeBeadsPath(root, file) && file !== ".beads");
+
+  if (trackedPaths.length > 0) {
+    try {
+      runGit(root, ["restore", "--staged", "--worktree", "--", ...trackedPaths]);
+    } catch (error) {
+      warnings.push(`Could not restore tracked .beads paths: ${commandError(error)}`);
+    }
+  }
+
+  for (const file of untrackedPaths) {
+    try {
+      fs.rmSync(path.join(root, file), { force: true, recursive: true });
+    } catch (error) {
+      warnings.push(`Could not remove untracked .beads path ${file}: ${commandError(error)}`);
+    }
+  }
+
+  const skipped = changed
+    .map((entry) => entry.path)
+    .filter((file) => !isSafeBeadsPath(root, file) || file === ".beads");
+  if (skipped.length > 0) {
+    warnings.push(`Skipped unsafe .beads restore paths: ${summarizeEntries(skipped)}`);
+  }
+
+  return warnings;
+}
+
+function changedSnapshotEntries(before: GitStatusEntry[], after: GitStatusEntry[]): string[] {
+  const beforeSet = new Set(before.map(entryKey));
+  const afterSet = new Set(after.map(entryKey));
   return [
-    ...after.filter((entry) => !beforeSet.has(entry)),
-    ...before.filter((entry) => !afterSet.has(entry))
+    ...after.map(entryKey).filter((entry) => !beforeSet.has(entry)),
+    ...before.map(entryKey).filter((entry) => !afterSet.has(entry))
   ].sort();
+}
+
+function snapshotsEqual(left: GitStatusEntry[], right: GitStatusEntry[]): boolean {
+  const leftKeys = left.map(entryKey);
+  const rightKeys = right.map(entryKey);
+  return leftKeys.length === rightKeys.length && leftKeys.every((entry, index) => entry === rightKeys[index]);
+}
+
+function entryKey(entry: GitStatusEntry): string {
+  return `${entry.status} ${entry.path}`;
+}
+
+function summarizeEntries(entries: string[]): string {
+  return `${entries.slice(0, 5).join(", ")}${entries.length > 5 ? `, and ${entries.length - 5} more` : ""}`;
+}
+
+function isSafeBeadsPath(root: string, file: string): boolean {
+  const beadsRoot = path.resolve(root, ".beads");
+  const fullPath = path.resolve(root, file);
+  const relative = path.relative(beadsRoot, fullPath);
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
 function beadsPathFromWhere(value: unknown): string | undefined {

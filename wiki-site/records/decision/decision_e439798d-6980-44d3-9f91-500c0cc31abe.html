@@ -45,7 +45,7 @@
     <main id="content" class="content">
       <header class="page-header">
         <h1>Integrate Beads as optional developer work context</h1>
-        <p>Detect .beads automatically, but skip detailed bd reads in auto mode. Read detailed Beads context only when .wikiwiki/config.json explicitly sets integrations.beads.enabled to true, guard those reads with a .beads git-status snapshot, report Beads as unavailable if bd mutates storage, and suppress dependency/generated/low-level Beads paths from spin and closeout source files.</p>
+        <p>Detect .beads automatically, but skip detailed bd reads in auto mode. Read detailed Beads context only when .wikiwiki/config.json explicitly sets integrations.beads.enabled to true, guard those reads with a .beads git-status snapshot, restore read-created .beads changes when the workspace was clean before the read, report Beads as unavailable if bd mutates storage, and suppress dependency/generated/low-level Beads paths from spin and closeout source files.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -59,11 +59,11 @@
   </div>
   <section class="prose">
   <h2>Context</h2>
-  <p>Some repos use Beads for task state and agent work memory. PaneRelief dogfooding showed that bd --readonly can still dirty .beads internals during setup/status/spin/closeout, so Wikiwiki needs to cooperate with Beads without mutating or flooding the host worktree.</p>
+  <p>Some repos use Beads for task state and agent work memory. PaneRelief dogfooding showed that bd --readonly can still dirty .beads internals during setup/status/spin/closeout/site, so Wikiwiki needs to cooperate with Beads without leaving mutations or flooding the host worktree.</p>
   <h2>Decision</h2>
-  <p>Detect .beads automatically, but skip detailed bd reads in auto mode. Read detailed Beads context only when .wikiwiki/config.json explicitly sets integrations.beads.enabled to true, guard those reads with a .beads git-status snapshot, report Beads as unavailable if bd mutates storage, and suppress dependency/generated/low-level Beads paths from spin and closeout source files.</p>
+  <p>Detect .beads automatically, but skip detailed bd reads in auto mode. Read detailed Beads context only when .wikiwiki/config.json explicitly sets integrations.beads.enabled to true, guard those reads with a .beads git-status snapshot, restore read-created .beads changes when the workspace was clean before the read, report Beads as unavailable if bd mutates storage, and suppress dependency/generated/low-level Beads paths from spin and closeout source files.</p>
   <h2>Consequences</h2>
-  <p>Beads repos avoid dirty worktrees by default while still getting clear detected/skipped status. Internal developer sites and JSON reports can opt into detailed Beads context after checking local bd reads. Spin and closeout stay focused on first-party source changes instead of node_modules, generated drafts, wiki output, or Beads storage internals.</p>
+  <p>Beads repos avoid dirty worktrees by default while still getting clear detected/skipped status. Internal developer sites and JSON reports can opt into detailed Beads context after checking local bd reads; mutating reads are rejected and clean pre-read .beads state is restored. If .beads was already dirty, Wikiwiki does not attempt an unsafe restore and reports that clearly. Spin and closeout stay focused on first-party source changes instead of node_modules, generated drafts, wiki output, or Beads storage internals.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
@@ -75,6 +75,9 @@
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/status.ts"><code>src/cli/commands/status.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/setup.ts"><code>src/cli/commands/setup.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/closeout.ts"><code>src/cli/commands/closeout.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/beads.test.js"><code>test/beads.test.js</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/concepts.md"><code>docs/concepts.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>
@@ -89,7 +92,7 @@
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
     <div><dt>Created</dt><dd><time datetime="2026-07-04T20:31:26.520Z">2026-07-04</time></dd></div>
-    <div><dt>Updated</dt><dd><time datetime="2026-07-04T22:41:24.722Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T23:01:48.033Z">2026-07-04</time></dd></div>
     <div><dt>Tags</dt><dd><code>audience:developer</code> <code>beads</code> <code>integration</code> <code>workflow</code> <code>dogfood</code> <code>safety</code></dd></div>
     <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/beads.ts"><code>src/core/beads.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/git.ts"><code>src/core/git.ts</code></a></li>
@@ -99,6 +102,9 @@
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/status.ts"><code>src/cli/commands/status.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/setup.ts"><code>src/cli/commands/setup.ts</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/closeout.ts"><code>src/cli/commands/closeout.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/beads.test.js"><code>test/beads.test.js</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/concepts.md"><code>docs/concepts.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>

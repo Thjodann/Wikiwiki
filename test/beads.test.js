@@ -13,6 +13,26 @@ function tempRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "wikiwiki-beads-"));
 }
 
+function commitAll(root, message) {
+  execFileSync("git", ["add", "."], { cwd: root, stdio: "ignore" });
+  execFileSync("git", [
+    "-c",
+    "user.name=Wikiwiki Test",
+    "-c",
+    "user.email=wikiwiki@example.test",
+    "commit",
+    "-m",
+    message
+  ], { cwd: root, stdio: "ignore" });
+}
+
+function gitStatus(root, pathspec = ".beads") {
+  return execFileSync("git", ["status", "--short", "--untracked-files=all", "--", pathspec], {
+    cwd: root,
+    encoding: "utf8"
+  }).trim();
+}
+
 function withPath(value, fn) {
   const previousPath = process.env.PATH;
   process.env.PATH = value;
@@ -137,7 +157,28 @@ test("readBeadsIntegration refuses Beads details when bd mutates .beads", () => 
   assert.equal(beads.available, false);
   assert.equal(beads.error, "beads_read_mutated_worktree");
   assert.match(beads.warnings.join("\n"), /\.beads\/backup\/read\.log/);
+  assert.match(beads.warnings.join("\n"), /Restored \.beads to its pre-read state/);
   assert.deepEqual(beads.issue_ids, []);
+  assert.equal(gitStatus(root), "");
+});
+
+test("readBeadsIntegration does not restore when .beads was already dirty", () => {
+  const root = tempRoot();
+  execFileSync("git", ["init"], { cwd: root, stdio: "ignore" });
+  fs.mkdirSync(path.join(root, ".beads"));
+  fs.writeFileSync(path.join(root, ".beads", "existing.txt"), "before\n");
+  commitAll(root, "seed beads");
+  fs.writeFileSync(path.join(root, ".beads", "existing.txt"), "dirty before read\n");
+  const bin = createMutatingFakeBd(root);
+
+  const beads = withPath(`${bin}${path.delimiter}${process.env.PATH || ""}`, () => readBeadsIntegration(root, { enabled: true }));
+  const status = gitStatus(root);
+
+  assert.equal(beads.available, false);
+  assert.equal(beads.error, "beads_read_mutated_worktree");
+  assert.match(beads.warnings.join("\n"), /Pre-existing \.beads changes were present/);
+  assert.match(status, /M .beads\/existing\.txt/);
+  assert.match(status, /\?\? .beads\/backup\/read\.log/);
 });
 
 function createMutatingFakeBd(root) {

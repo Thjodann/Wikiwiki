@@ -59,6 +59,13 @@ function assertPosixPaths(paths) {
   }
 }
 
+function gitStatus(root, pathspec = ".beads") {
+  return execFileSync("git", ["status", "--short", "--untracked-files=all", "--", pathspec], {
+    cwd: root,
+    encoding: "utf8"
+  }).trim();
+}
+
 function createFakeBd(root) {
   const bin = path.join(root, "bin");
   fs.mkdirSync(bin, { recursive: true });
@@ -105,6 +112,36 @@ if (has("where")) {
   return {
     env: { PATH: `${bin}${path.delimiter}${process.env.PATH || ""}` },
     log: path.join(root, "bd-calls.log")
+  };
+}
+
+function createMutatingFakeBd(root) {
+  const bin = path.join(root, "mutating-bin");
+  fs.mkdirSync(bin, { recursive: true });
+  const script = path.join(bin, "fake-bd.js");
+  fs.writeFileSync(script, `const fs = require("node:fs");
+const path = require("node:path");
+const args = process.argv.slice(2);
+fs.mkdirSync(path.join(process.cwd(), ".beads", "backup"), { recursive: true });
+fs.appendFileSync(path.join(process.cwd(), ".beads", "backup", "read.log"), args.join(" ") + "\\n");
+function out(value) {
+  process.stdout.write(JSON.stringify(value, null, 2));
+}
+if (args.includes("where")) {
+  out({ beads_dir: path.join(process.cwd(), ".beads") });
+} else if (args.includes("status")) {
+  out({ counts: { ready: 1, in_progress: 0 } });
+} else {
+  out({ issues: [] });
+}
+`, "utf8");
+  fs.writeFileSync(
+    path.join(bin, "bd"),
+    `#!/bin/sh\nDIR=\${0%/*}\nexec ${JSON.stringify(process.execPath)} "$DIR/fake-bd.js" "$@"\n`,
+    { mode: 0o755 }
+  );
+  return {
+    env: { PATH: `${bin}${path.delimiter}${process.env.PATH || ""}` }
   };
 }
 
@@ -753,6 +790,7 @@ test("site command creates a browseable static wiki", () => {
   assert.equal(result.audience, "user");
   assert.equal(result.output_behavior, "replaces wiki-site/");
   assertPosixPaths(result.rendered_files);
+  assert.deepEqual(result.site_files, result.rendered_files);
   assert.ok(result.rendered_files.includes("wiki-site/index.html"));
   assert.ok(result.rendered_files.includes("wiki-site/favicon.svg"));
   assert.ok(result.rendered_files.includes("wiki-site/assets/wikiwiki.css"));
@@ -763,6 +801,27 @@ test("site command creates a browseable static wiki", () => {
     fs.readFileSync(path.join(root, "wiki-site/records/concept", `${result.rendered_files.find((file) => file.startsWith("wiki-site/records/concept/")).split("/").at(-1)}`), "utf8"),
     /https:\/\/github\.com\/acme\/project\/blob\/main\/README\.md/
   );
+});
+
+test("site restores .beads after explicit mutating Beads reads", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+  fs.mkdirSync(path.join(root, ".beads"));
+  fs.writeFileSync(
+    path.join(root, ".wikiwiki/config.json"),
+    `${JSON.stringify({ integrations: { beads: { enabled: true } } }, null, 2)}\n`
+  );
+  const fakeBd = createMutatingFakeBd(root);
+
+  const result = runJson(root, ["site", "--audience", "all", "--json"], { env: fakeBd.env });
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, "wiki-site/site-manifest.json"), "utf8"));
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.site_files, result.rendered_files);
+  assert.equal(manifest.integrations.beads.available, false);
+  assert.equal(manifest.integrations.beads.error, "beads_read_mutated_worktree");
+  assert.match(manifest.integrations.beads.warnings.join("\n"), /Restored \.beads to its pre-read state/);
+  assert.equal(gitStatus(root), "");
 });
 
 test("status and render JSON report POSIX-style generated paths", () => {
