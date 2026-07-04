@@ -6,8 +6,8 @@ export type CommonRecordOptions = {
   source?: Source;
   authority?: Authority;
   confidence?: Confidence;
-  files?: string;
-  tags?: string;
+  files?: string | string[];
+  tags?: string | string[];
   json?: boolean | string;
 };
 
@@ -16,8 +16,8 @@ export function addCommonRecordOptions(command: Command): Command {
     .option("--source <source>", "record source: manual, agent, git-diff, imported")
     .option("--authority <authority>", "record authority: user, agent, system")
     .option("--confidence <confidence>", "record confidence: low, medium, high")
-    .option("--files <files>", "comma-separated related files")
-    .option("--tags <tags>", "comma-separated tags");
+    .option("--files <files>", "comma-separated related files; repeatable", collectList, [])
+    .option("--tags <tags>", "comma-separated tags; repeatable", collectList, []);
 }
 
 export function wantsJsonOutput(value: unknown): boolean {
@@ -69,13 +69,17 @@ export function parseList(value: string | string[] | undefined): string[] {
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => item.trim()).filter(Boolean);
+    return value.flatMap((item) => parseList(item));
   }
 
   return value
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function collectList(value: string, previous: string[] = []): string[] {
+  return [...previous, ...parseList(value)];
 }
 
 export function commonRecordFields(

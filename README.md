@@ -22,9 +22,14 @@ release step. Until the npm package is published, install it from GitHub in a
 target repo:
 
 ```sh
-npm install --save-dev github:Thjodann/Wikiwiki
+npm install --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
 ./node_modules/.bin/wk --help
 ```
+
+`--package-lock=false` is intentional for this temporary GitHub source install:
+npm currently writes GitHub git dependencies into `package-lock.json` as
+`git+ssh` URLs. Once `@thjodann/wk` is published to npm, use the package name
+and your normal lockfile workflow.
 
 For local development on Wikiwiki itself, install and run from source:
 

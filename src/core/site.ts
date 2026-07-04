@@ -1006,7 +1006,6 @@ function siteManifestIntegrations(model: SiteModel): IntegrationSummary | undefi
       enabled: beads.enabled,
       available: beads.available,
       configured: beads.configured,
-      ...(beads.beads_path ? { beads_path: beads.beads_path } : {}),
       ...(beads.error ? { error: beads.error } : {}),
       warnings: beads.warnings,
       counts: beads.counts,

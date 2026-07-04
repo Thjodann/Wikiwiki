@@ -359,6 +359,8 @@ test("buildSiteFiles redacts Beads issue details when site output is not opted i
   assert.deepEqual(manifest.integrations.beads.ready, []);
   assert.deepEqual(manifest.integrations.beads.in_progress, []);
   assert.deepEqual(manifest.integrations.beads.recent_closed, []);
+  assert.equal(Object.hasOwn(manifest.integrations.beads, "beads_path"), false);
+  assert.doesNotMatch(manifestText, new RegExp(root.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(manifestText, /PRISM-a1|Ready task|Active task|codex/);
   assert.doesNotMatch(searchIndexText, /beads:|PRISM-a1|Ready task|Active task|codex/);
 });

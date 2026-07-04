@@ -127,8 +127,14 @@ test("package publishes runtime build files, package docs, and the wk skill", ()
 
 test("README documents GitHub source install before npm publish", () => {
   const readme = fs.readFileSync(path.join(process.cwd(), "README.md"), "utf8");
+  const setupDoc = fs.readFileSync(path.join(process.cwd(), "docs/setup.md"), "utf8");
 
-  assert.match(readme, /npm install --save-dev github:Thjodann\/Wikiwiki/);
+  assert.match(readme, /npm install --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.match(setupDoc, /npm install --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.match(readme, /git\+ssh/);
+  assert.match(setupDoc, /git\+ssh/);
+  assert.doesNotMatch(readme, /npm install --save-dev github:Thjodann\/Wikiwiki/);
+  assert.doesNotMatch(setupDoc, /npm install --save-dev github:Thjodann\/Wikiwiki/);
   assert.match(readme, /\.\/node_modules\/\.bin\/wk --help/);
   assert.doesNotMatch(readme, /npx wk --help/);
   assert.match(readme, /publishing is still a manual\s+release step/);
@@ -436,6 +442,32 @@ test("record lifecycle commands list, get, update, and delete active records", (
     () => run(root, ["record", "get", "concept", concept.id, "--json"]),
     /Active concept record not found/
   );
+});
+
+test("record add commands append repeated files and tags flags", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+
+  const concept = runJson(root, [
+    "concept",
+    "add",
+    "--name",
+    "Repeatable flags",
+    "--summary",
+    "Agents can pass repeated provenance flags.",
+    "--files",
+    "README.md",
+    "--files",
+    "DESIGN.md,docs/setup.md",
+    "--tags",
+    "audience:all",
+    "--tags",
+    "overview,agent",
+    "--json"
+  ]).record;
+
+  assert.deepEqual(concept.files, ["README.md", "DESIGN.md", "docs/setup.md"]);
+  assert.deepEqual(concept.tags, ["audience:all", "overview", "agent"]);
 });
 
 test("spin returns heuristic draft templates and command hints", () => {
