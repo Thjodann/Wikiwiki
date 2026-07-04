@@ -174,6 +174,21 @@ window.WIKIWIKI_SEARCH_INDEX = [
   },
   {
     "type": "decision",
+    "id": "decision_45f2d29a-3140-40f6-b62c-8e299621419b",
+    "title": "Ship a lean npm package",
+    "summary": "Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL.",
+    "tags": [
+      "package",
+      "release",
+      "npm"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/decision/decision_45f2d29a-3140-40f6-b62c-8e299621419b.html",
+    "text": "decision_45f2d29a-3140-40f6-b62c-8e299621419b agent agent high 2026-07-04T16:41:01.726Z 2026-07-04T16:41:01.726Z decision Ship a lean npm package Before PRISM depends on Wikiwiki, the @thjodann/wk tarball should contain the CLI runtime and package documentation without generated dogfood output or large decorative assets. Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL. The package stays small and intentional while installed users can still run wk render and wk site to generate Markdown and static wiki output inside their own repos. package.json README.md LICENSE test/cli.test.js package release npm"
+  },
+  {
+    "type": "decision",
     "id": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd",
     "title": "Use JSONL for MVP storage",
     "summary": "Store each record type in an append-only JSONL file under .wikiwiki/records.",
@@ -299,6 +314,17 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "confidence": "high",
     "url": "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html",
     "text": "event_1222a170-521f-476b-bd83-7359a4ba66c2 agent agent high 2026-07-04T02:00:24.667Z event Renamed CLI identity to wk Changed package identity to @thjodann/wk, added wk as the primary binary while keeping wikiwiki as a compatibility alias, updated Commander help, spin command hints, README examples, tests, and generated-page command guidance, and preserved .wikiwiki and wiki paths. package.json package-lock.json src/index.ts src/cli/commands/spin.ts src/core/renderer.ts src/core/validator.ts src/cli/commands/render.ts README.md test/cli.test.js"
+  },
+  {
+    "type": "event",
+    "id": "event_495227ea-a813-41fa-b7a6-910f338a518f",
+    "title": "Trimmed npm package contents for release readiness",
+    "summary": "Trimmed npm package contents for release readiness",
+    "tags": [],
+    "authority": "agent",
+    "confidence": "high",
+    "url": "records/event/event_495227ea-a813-41fa-b7a6-910f338a518f.html",
+    "text": "event_495227ea-a813-41fa-b7a6-910f338a518f agent agent high 2026-07-04T16:41:01.840Z event Trimmed npm package contents for release readiness Added LICENSE, switched the README banner to a GitHub-hosted URL, narrowed package.json files to dist, README.md, and LICENSE, and added a package-hygiene regression test so generated wiki output and the large banner asset stay out of the tarball. package.json README.md LICENSE test/cli.test.js"
   },
   {
     "type": "link",

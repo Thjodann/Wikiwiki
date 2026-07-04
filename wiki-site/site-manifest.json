@@ -82,6 +82,12 @@
     },
     {
       "type": "decision",
+      "id": "decision_45f2d29a-3140-40f6-b62c-8e299621419b",
+      "title": "Ship a lean npm package",
+      "url": "records/decision/decision_45f2d29a-3140-40f6-b62c-8e299621419b.html"
+    },
+    {
+      "type": "decision",
       "id": "decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd",
       "title": "Use JSONL for MVP storage",
       "url": "records/decision/decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd.html"
@@ -145,6 +151,12 @@
       "id": "event_1222a170-521f-476b-bd83-7359a4ba66c2",
       "title": "Renamed CLI identity to wk",
       "url": "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html"
+    },
+    {
+      "type": "event",
+      "id": "event_495227ea-a813-41fa-b7a6-910f338a518f",
+      "title": "Trimmed npm package contents for release readiness",
+      "url": "records/event/event_495227ea-a813-41fa-b7a6-910f338a518f.html"
     },
     {
       "type": "link",

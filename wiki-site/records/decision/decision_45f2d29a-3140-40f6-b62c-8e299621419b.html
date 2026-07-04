@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Implemented static human wiki site generation - Wikiwiki</title>
+  <title>Ship a lean npm package - Wikiwiki</title>
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
   <script src="../../assets/search-index.js" defer></script>
   <script src="../../assets/wikiwiki.js" defer></script>
@@ -31,8 +31,8 @@
   <a class="nav-link" href="../../search.html">Search</a>
   <p class="nav-heading">Records</p>
   <a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="../../decisions.html">Decisions<span>7</span></a>
-<a class="nav-link active" href="../../devlog.html" aria-current="page">Devlog<span>10</span></a>
+<a class="nav-link active" href="../../decisions.html" aria-current="page">Decisions<span>7</span></a>
+<a class="nav-link" href="../../devlog.html">Devlog<span>10</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
@@ -41,39 +41,41 @@
     <main id="content" class="content">
       <header class="page-header">
         <p class="eyebrow">Generated Wikiwiki site</p>
-        <h1>Implemented static human wiki site generation</h1>
-        <p>Implemented static human wiki site generation</p>
+        <h1>Ship a lean npm package</h1>
+        <p>Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../devlog.html">Devlog</a>
+    <a href="../../decisions.html">Decisions</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Devlog</span>
+    <span class="type-badge">Decision</span>
+    <span class="tag-list"><span>package</span><span>release</span><span>npm</span></span>
   </div>
   <section class="prose">
-  <h2>What happened</h2>
-  <p>Added wk site, the core static site generator, generated wiki-site output with sidebar navigation, record pages, client-side search data, .html link rewriting, responsive CSS, docs, and tests for local link behavior.</p>
+  <h2>Context</h2>
+  <p>Before PRISM depends on Wikiwiki, the @thjodann/wk tarball should contain the CLI runtime and package documentation without generated dogfood output or large decorative assets.</p>
+  <h2>Decision</h2>
+  <p>Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL.</p>
+  <h2>Consequences</h2>
+  <p>The package stays small and intentional while installed users can still run wk render and wk site to generate Markdown and static wiki output inside their own repos.</p>
 </section>
   <details class="record-meta">
   <summary>Record details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>event_dddc9fc5-611a-4902-b27c-8ee455c6832a</code></dd></div>
+    <div><dt>ID</dt><dd><code>decision_45f2d29a-3140-40f6-b62c-8e299621419b</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T15:45:27.894Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd>None</dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/site.ts"><code>src/cli/commands/site.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/index.ts"><code>src/index.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T16:41:01.726Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-04T16:41:01.726Z">2026-07-04</time></dd></div>
+    <div><dt>Tags</dt><dd><code>package</code> <code>release</code> <code>npm</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/package.json"><code>package.json</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/AGENTS.md"><code>AGENTS.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/wiki-site/index.html"><code>wiki-site/index.html</code></a></li></ul></dd></div>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/LICENSE"><code>LICENSE</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

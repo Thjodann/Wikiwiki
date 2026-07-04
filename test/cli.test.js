@@ -43,6 +43,15 @@ test("package exposes wk primary binary and wikiwiki compatibility alias", () =>
   assert.equal(pkg.bin.wikiwiki, "dist/index.js");
 });
 
+test("package publishes only runtime build files and package docs", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
+
+  assert.deepEqual(pkg.files, ["dist", "README.md", "LICENSE"]);
+  assert.equal(pkg.files.includes("wiki"), false);
+  assert.equal(pkg.files.includes("wiki-site"), false);
+  assert.equal(pkg.files.includes("assets/wikiwiki-banner.png"), false);
+});
+
 test("init creates record files and all generated wiki pages", () => {
   const root = tempRepo();
 

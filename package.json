@@ -22,9 +22,7 @@
   "files": [
     "dist",
     "README.md",
-    "assets/wikiwiki-banner.png",
-    "wiki",
-    "wiki-site"
+    "LICENSE"
   ],
   "engines": {
     "node": ">=22"

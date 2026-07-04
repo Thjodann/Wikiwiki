@@ -73,3 +73,11 @@ Normalized JSON/report paths to POSIX separators, added source_base_url config a
 Files: `src/core/paths.ts`, `src/core/config.ts`, `src/core/site.ts`, `src/cli/commands/site.ts`, `src/cli/commands/status.ts`, `src/cli/commands/render.ts`, `src/cli/commands/search.ts`, `test/site.test.js`, `test/cli.test.js`, `README.md`
 
 Recorded: 2026-07-04T16:28:13.055Z | Record: `event_77558856-112d-4c41-9003-696a8c1e3dda` | Confidence: high
+
+## Trimmed npm package contents for release readiness
+
+Added LICENSE, switched the README banner to a GitHub-hosted URL, narrowed package.json files to dist, README.md, and LICENSE, and added a package-hygiene regression test so generated wiki output and the large banner asset stay out of the tarball.
+
+Files: `package.json`, `README.md`, `LICENSE`, `test/cli.test.js`
+
+Recorded: 2026-07-04T16:41:01.840Z | Record: `event_495227ea-a813-41fa-b7a6-910f338a518f` | Confidence: high

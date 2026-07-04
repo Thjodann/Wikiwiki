@@ -85,3 +85,17 @@ Files: `src/core/config.ts`, `src/core/site.ts`, `src/cli/commands/site.ts`, `.w
 Tags: `site`, `github-pages`, `source-links`, `dx`
 
 Record: `decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5` | Authority: user | Confidence: high
+
+## Ship a lean npm package
+
+Context: Before PRISM depends on Wikiwiki, the @thjodann/wk tarball should contain the CLI runtime and package documentation without generated dogfood output or large decorative assets.
+
+Decision: Publish only dist, README.md, and LICENSE from package.json files; keep wiki/, wiki-site/, and assets/wikiwiki-banner.png in the repository but out of the npm package, and load the README banner from the GitHub-hosted asset URL.
+
+Consequences: The package stays small and intentional while installed users can still run wk render and wk site to generate Markdown and static wiki output inside their own repos.
+
+Files: `package.json`, `README.md`, `LICENSE`, `test/cli.test.js`
+
+Tags: `package`, `release`, `npm`
+
+Record: `decision_45f2d29a-3140-40f6-b62c-8e299621419b` | Authority: agent | Confidence: high
