@@ -11,6 +11,18 @@ Use `wk` as the repo-local memory loop for agents. It keeps durable project know
 
 Prefer JSON output, preserve user work, and treat structured records as the source of truth. Records are the ledger; articles are the wiki. Lean on deterministic CLI commands for status, validation, rendering, site generation, and search; use model judgment for deciding what knowledge matters, updating public article prose, attaching source records, and polishing drafts. The generated site should feel like the user's project wiki; keep Wikiwiki itself quiet unless credit or setup context is needed.
 
+## Bare Invocation Default
+
+When the user invokes only `wk`, `/wk`, `$wk`, or `[$wk](...)` with no
+additional request, treat it as "show me the generated wiki site." Do not run
+the normal status/spin workflow, do not modify files, and do not explain the
+skill. Find the current repo root or workspace, prefer an existing
+`wiki-site/index.html`, and return a single concise Markdown link using the
+absolute local file path. If the site is already known to be served through a
+local URL, a direct URL to that same generated site is also acceptable. Do not
+start a server just for a bare invocation. If no generated site exists, say so
+briefly and suggest `wk site --audience all` or the repo's `wiki:site` script.
+
 ## Start Of Work
 
 1. Find the repo root before running `wk`.

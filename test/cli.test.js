@@ -151,6 +151,20 @@ function assertPosixPaths(paths) {
   }
 }
 
+function assertBareInvocationDefault(skill) {
+  assert.match(skill, /## Bare Invocation Default/);
+  assert.match(skill, /invokes only `wk`, `\/wk`, `\$wk`, or `\[\$wk\]\(\.\.\.\)`/);
+  assert.match(skill, /show me the generated wiki site/);
+  assert.match(skill, /Do not run\s+the normal status\/spin workflow/);
+  assert.match(skill, /do not modify files/);
+  assert.match(skill, /do not explain the\s+skill/);
+  assert.match(skill, /prefer an existing\s+`wiki-site\/index\.html`/);
+  assert.match(skill, /single concise Markdown link/);
+  assert.match(skill, /absolute local file path/);
+  assert.match(skill, /Do not\s+start a server just for a bare invocation/);
+  assert.match(skill, /suggest `wk site --audience all` or the repo's `wiki:site` script/);
+}
+
 function gitStatus(root, pathspec = ".beads") {
   return execFileSync("git", ["status", "--short", "--untracked-files=all", "--", pathspec], {
     cwd: root,
@@ -317,6 +331,7 @@ test("bundled wk skill includes Beads coordination rules", () => {
   assert.match(skill, /Inspect actual visual sources before writing a theme/);
   assert.match(skill, /Auto\/Light\/Dark controls/);
   assert.match(skill, /wk setup --profile mixed --audience all --agent codex/);
+  assertBareInvocationDefault(skill);
 });
 
 test("install-agent codex previews and installs the bundled wk skill", () => {
@@ -333,6 +348,7 @@ test("install-agent codex previews and installs the bundled wk skill", () => {
   assert.equal(installed.destination, destination);
   assert.ok(fs.existsSync(path.join(destination, "SKILL.md")));
   assert.ok(fs.existsSync(path.join(destination, "agents/openai.yaml")));
+  assertBareInvocationDefault(fs.readFileSync(path.join(destination, "SKILL.md"), "utf8"));
 });
 
 test("install-agent codex installs into an empty destination", () => {
@@ -447,6 +463,7 @@ test("setup can install the companion Codex skill during agentic setup", () => {
   assert.ok(fs.existsSync(path.join(destination, "SKILL.md")));
   assert.ok(fs.existsSync(path.join(destination, "agents/openai.yaml")));
   assert.match(fs.readFileSync(path.join(destination, "SKILL.md"), "utf8"), /# WK/);
+  assertBareInvocationDefault(fs.readFileSync(path.join(destination, "SKILL.md"), "utf8"));
 });
 
 test("setup requires an agent target when an agent destination is passed", () => {
