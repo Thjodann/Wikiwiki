@@ -3,3 +3,9 @@ dist/
 .wikiwiki/drafts/closeout/
 .DS_Store
 *.log
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
