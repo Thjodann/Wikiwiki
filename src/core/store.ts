@@ -97,6 +97,7 @@ export function readRecordsWithIssues<T extends RecordType>(
 
 export function readAllRecords(root: string): RecordsByType {
   return {
+    article: readRecords(root, "article"),
     concept: readRecords(root, "concept"),
     decision: readRecords(root, "decision"),
     event: readRecords(root, "event"),

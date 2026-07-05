@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Use JSONL for MVP storage - Wikiwiki Wiki</title>
+  <title>Documented the agentic wk update pipeline - Wikiwiki Wiki</title>
   <script>(function(){try{var m=localStorage.getItem("wikiwiki-theme-mode")||"auto";if(m==="light"||m==="dark"){document.documentElement.dataset.theme=m;}else{delete document.documentElement.dataset.theme;}}catch(e){}}());</script>
   <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
@@ -41,8 +41,8 @@
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
 <a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
-<a class="nav-link active" href="../../decisions.html" aria-current="page">Decisions<span>16</span></a>
-<a class="nav-link" href="../../devlog.html">Devlog<span>22</span></a>
+<a class="nav-link" href="../../decisions.html">Decisions<span>16</span></a>
+<a class="nav-link active" href="../../devlog.html" aria-current="page">Devlog<span>22</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
@@ -51,44 +51,45 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Use JSONL for MVP storage</h1>
-        <p>Store each record type in an append-only JSONL file under .wikiwiki/records.</p>
+        <h1>Documented the agentic wk update pipeline</h1>
+        <p>Documented the agentic wk update pipeline</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../decisions.html">Decisions</a>
+    <a href="../../devlog.html">Devlog</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Decision</span>
-    <span class="tag-list"><span>storage</span><span>mvp</span></span>
+    <span class="type-badge">Devlog</span><span class="audience-badge">For developers</span>
+    <span class="tag-list"><span>devlog</span><span>agent-workflow</span><span>setup</span><span>update</span></span>
   </div>
   <section class="prose">
-  <h2>Context</h2>
-  <p>The first milestone needs storage that agents can inspect, append, validate, and repair with simple tools.</p>
-  <h2>Decision</h2>
-  <p>Store each record type in an append-only JSONL file under .wikiwiki/records.</p>
-  <h2>Consequences</h2>
-  <p>The MVP stays simple and repo-native; update and compaction commands can be added later.</p>
+  <h2>What happened</h2>
+  <p>Added docs and bundled skill instructions for a user request of Update wk. The pipeline updates the CLI through npm or an equivalent package manager when available, refreshes the installed wk agent skill from GitHub raw files when npm is unavailable, and requires agents to report when only the skill changed and the CLI update is blocked.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/store.ts"><code>src/core/store.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/schemas.ts"><code>src/core/schemas.ts</code></a></li></ul>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd</code></dd></div>
+    <div><dt>ID</dt><dd><code>event_617bb76f-e11f-4e65-90dc-a500cb54b08f</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-03T23:04:27.960Z">2026-07-03</time></dd></div>
-    <div><dt>Updated</dt><dd><time datetime="2026-07-03T23:04:27.960Z">2026-07-03</time></dd></div>
-    <div><dt>Tags</dt><dd><code>storage</code> <code>mvp</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/store.ts"><code>src/core/store.ts</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/schemas.ts"><code>src/core/schemas.ts</code></a></li></ul></dd></div>
+    <div><dt>Created</dt><dd><time datetime="2026-07-05T00:38:26.848Z">2026-07-05</time></dd></div>
+    <div><dt>Tags</dt><dd><code>audience:developer</code> <code>devlog</code> <code>agent-workflow</code> <code>setup</code> <code>update</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

@@ -53,9 +53,23 @@ export const eventSchema = timestampedSchema.extend({
 
 export const noteSchema = timestampedSchema.extend({
   type: z.literal("note"),
+  title: z.string().min(1).optional(),
   body: z.string().min(1),
   files: stringArraySchema.default([]),
   tags: stringArraySchema
+});
+
+export const articleSchema = updatableSchema.extend({
+  type: z.literal("article"),
+  title: z.string().min(1),
+  slug: z.string().min(1),
+  summary: z.string().min(1),
+  body: z.string(),
+  categories: stringArraySchema.default([]),
+  aliases: stringArraySchema.default([]),
+  source_record_ids: stringArraySchema.default([]),
+  files: stringArraySchema.default([]),
+  tags: stringArraySchema.default([])
 });
 
 export const symbolSchema = updatableSchema.extend({
@@ -79,11 +93,13 @@ export const anyRecordSchema = z.discriminatedUnion("type", [
   decisionSchema,
   eventSchema,
   noteSchema,
+  articleSchema,
   symbolSchema,
   linkSchema
 ]);
 
 export const recordSchemas = {
+  article: articleSchema,
   concept: conceptSchema,
   decision: decisionSchema,
   event: eventSchema,
@@ -93,6 +109,7 @@ export const recordSchemas = {
 } as const;
 
 export const recordTypes = [
+  "article",
   "concept",
   "decision",
   "event",
@@ -108,12 +125,14 @@ export type ConceptRecord = z.infer<typeof conceptSchema>;
 export type DecisionRecord = z.infer<typeof decisionSchema>;
 export type EventRecord = z.infer<typeof eventSchema>;
 export type NoteRecord = z.infer<typeof noteSchema>;
+export type ArticleRecord = z.infer<typeof articleSchema>;
 export type SymbolRecord = z.infer<typeof symbolSchema>;
 export type LinkRecord = z.infer<typeof linkSchema>;
 export type AnyRecord = z.infer<typeof anyRecordSchema>;
 export type RecordType = (typeof recordTypes)[number];
 
 export type RecordByType = {
+  article: ArticleRecord;
   concept: ConceptRecord;
   decision: DecisionRecord;
   event: EventRecord;

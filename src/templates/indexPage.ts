@@ -19,6 +19,7 @@ This is the generated human-readable view of ${options.repoName}'s structured pr
 
 ## Pages
 
+- [Articles](./articles.md)
 - [Concepts](./concepts.md)
 - [Decisions](./decisions.md)
 - [Devlog](./devlog.md)

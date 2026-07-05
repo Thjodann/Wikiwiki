@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { recordTypes } from "../core/schemas";
-import type { AnyRecord, Authority, Confidence, RecordType, Source } from "../core/schemas";
+import type { AnyRecord, Authority, Confidence, NoteRecord, RecordType, Source } from "../core/schemas";
 
 export type CommonRecordOptions = {
   source?: Source;
@@ -78,7 +78,7 @@ export function parseList(value: string | string[] | undefined): string[] {
     .filter(Boolean);
 }
 
-function collectList(value: string, previous: string[] = []): string[] {
+export function collectList(value: string, previous: string[] = []): string[] {
   return [...previous, ...parseList(value)];
 }
 
@@ -135,6 +135,10 @@ export function parseRecordType(value: string): RecordType {
 }
 
 export function recordTitle(record: AnyRecord): string {
+  if (record.type === "note") {
+    return noteTitle(record);
+  }
+
   if ("name" in record && typeof record.name === "string") {
     return record.name;
   }
@@ -148,7 +152,7 @@ export function recordTitle(record: AnyRecord): string {
   }
 
   if ("body" in record && typeof record.body === "string") {
-    return record.body.slice(0, 80);
+    return conciseTitle(record.body);
   }
 
   if ("relationship" in record && typeof record.relationship === "string") {
@@ -156,4 +160,20 @@ export function recordTitle(record: AnyRecord): string {
   }
 
   return record.id;
+}
+
+function noteTitle(record: NoteRecord): string {
+  return record.title ?? `Note from ${record.created_at.slice(0, 10)}`;
+}
+
+function conciseTitle(value: string, maxLength = 80): string {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  const window = normalized.slice(0, maxLength + 1);
+  const wordBreak = window.lastIndexOf(" ");
+  const end = wordBreak >= 32 ? wordBreak : maxLength;
+  return `${normalized.slice(0, end).replace(/[\s,;:.-]+$/, "")}...`;
 }

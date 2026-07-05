@@ -103,6 +103,56 @@ with project-specific colors, typography, surface treatment, and paired
 light/dark palettes. Generated sites default to Auto, so they follow the user's
 system appearance until the reader chooses Light or Dark.
 
+The first public page should usually be an article record:
+
+```sh
+wk article add \
+  --title "Getting started" \
+  --summary "The first successful user path." \
+  --body "Install, run, and verify the project." \
+  --categories guides,onboarding \
+  --tags audience:user,getting-started
+```
+
+Use concepts, decisions, notes, events, symbols, and links for the supporting
+ledger behind those public pages.
+
+## Awesome Initial Install
+
+For an agent-assisted first install, aim for both style and substance instead
+of a merely valid wiki:
+
+```sh
+wk setup --profile mixed --audience all
+wk theme preview --json
+wk theme init
+wk spin --profile mixed --json
+wk validate
+wk render
+wk site --audience all
+```
+
+Before running `wk theme init`, the agent should inspect the host repo's actual
+visual sources: app/global CSS, design tokens, theme files, landing page styles,
+and app shell/layout styles. `wk theme preview` and `wk theme init` also inspect
+those files automatically when they are present, then fall back to README and
+package metadata for naming and copy. In styled web apps, this lets
+`.wikiwiki/site-theme.json` start with the host product's likely color mode,
+accent spectrum, radius, font family, gradients, glass/gloss, shadows, badges,
+and tag colors.
+
+After the theme is in place, seed a small set of high-signal records before
+publishing the first site: product promise, privacy/data boundary, architecture
+overview, distribution/support model, important symbols, and one development
+event. Then verify the generated site like a real local artifact:
+
+- open `wiki-site/index.html`
+- check Auto, Light, and Dark controls
+- check local links and source-file links
+- check search
+- check contrast for body text, muted text, accents, badges, and tags
+- keep `wiki-site/` generated; edit `.wikiwiki/site-theme.json` and records
+
 ## Agentic IDE Setup
 
 Agentic IDE setup is for teams that want their coding agent to maintain the
@@ -173,13 +223,72 @@ Invoke-WebRequest `
 For other agentic IDEs, copy [skills/wk/SKILL.md](../skills/wk/SKILL.md) into
 the IDE's persistent agent instructions or skill system. The important behavior
 is the same everywhere: start with `wk status --json` and `wk spin --json`,
-update structured records when there is durable knowledge, and run
-`wk closeout` after meaningful work. The closeout packet is reviewable; it does
-not silently append records.
+read relevant articles and source records, update article records when public
+wiki knowledge changes, add evidence records when durable context is worth
+keeping, then run `wk validate`, `wk render`, `wk site`, and `wk closeout`
+after meaningful work. The closeout packet is reviewable; it does not silently
+append records.
 
 The npm package includes the skill folder at `skills/wk/` for local
 copy/install flows. The skill is not a separate product surface; it teaches an
 agent to use the same deterministic CLI that non-AI users can run themselves.
+
+## Agentic Update Pipeline
+
+When a user asks an agent to "Update wk", the agent should try to update both
+the repo-local CLI and the installed agent instructions. Start by inspecting the
+current state:
+
+```sh
+command -v wk || true
+wk --version || true
+git status --short
+```
+
+If npm is available, update from the current GitHub source package until
+`@thjodann/wk` is published:
+
+```sh
+test "$(npm prefix)" = "$PWD" || npm init -y
+npm install --prefix "$PWD" --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
+./node_modules/.bin/wk --version
+./node_modules/.bin/wk install-agent codex --yes
+```
+
+After npm publishing, replace the GitHub URL with `@thjodann/wk@latest` and use
+the repo's normal lockfile policy. If the repo uses `pnpm`, `yarn`, or another
+JavaScript package manager, use the closest equivalent and keep the install
+rooted in the target repo.
+
+If npm and equivalent package managers are not available, the agent cannot
+rebuild or replace the CLI from source because the generated `dist/` files are
+not the Git source of truth. In that case, refresh only the agent skill from
+GitHub raw files and report the CLI update as blocked:
+
+```sh
+WK_SKILL_HOME="${CODEX_HOME:-$HOME/.codex}/skills/wk"
+tmpdir="$(mktemp -d)"
+mkdir -p "$tmpdir/agents" "$WK_SKILL_HOME/agents"
+curl -fsSL https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/SKILL.md \
+  -o "$tmpdir/SKILL.md"
+curl -fsSL https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/skills/wk/agents/openai.yaml \
+  -o "$tmpdir/agents/openai.yaml"
+cp "$tmpdir/SKILL.md" "$WK_SKILL_HOME/SKILL.md"
+cp "$tmpdir/agents/openai.yaml" "$WK_SKILL_HOME/agents/openai.yaml"
+rm -rf "$tmpdir"
+```
+
+PowerShell users can use the same `Invoke-WebRequest` commands from the manual
+skill install section above. After either path, verify only what was actually
+updated:
+
+```sh
+wk --version || true
+wk status --json || true
+```
+
+Agents should not delete lockfiles, overwrite unknown agent files, or claim the
+CLI was updated when only the skill instructions changed.
 
 ## Optional Beads Coordination
 
@@ -215,6 +324,6 @@ User-audience sites omit Beads data from generated pages, `site-manifest.json`,
 and search data.
 
 Beads owns tasks, blockers, dependencies, ownership, and follow-ups. Wikiwiki
-owns durable concepts, decisions, notes, events, symbols, links, generated
-Markdown, and the static human wiki. Wikiwiki never creates, edits, claims, or
-closes Beads issues.
+owns public articles, durable concepts, decisions, notes, events, symbols,
+links, generated Markdown, and the static human wiki. Wikiwiki never creates,
+edits, claims, or closes Beads issues.

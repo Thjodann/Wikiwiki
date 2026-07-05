@@ -8,6 +8,7 @@
   "theme_file": ".wikiwiki/site-theme.json",
   "pages": [
     "index.html",
+    "articles.html",
     "guides.html",
     "concepts.html",
     "decisions.html",
@@ -15,8 +16,66 @@
     "notes.html",
     "symbols.html",
     "links.html",
-    "search.html"
+    "search.html",
+    "records/concept/concept_17ca8065-a8d3-4373-9afe-b47b51a424d3.html",
+    "records/concept/concept_650e0409-9414-4667-8b40-f36c406a1cb0.html",
+    "records/concept/concept_4fde0906-d53a-4b9f-b977-3fe964a9d447.html",
+    "records/concept/concept_9014ffe0-3948-4333-b6c9-f02896f81f84.html",
+    "records/concept/concept_2f7f15b0-5a10-4097-9d78-93a24c060f39.html",
+    "records/concept/concept_4e17c000-edc9-4895-9da1-85cde9756eab.html",
+    "records/concept/concept_26478291-0b15-4363-b661-436bab183226.html",
+    "records/decision/decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517.html",
+    "records/decision/decision_5ad8c2cf-266c-4824-8833-1d40103933b9.html",
+    "records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html",
+    "records/decision/decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500.html",
+    "records/decision/decision_e439798d-6980-44d3-9f91-500c0cc31abe.html",
+    "records/decision/decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f.html",
+    "records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html",
+    "records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html",
+    "records/decision/decision_e5333a83-7321-4a65-b040-12c1487f60e7.html",
+    "records/decision/decision_aea0762f-b222-4ea3-971d-bfba768255a7.html",
+    "records/decision/decision_45f2d29a-3140-40f6-b62c-8e299621419b.html",
+    "records/decision/decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747.html",
+    "records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html",
+    "records/decision/decision_4054b35e-c388-4e72-b116-c7efdb7e2d77.html",
+    "records/decision/decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd.html",
+    "records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html",
+    "records/event/event_d58eb17b-7bd3-4d80-8d1d-5904aa7323ea.html",
+    "records/event/event_e116aa8a-281e-4d85-a8be-abca622110e6.html",
+    "records/event/event_957eb317-04d9-4cd3-bce3-5b0b58de4bec.html",
+    "records/event/event_4683be8c-c419-472d-b2fe-c7ef2456b713.html",
+    "records/event/event_1d0da54d-a525-45ce-8060-592f4fece547.html",
+    "records/event/event_45056ffe-30bc-4251-9de0-3566f289f059.html",
+    "records/event/event_da489cef-22d6-46db-989d-25eb52891c37.html",
+    "records/event/event_c4607373-c79d-4a0c-8aa3-2bbf2ec1cd86.html",
+    "records/event/event_617bb76f-e11f-4e65-90dc-a500cb54b08f.html",
+    "records/event/event_410942e4-5e5f-445a-88be-db5aa7cfa176.html",
+    "records/event/event_5de1e86f-f1fd-4b23-909f-1433eba3ce10.html",
+    "records/event/event_77558856-112d-4c41-9003-696a8c1e3dda.html",
+    "records/event/event_dddc9fc5-611a-4902-b27c-8ee455c6832a.html",
+    "records/event/event_90e00cd6-ec7a-4890-9430-95fbd4ce85c8.html",
+    "records/event/event_bc62fab0-ba40-4a0e-8d3a-b816ea356345.html",
+    "records/event/event_f8c324a7-1f16-44c4-bc69-4584386c1085.html",
+    "records/event/event_2c53f001-eb63-4e55-82d3-fc9df43b53f2.html",
+    "records/event/event_6c360d34-0e2b-414e-9445-af1fe597103a.html",
+    "records/event/event_d67ebd8e-e9f4-4c08-a011-72295a6e7210.html",
+    "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html",
+    "records/event/event_e38dffad-d6eb-4d9b-9833-967ed2a947b6.html",
+    "records/event/event_495227ea-a813-41fa-b7a6-910f338a518f.html",
+    "records/link/link_f1dadf17-2e61-4024-bb02-d237e43ea911.html",
+    "records/link/link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0.html",
+    "records/note/note_482c1563-27d5-48b3-a8f7-81075cc69b28.html",
+    "records/note/note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92.html",
+    "records/note/note_e237de63-0391-4d81-8a69-f47666a6dfd7.html",
+    "records/symbol/symbol_9ee0c0cc-6687-47cd-8a48-b95d7e706652.html",
+    "records/symbol/symbol_ed971cd3-7469-4ea8-b928-1865d875fc1c.html",
+    "records/symbol/symbol_3ff0b577-f648-4c44-a713-bd3c4bb57e98.html",
+    "records/symbol/symbol_fa848524-5a78-4fc0-9781-cf7673acae13.html",
+    "records/symbol/symbol_766a4f0e-54ee-44cc-a9f3-62faac669612.html",
+    "records/symbol/symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959.html",
+    "records/symbol/symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5.html"
   ],
+  "articles": [],
   "records": [
     {
       "type": "concept",
@@ -206,6 +265,12 @@
     },
     {
       "type": "event",
+      "id": "event_617bb76f-e11f-4e65-90dc-a500cb54b08f",
+      "title": "Documented the agentic wk update pipeline",
+      "url": "records/event/event_617bb76f-e11f-4e65-90dc-a500cb54b08f.html"
+    },
+    {
+      "type": "event",
       "id": "event_410942e4-5e5f-445a-88be-db5aa7cfa176",
       "title": "Drafted aspirational README",
       "url": "records/event/event_410942e4-5e5f-445a-88be-db5aa7cfa176.html"
@@ -239,6 +304,12 @@
       "id": "event_bc62fab0-ba40-4a0e-8d3a-b816ea356345",
       "title": "Implemented Wikiwiki V1 CLI loop",
       "url": "records/event/event_bc62fab0-ba40-4a0e-8d3a-b816ea356345.html"
+    },
+    {
+      "type": "event",
+      "id": "event_f8c324a7-1f16-44c4-bc69-4584386c1085",
+      "title": "Improved first-install branded theme dogfood path",
+      "url": "records/event/event_f8c324a7-1f16-44c4-bc69-4584386c1085.html"
     },
     {
       "type": "event",
@@ -291,20 +362,20 @@
     {
       "type": "note",
       "id": "note_482c1563-27d5-48b3-a8f7-81075cc69b28",
-      "title": "Generated wiki pages are owned by Wikiwiki; edit structured records instead.",
+      "title": "Note from 2026-07-03",
       "url": "records/note/note_482c1563-27d5-48b3-a8f7-81075cc69b28.html"
     },
     {
       "type": "note",
-      "id": "note_e237de63-0391-4d81-8a69-f47666a6dfd7",
-      "title": "User chose the supplied Wikiwiki banner image for the README and explicitly allo",
-      "url": "records/note/note_e237de63-0391-4d81-8a69-f47666a6dfd7.html"
+      "id": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92",
+      "title": "Note from 2026-07-04",
+      "url": "records/note/note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92.html"
     },
     {
       "type": "note",
-      "id": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92",
-      "title": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model",
-      "url": "records/note/note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92.html"
+      "id": "note_e237de63-0391-4d81-8a69-f47666a6dfd7",
+      "title": "Note from 2026-07-04",
+      "url": "records/note/note_e237de63-0391-4d81-8a69-f47666a6dfd7.html"
     },
     {
       "type": "symbol",

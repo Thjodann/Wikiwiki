@@ -53,5 +53,7 @@ export function registerSetupCommand(program: Command): void {
           console.log(`- ${name}: ${command}`);
         }
       }
+      console.log("Next: run `wk theme preview --json`, then `wk theme init` to create a branded .wikiwiki/site-theme.json from repo identity and app styles.");
+      console.log("For an impressive first install, seed high-signal records, then run `wk validate`, `wk render`, and `wk site`.");
     });
 }

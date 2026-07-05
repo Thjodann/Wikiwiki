@@ -8,6 +8,7 @@ export const wikiDirectoryName = "wiki";
 export const siteDirectoryName = "wiki-site";
 
 export const recordFileNames: Record<RecordType, string> = {
+  article: "articles.jsonl",
   concept: "concepts.jsonl",
   decision: "decisions.jsonl",
   event: "events.jsonl",

@@ -76,12 +76,9 @@ function searchRenderedFiles(root: string, query: string) {
   }
 
   const normalized = query.toLowerCase();
-  return fs
-    .readdirSync(outputPath)
-    .filter((fileName) => fileName.endsWith(".md"))
+  return listMarkdownFiles(outputPath)
     .sort()
-    .flatMap((fileName) => {
-      const file = path.join(outputPath, fileName);
+    .flatMap((file) => {
       const content = fs.readFileSync(file, "utf8");
       if (!content.toLowerCase().includes(normalized)) {
         return [];
@@ -91,6 +88,19 @@ function searchRenderedFiles(root: string, query: string) {
         file: relativeReportPath(root, file),
         snippet: snippet(content, query)
       }];
+    });
+}
+
+function listMarkdownFiles(root: string): string[] {
+  return fs
+    .readdirSync(root, { withFileTypes: true })
+    .flatMap((entry) => {
+      const file = path.join(root, entry.name);
+      if (entry.isDirectory()) {
+        return listMarkdownFiles(file);
+      }
+
+      return entry.isFile() && entry.name.endsWith(".md") ? [file] : [];
     });
 }
 

@@ -19,6 +19,7 @@ export type ThemePreviewResult = {
   theme_path: string;
   exists: boolean;
   mood: ThemeMood;
+  style_sources: string[];
   identity: ThemeIdentity;
   theme: WikiwikiSiteTheme;
 };
@@ -48,6 +49,45 @@ const defaultDescription = "A project wiki generated from durable repo knowledge
 type MoodTheme = {
   light: WikiwikiThemePalette;
   dark: WikiwikiThemePalette;
+};
+
+type StyleSource = {
+  file: string;
+  score: number;
+  content: string;
+};
+
+type StyleColor = {
+  hex: string;
+  rgb: Rgb;
+  count: number;
+  score: number;
+  contexts: string[];
+};
+
+type StyleInference = {
+  sources: StyleSource[];
+  colors: StyleColor[];
+  accents: string[];
+  darkSurface?: string;
+  darkPanel?: string;
+  darkText?: string;
+  lightSurface?: string;
+  lightPanel?: string;
+  lightText?: string;
+  defaultColorScheme?: "light" | "dark";
+  radius?: string;
+  fontFamily?: string;
+  gradientAngle: string;
+  hasGlow: boolean;
+  hasGlass: boolean;
+  hasShadow: boolean;
+};
+
+type Rgb = {
+  r: number;
+  g: number;
+  b: number;
 };
 
 const moodThemes: Record<ThemeMood, MoodTheme> = {
@@ -438,20 +478,22 @@ const moodThemes: Record<ThemeMood, MoodTheme> = {
 };
 
 export function previewTheme(root: string, options: ThemeOptions = {}): ThemePreviewResult {
+  const style = inferProjectStyle(root);
   const identity = inferThemeIdentity(root, options);
-  const mood = resolveThemeMood(root, identity, options.mood);
-  const theme = moodThemes[mood];
+  const mood = resolveThemeMood(root, identity, options.mood, style);
+  const theme = applyProjectStyle(moodThemes[mood], style);
   return {
     ok: true,
     mode: "preview",
     theme_path: relativeReportPath(root, siteThemePath(root)),
     exists: fs.existsSync(siteThemePath(root)),
     mood,
+    style_sources: style.sources.map((source) => relativeReportPath(root, source.file)),
     identity,
     theme: {
       project_name: identity.project_name,
       project_description: identity.project_description,
-      default_color_scheme: "auto",
+      default_color_scheme: style.defaultColorScheme ?? "auto",
       ...theme.light,
       modes: {
         light: theme.light,
@@ -502,10 +544,10 @@ function inferThemeIdentity(root: string, options: ThemeOptions): ThemeIdentity 
     ? prettyPackageName(packageJson.name)
     : undefined;
   const packageDescription = packageJson?.description && typeof packageJson.description === "string"
-    ? packageJson.description.trim()
+    ? plainText(packageJson.description)
     : undefined;
-  const optionName = options.projectName?.trim();
-  const optionDescription = options.description?.trim();
+  const optionName = plainText(options.projectName);
+  const optionDescription = plainText(options.description);
   const fallbackName = prettyPackageName(path.basename(root));
 
   return {
@@ -516,7 +558,7 @@ function inferThemeIdentity(root: string, options: ThemeOptions): ThemeIdentity 
   };
 }
 
-function resolveThemeMood(root: string, identity: ThemeIdentity, moodOption: string | undefined): ThemeMood {
+function resolveThemeMood(root: string, identity: ThemeIdentity, moodOption: string | undefined, style: StyleInference): ThemeMood {
   const parsedMood = parseThemeMood(moodOption);
   if (parsedMood) {
     return parsedMood;
@@ -524,10 +566,12 @@ function resolveThemeMood(root: string, identity: ThemeIdentity, moodOption: str
 
   const readme = readReadme(root) ?? "";
   const packageJson = readPackageJson(root);
+  const styleText = style.sources.map((source) => source.content.slice(0, 12000)).join(" ");
   const text = [
     identity.project_name,
     identity.project_description,
     readme,
+    styleText,
     typeof packageJson?.description === "string" ? packageJson.description : "",
     typeof packageJson?.name === "string" ? packageJson.name : ""
   ].join(" ").toLowerCase();
@@ -540,7 +584,576 @@ function resolveThemeMood(root: string, identity: ThemeIdentity, moodOption: str
     return scored[0].mood;
   }
 
+  if (style.accents.length >= 3) {
+    return "vivid";
+  }
+
+  if (style.defaultColorScheme === "dark") {
+    return "dark";
+  }
+
   return themeMoods[stableHash(identity.project_name) % themeMoods.length];
+}
+
+function inferProjectStyle(root: string): StyleInference {
+  const sources = findStyleSources(root);
+  const colors = extractStyleColors(sources);
+  const accents = accentColors(colors);
+  const darkSurface = surfaceColor(colors, "dark", ["bg", "background", "body", "shell", "app"]);
+  const darkPanel = surfaceColor(colors, "dark", ["panel", "card", "surface", "glass"]);
+  const lightSurface = surfaceColor(colors, "light", ["bg", "background", "body", "shell", "app"]);
+  const lightPanel = surfaceColor(colors, "light", ["panel", "card", "surface", "glass"]);
+  const darkText = textColor(colors, "dark");
+  const lightText = textColor(colors, "light");
+  const combined = sources.map((source) => source.content).join("\n").toLowerCase();
+  const darkSignals = [
+    /color-scheme\s*:\s*dark/.test(combined),
+    /data-theme=["']dark/.test(combined),
+    /prefers-color-scheme\s*:\s*dark/.test(combined),
+    Boolean(darkSurface),
+    colors.filter((color) => relativeLuminance(color.rgb) < 0.18).length > colors.filter((color) => relativeLuminance(color.rgb) > 0.82).length
+  ].filter(Boolean).length;
+  const lightSignals = [
+    /color-scheme\s*:\s*light/.test(combined),
+    /data-theme=["']light/.test(combined),
+    Boolean(lightSurface)
+  ].filter(Boolean).length;
+
+  return {
+    sources,
+    colors,
+    accents,
+    darkSurface,
+    darkPanel,
+    darkText,
+    lightSurface,
+    lightPanel,
+    lightText,
+    defaultColorScheme: darkSignals > lightSignals ? "dark" : lightSignals > darkSignals ? "light" : undefined,
+    radius: inferRadius(sources),
+    fontFamily: inferFontFamily(sources),
+    gradientAngle: inferGradientAngle(sources),
+    hasGlow: /radial-gradient|glow|blur\(/i.test(combined),
+    hasGlass: /backdrop-filter|glass|rgba\([^)]*,\s*0\.\d+\)/i.test(combined),
+    hasShadow: /box-shadow|shadow/i.test(combined)
+  };
+}
+
+function applyProjectStyle(base: MoodTheme, style: StyleInference): MoodTheme {
+  if (style.sources.length === 0 || (style.accents.length === 0 && !style.darkSurface && !style.lightSurface)) {
+    return {
+      light: { ...base.light },
+      dark: { ...base.dark }
+    };
+  }
+
+  const accents = style.accents.length > 0
+    ? style.accents
+    : [base.light.accent ?? base.dark.accent ?? "#2563eb"];
+  const primary = accents[0];
+  const secondary = accents[1] ?? base.light.secondary ?? base.dark.secondary ?? primary;
+  const tertiary = accents[2] ?? base.dark.secondary ?? secondary;
+  const primaryRgb = parseHexColor(primary) ?? { r: 37, g: 99, b: 235 };
+  const secondaryRgb = parseHexColor(secondary) ?? primaryRgb;
+  const tertiaryRgb = parseHexColor(tertiary) ?? secondaryRgb;
+  const lightBgRgb = parseHexColor(style.lightSurface) ?? mixRgb(primaryRgb, { r: 255, g: 250, b: 244 }, 0.06);
+  const lightPanelRgb = parseHexColor(style.lightPanel) ?? mixRgb(primaryRgb, { r: 255, g: 253, b: 248 }, 0.04);
+  const darkBgRgb = parseHexColor(style.darkSurface) ?? mixRgb(primaryRgb, { r: 15, g: 12, b: 14 }, 0.12);
+  const darkPanelRgb = parseHexColor(style.darkPanel) ?? mixRgb(primaryRgb, { r: 25, g: 20, b: 24 }, 0.14);
+  const darkAccent = colorToHex(readableAccentFor(primaryRgb, darkPanelRgb, "dark"));
+  const lightAccent = colorToHex(readableAccentFor(primaryRgb, lightPanelRgb, "light"));
+  const darkSecondary = colorToHex(readableAccentFor(secondaryRgb, darkPanelRgb, "dark"));
+  const lightSecondary = colorToHex(readableAccentFor(secondaryRgb, lightPanelRgb, "light"));
+  const lightAccentStrong = colorToHex(readableAccentFor(mixRgb(primaryRgb, { r: 17, g: 24, b: 39 }, 0.62), lightPanelRgb, "light"));
+  const darkAccentStrong = colorToHex(readableAccentFor(mixRgb(primaryRgb, { r: 255, g: 255, b: 255 }, 0.5), darkPanelRgb, "dark"));
+  const lightText = style.defaultColorScheme === "light" ? style.lightText : undefined;
+  const darkText = style.defaultColorScheme === "dark" ? style.darkText : undefined;
+  const radius = style.radius ?? base.light.radius ?? base.dark.radius ?? "8px";
+  const fontFamily = style.fontFamily ?? base.light.font_family ?? base.dark.font_family;
+  const angle = style.gradientAngle;
+  const brandGradient = gradientFromAccents(angle, accents);
+  const lightBadgeBg = colorToHex(mixRgb(primaryRgb, lightPanelRgb, 0.16));
+  const darkBadgeBg = colorToHex(mixRgb(primaryRgb, darkPanelRgb, 0.28));
+  const lightTagBg = colorToHex(mixRgb(secondaryRgb, lightPanelRgb, 0.15));
+  const darkTagBg = colorToHex(mixRgb(secondaryRgb, darkPanelRgb, 0.26));
+
+  return {
+    light: {
+      ...base.light,
+      accent: lightAccent,
+      accent_strong: lightAccentStrong,
+      secondary: lightSecondary,
+      bg: colorToHex(lightBgRgb),
+      panel: colorToHex(lightPanelRgb),
+      panel_soft: colorToHex(mixRgb(tertiaryRgb, lightPanelRgb, 0.1)),
+      text: lightText ?? readableTextFor(lightPanelRgb),
+      muted: colorToHex(mixRgb(parseHexColor(lightText) ?? { r: 31, g: 41, b: 55 }, lightPanelRgb, 0.65)),
+      border: colorToHex(mixRgb(primaryRgb, lightPanelRgb, 0.22)),
+      code_bg: colorToHex(mixRgb(tertiaryRgb, lightPanelRgb, 0.08)),
+      shadow: style.hasShadow ? `0 24px 70px ${rgba(mixRgb(primaryRgb, { r: 17, g: 24, b: 39 }, 0.38), 0.14)}` : base.light.shadow,
+      shadow_strong: style.hasShadow ? `0 32px 100px ${rgba(mixRgb(primaryRgb, { r: 17, g: 24, b: 39 }, 0.4), 0.22)}` : base.light.shadow_strong,
+      radius,
+      font_family: fontFamily,
+      sidebar_bg: `linear-gradient(180deg, ${rgba(lightPanelRgb, 0.95)}, ${rgba(mixRgb(primaryRgb, lightBgRgb, 0.08), 0.9)})`,
+      hero_gradient: style.hasGlow
+        ? `radial-gradient(circle at top left, ${rgba(primaryRgb, 0.18)}, transparent 34%), linear-gradient(${angle}, ${colorToHex(lightPanelRgb)} 0%, ${colorToHex(mixRgb(secondaryRgb, lightBgRgb, 0.12))} 100%)`
+        : `linear-gradient(${angle}, ${colorToHex(lightPanelRgb)} 0%, ${colorToHex(mixRgb(primaryRgb, lightBgRgb, 0.14))} 100%)`,
+      card_gradient: style.hasGlass
+        ? `linear-gradient(180deg, ${rgba(lightPanelRgb, 0.92)} 0%, ${rgba(mixRgb(primaryRgb, lightPanelRgb, 0.07), 0.82)} 100%)`
+        : `linear-gradient(180deg, ${colorToHex(lightPanelRgb)} 0%, ${colorToHex(mixRgb(primaryRgb, lightPanelRgb, 0.05))} 100%)`,
+      brand_gradient: brandGradient,
+      brand_mark_text: readableTextFor(primaryRgb),
+      badge_bg: lightBadgeBg,
+      badge_text: readableTextForPair(lightBadgeBg, lightAccentStrong),
+      tag_bg: lightTagBg,
+      tag_text: readableTextForPair(lightTagBg, lightSecondary),
+      focus_ring: rgba(primaryRgb, 0.22),
+      gloss: rgba(primaryRgb, style.hasGlass ? 0.2 : 0.14)
+    },
+    dark: {
+      ...base.dark,
+      accent: darkAccent,
+      accent_strong: darkAccentStrong,
+      secondary: darkSecondary,
+      bg: colorToHex(darkBgRgb),
+      panel: colorToHex(darkPanelRgb),
+      panel_soft: colorToHex(mixRgb(tertiaryRgb, darkPanelRgb, 0.12)),
+      text: darkText ?? readableTextFor(darkPanelRgb),
+      muted: colorToHex(mixRgb(parseHexColor(darkText) ?? { r: 248, g: 250, b: 252 }, darkPanelRgb, 0.7)),
+      border: colorToHex(mixRgb(primaryRgb, darkPanelRgb, 0.26)),
+      code_bg: colorToHex(mixRgb(darkBgRgb, { r: 0, g: 0, b: 0 }, 0.76)),
+      shadow: `0 24px 80px ${rgba({ r: 0, g: 0, b: 0 }, style.hasShadow ? 0.38 : 0.3)}`,
+      shadow_strong: `0 36px 120px ${rgba({ r: 0, g: 0, b: 0 }, style.hasShadow ? 0.55 : 0.45)}`,
+      radius,
+      font_family: fontFamily,
+      sidebar_bg: `linear-gradient(180deg, ${rgba(darkPanelRgb, 0.95)}, ${rgba(darkBgRgb, 0.92)})`,
+      hero_gradient: style.hasGlow
+        ? `radial-gradient(circle at top left, ${rgba(primaryRgb, 0.3)}, transparent 34%), linear-gradient(${angle}, ${colorToHex(mixRgb(primaryRgb, darkPanelRgb, 0.16))} 0%, ${colorToHex(darkBgRgb)} 100%)`
+        : `linear-gradient(${angle}, ${colorToHex(mixRgb(primaryRgb, darkPanelRgb, 0.14))} 0%, ${colorToHex(darkBgRgb)} 100%)`,
+      card_gradient: style.hasGlass
+        ? `linear-gradient(180deg, ${rgba(mixRgb(primaryRgb, darkPanelRgb, 0.08), 0.86)} 0%, ${rgba(darkPanelRgb, 0.72)} 100%)`
+        : `linear-gradient(180deg, ${colorToHex(mixRgb(primaryRgb, darkPanelRgb, 0.08))} 0%, ${colorToHex(darkPanelRgb)} 100%)`,
+      brand_gradient: brandGradient,
+      brand_mark_text: readableTextFor(primaryRgb),
+      badge_bg: darkBadgeBg,
+      badge_text: readableTextForPair(darkBadgeBg, darkAccentStrong),
+      tag_bg: darkTagBg,
+      tag_text: readableTextForPair(darkTagBg, darkSecondary),
+      focus_ring: rgba(primaryRgb, 0.32),
+      gloss: rgba(primaryRgb, style.hasGlass ? 0.24 : 0.18)
+    }
+  };
+}
+
+function findStyleSources(root: string): StyleSource[] {
+  const files: string[] = [];
+  collectStyleFiles(root, root, files, 0);
+  return files
+    .map((file) => ({
+      file,
+      score: styleFileScore(relativeReportPath(root, file)),
+      content: readStyleFile(file)
+    }))
+    .filter((source) => source.score > 0 && source.content.trim().length > 0)
+    .sort((a, b) => b.score - a.score || a.file.localeCompare(b.file))
+    .slice(0, 16);
+}
+
+function collectStyleFiles(root: string, directory: string, files: string[], depth: number): void {
+  if (files.length >= 180 || depth > 6) {
+    return;
+  }
+
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(directory, { withFileTypes: true });
+  } catch {
+    return;
+  }
+
+  for (const entry of entries) {
+    if (entry.name.startsWith(".") && entry.name !== ".storybook") {
+      continue;
+    }
+
+    const file = path.join(directory, entry.name);
+    const relative = relativeReportPath(root, file);
+    if (entry.isDirectory()) {
+      if (!ignoredStyleDirectory(entry.name)) {
+        collectStyleFiles(root, file, files, depth + 1);
+      }
+      continue;
+    }
+
+    if (entry.isFile() && styleFileScore(relative) > 0) {
+      files.push(file);
+    }
+  }
+}
+
+function ignoredStyleDirectory(name: string): boolean {
+  return [
+    ".git",
+    ".wikiwiki",
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".next",
+    ".nuxt",
+    ".svelte-kit",
+    "wiki",
+    "wiki-site"
+  ].includes(name);
+}
+
+function styleFileScore(file: string): number {
+  const lower = file.toLowerCase();
+  const ext = path.extname(lower);
+  if (lower.endsWith(".min.css")) {
+    return 0;
+  }
+
+  let score = 0;
+  if ([".css", ".scss", ".sass", ".less", ".pcss", ".postcss"].includes(ext)) {
+    score += 24;
+  } else if ([".ts", ".tsx", ".js", ".jsx", ".json"].includes(ext)) {
+    if (!/(^|\/)(tailwind\.config|theme\.config|[^/]*(theme|tokens?|design|palette|brand)[^/]*)\./.test(lower)) {
+      return 0;
+    }
+    score += 2;
+  } else {
+    return 0;
+  }
+
+  if (/(^|\/)(global|globals|app|layout|landing|home|shell|theme|themes|tokens?|design|palette|brand)[^/]*\./.test(lower)) {
+    score += 18;
+  }
+  if (/(^|\/)(src|app|pages|styles?|css|theme|tokens?|design-system|components)\//.test(lower)) {
+    score += 8;
+  }
+  if (/tailwind\.config|theme\.config|tokens?\.json|design-tokens/.test(lower)) {
+    score += 12;
+  }
+  if (/(test|spec|fixture|mock|snapshot|storybook-static)/.test(lower)) {
+    score -= 12;
+  }
+
+  return Math.max(0, score);
+}
+
+function readStyleFile(file: string): string {
+  try {
+    const stat = fs.statSync(file);
+    if (stat.size > 240000) {
+      return fs.readFileSync(file, "utf8").slice(0, 240000);
+    }
+    return fs.readFileSync(file, "utf8");
+  } catch {
+    return "";
+  }
+}
+
+function extractStyleColors(sources: StyleSource[]): StyleColor[] {
+  const colors = new Map<string, StyleColor>();
+  for (const source of sources) {
+    const pattern = /#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})\b/gi;
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(source.content)) !== null) {
+      const hex = normalizeHexColor(match[0]);
+      const rgb = parseHexColor(hex);
+      if (!rgb) {
+        continue;
+      }
+
+      const context = source.content.slice(Math.max(0, match.index - 90), Math.min(source.content.length, match.index + 120)).toLowerCase();
+      const existing = colors.get(hex) ?? {
+        hex,
+        rgb,
+        count: 0,
+        score: 0,
+        contexts: []
+      };
+      existing.count += 1;
+      existing.score += source.score + colorContextScore(context) + colorfulness(rgb) * 10;
+      if (existing.contexts.length < 8) {
+        existing.contexts.push(context);
+      }
+      colors.set(hex, existing);
+    }
+  }
+
+  return [...colors.values()].sort((a, b) => b.score - a.score || b.count - a.count || a.hex.localeCompare(b.hex));
+}
+
+function colorContextScore(context: string): number {
+  let score = 0;
+  if (/(accent|brand|primary|spectrum|rainbow|highlight|active|selected|focus)/.test(context)) {
+    score += 24;
+  }
+  if (/(rose|pink|red|orange|yellow|green|cyan|blue|violet|purple)/.test(context)) {
+    score += 10;
+  }
+  if (/(bg|background|body|shell|surface|panel|card|glass)/.test(context)) {
+    score += 8;
+  }
+  if (/(text|foreground|color)/.test(context)) {
+    score += 4;
+  }
+  if (/(border|shadow|overlay)/.test(context)) {
+    score += 2;
+  }
+
+  return score;
+}
+
+function accentColors(colors: StyleColor[]): string[] {
+  return colors
+    .filter((color) => {
+      const luminance = relativeLuminance(color.rgb);
+      const context = color.contexts.join(" ");
+      const explicitAccent = /(accent|brand|primary|spectrum|rainbow|highlight|active|selected|focus)/.test(context);
+      const textLike = /(muted|text|foreground|fg)/.test(context);
+      return colorfulness(color.rgb) >= 0.25 && luminance > 0.08 && luminance < 0.9 && (explicitAccent || !textLike);
+    })
+    .sort((a, b) => {
+      const aAccent = accentContextScore(a);
+      const bAccent = accentContextScore(b);
+      return bAccent - aAccent || b.score - a.score || a.hex.localeCompare(b.hex);
+    })
+    .slice(0, 5)
+    .map((color) => color.hex);
+}
+
+function accentContextScore(color: StyleColor): number {
+  const context = color.contexts.join(" ");
+  return color.score
+    + colorfulness(color.rgb) * 30
+    + (/(accent|brand|primary|spectrum|rainbow|highlight|active|selected|focus)/.test(context) ? 60 : 0);
+}
+
+function surfaceColor(colors: StyleColor[], mode: "dark" | "light", keywords: string[]): string | undefined {
+  const candidates = colors.filter((color) => {
+    const luminance = relativeLuminance(color.rgb);
+    const context = color.contexts.join(" ");
+    const hasKeyword = keywords.some((keyword) => context.includes(keyword));
+    return hasKeyword && (mode === "dark" ? luminance < 0.24 : luminance > 0.72);
+  });
+  candidates.sort((a, b) => surfaceKeywordScore(b, keywords) - surfaceKeywordScore(a, keywords) || b.score - a.score || (mode === "dark" ? relativeLuminance(a.rgb) - relativeLuminance(b.rgb) : relativeLuminance(b.rgb) - relativeLuminance(a.rgb)));
+  return candidates[0]?.hex;
+}
+
+function surfaceKeywordScore(color: StyleColor, keywords: string[]): number {
+  const escapedHex = color.hex.replace("#", "\\#");
+  return color.contexts.reduce((score, context) => {
+    const declarationMatch = keywords.some((keyword) => new RegExp(`${keyword}[a-z0-9_-]*\\s*:\\s*${escapedHex}|[a-z0-9_-]*${keyword}[a-z0-9_-]*\\s*:\\s*${escapedHex}`, "i").test(context));
+    if (declarationMatch) {
+      return score + 100;
+    }
+
+    const keywordMatch = keywords.some((keyword) => context.includes(keyword));
+    return keywordMatch ? score + 10 : score;
+  }, 0);
+}
+
+function textColor(colors: StyleColor[], mode: "dark" | "light"): string | undefined {
+  const candidates = colors.filter((color) => {
+    const luminance = relativeLuminance(color.rgb);
+    const context = color.contexts.join(" ");
+    const declarationScore = textDeclarationScore(color);
+    return (declarationScore > 0 || (/(text|foreground|color)/.test(context) && !/(bg|background|border|shadow)/.test(context)))
+      && (mode === "dark" ? luminance > 0.74 : luminance < 0.28);
+  });
+  candidates.sort((a, b) => textDeclarationScore(b) - textDeclarationScore(a) || b.score - a.score || a.hex.localeCompare(b.hex));
+  return candidates[0]?.hex;
+}
+
+function textDeclarationScore(color: StyleColor): number {
+  const escapedHex = color.hex.replace("#", "\\#");
+  return color.contexts.reduce((score, context) => {
+    const direct = new RegExp(`(?:text|foreground|fg|color)[a-z0-9_-]*\\s*:\\s*${escapedHex}|[a-z0-9_-]*(?:text|foreground|fg)[a-z0-9_-]*\\s*:\\s*${escapedHex}`, "i").test(context);
+    return direct ? score + 100 : score;
+  }, 0);
+}
+
+function inferRadius(sources: StyleSource[]): string | undefined {
+  const candidates: { value: string; pixels: number; score: number }[] = [];
+  for (const source of sources) {
+    const pattern = /(?:border-radius|--[a-z0-9-]*radius[a-z0-9-]*)\s*:\s*([^;{}\n]+)/gi;
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(source.content)) !== null) {
+      const value = match[1].trim().split(/\s+/)[0].replace(/,$/, "");
+      const pixels = radiusPixels(value);
+      if (pixels >= 2 && pixels <= 40) {
+        candidates.push({ value, pixels, score: source.score + pixels });
+      }
+    }
+  }
+
+  candidates.sort((a, b) => b.score - a.score || b.pixels - a.pixels);
+  return candidates[0]?.value;
+}
+
+function radiusPixels(value: string): number {
+  const match = /^([0-9]+(?:\.[0-9]+)?)(px|rem|em)$/i.exec(value);
+  if (!match) {
+    return 0;
+  }
+
+  const amount = Number.parseFloat(match[1]);
+  const unit = match[2].toLowerCase();
+  return unit === "px" ? amount : amount * 16;
+}
+
+function inferFontFamily(sources: StyleSource[]): string | undefined {
+  for (const source of sources) {
+    const match = /font-family\s*:\s*([^;{}\n]+)/i.exec(source.content);
+    const value = match?.[1]?.trim();
+    if (value && !/^var\(/i.test(value) && !/inherit|initial|unset/i.test(value)) {
+      return value.replace(/\s+/g, " ");
+    }
+  }
+
+  return undefined;
+}
+
+function inferGradientAngle(sources: StyleSource[]): string {
+  for (const source of sources) {
+    const match = /linear-gradient\(\s*([^,\)]+)/i.exec(source.content);
+    const value = match?.[1]?.trim();
+    if (value && (/^-?\d+(?:\.\d+)?deg$/.test(value) || /^to\s+/.test(value))) {
+      return value;
+    }
+  }
+
+  return "135deg";
+}
+
+function plainText(value: string | undefined): string | undefined {
+  const cleaned = value
+    ?.replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<img\b[^>]*alt=["']([^"']*)["'][^>]*>/gi, " $1 ")
+    .replace(/<img\b[^>]*>/gi, " ")
+    .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)]\([^)]+\)/g, "$1")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, "\"")
+    .replace(/&#39;/g, "'")
+    .replace(/[`*_~]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleaned || undefined;
+}
+
+function gradientFromAccents(angle: string, accents: string[]): string {
+  const stops = [...new Set(accents)].slice(0, 5);
+  return `linear-gradient(${angle}, ${stops.join(", ")})`;
+}
+
+function normalizeHexColor(value: string): string {
+  const hex = value.replace(/^#/, "");
+  if (hex.length === 3) {
+    return `#${hex.split("").map((char) => `${char}${char}`).join("")}`.toLowerCase();
+  }
+  return `#${hex.slice(0, 6)}`.toLowerCase();
+}
+
+function parseHexColor(value: string | undefined): Rgb | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const match = /^#([0-9a-f]{6})$/i.exec(normalizeHexColor(trimmed));
+  if (!match) {
+    return undefined;
+  }
+
+  return {
+    r: Number.parseInt(match[1].slice(0, 2), 16),
+    g: Number.parseInt(match[1].slice(2, 4), 16),
+    b: Number.parseInt(match[1].slice(4, 6), 16)
+  };
+}
+
+function colorToHex(color: Rgb): string {
+  return `#${[color.r, color.g, color.b]
+    .map((channel) => Math.round(Math.max(0, Math.min(255, channel))).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function mixRgb(a: Rgb, b: Rgb, aWeight: number): Rgb {
+  const clamped = Math.max(0, Math.min(1, aWeight));
+  const bWeight = 1 - clamped;
+  return {
+    r: a.r * clamped + b.r * bWeight,
+    g: a.g * clamped + b.g * bWeight,
+    b: a.b * clamped + b.b * bWeight
+  };
+}
+
+function rgba(color: Rgb, alpha: number): string {
+  const clamped = Math.max(0, Math.min(1, alpha));
+  return `rgba(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)}, ${Number(clamped.toFixed(3))})`;
+}
+
+function relativeLuminance(color: Rgb): number {
+  const [r, g, b] = [color.r, color.g, color.b].map((channel) => {
+    const value = channel / 255;
+    return value <= 0.03928
+      ? value / 12.92
+      : ((value + 0.055) / 1.055) ** 2.4;
+  });
+
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrastRatio(a: Rgb, b: Rgb): number {
+  const lighter = Math.max(relativeLuminance(a), relativeLuminance(b));
+  const darker = Math.min(relativeLuminance(a), relativeLuminance(b));
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function readableTextFor(background: Rgb): string {
+  return relativeLuminance(background) > 0.5 ? "#111827" : "#f8fafc";
+}
+
+function readableTextForPair(background: string, preferred: string): string {
+  const bg = parseHexColor(background);
+  const text = parseHexColor(preferred);
+  if (bg && text && contrastRatio(bg, text) >= 4.5) {
+    return preferred;
+  }
+
+  return bg ? readableTextFor(bg) : preferred;
+}
+
+function readableAccentFor(color: Rgb, surface: Rgb, mode: "light" | "dark"): Rgb {
+  if (contrastRatio(color, surface) >= 3) {
+    return color;
+  }
+
+  const target = mode === "dark" ? { r: 255, g: 255, b: 255 } : { r: 17, g: 24, b: 39 };
+  for (const weight of [0.75, 0.6, 0.45, 0.3]) {
+    const candidate = mixRgb(color, target, weight);
+    if (contrastRatio(candidate, surface) >= 3) {
+      return candidate;
+    }
+  }
+
+  return target;
+}
+
+function colorfulness(color: Rgb): number {
+  const max = Math.max(color.r, color.g, color.b);
+  const min = Math.min(color.r, color.g, color.b);
+  return max === 0 ? 0 : (max - min) / max;
 }
 
 function readPackageJson(root: string): PackageJson | undefined {
@@ -572,7 +1185,7 @@ function readReadme(root: string): string | undefined {
 
 function readmeH1(readme: string): string | undefined {
   const line = readme.split(/\r?\n/).find((item) => /^#\s+/.test(item.trim()));
-  return line?.replace(/^#\s+/, "").trim() || undefined;
+  return plainText(line?.replace(/^#\s+/, "")) || undefined;
 }
 
 function firstUsefulReadmeParagraph(readme: string): string | undefined {
@@ -584,10 +1197,10 @@ function firstUsefulReadmeParagraph(readme: string): string | undefined {
       .map((line) => line.trim())
       .filter((line) => line && !line.startsWith("#") && !line.startsWith("!") && !line.startsWith("|"))
       .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
-    if (normalized.length >= 24 && !/^(npm|wk|git|cd)\s/.test(normalized)) {
-      return normalized;
+      .replace(/\s+/g, " ");
+    const plain = plainText(normalized);
+    if (plain && plain.length >= 24 && !/^(npm|wk|git|cd)\s/.test(plain)) {
+      return plain;
     }
   }
 

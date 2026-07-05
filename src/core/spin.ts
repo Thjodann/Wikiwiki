@@ -293,6 +293,17 @@ function seedDraftPayload(seed: ProfileSeed): Record<string, unknown> {
   };
 
   switch (seed.type) {
+    case "article":
+      return {
+        ...base,
+        title: seed.title,
+        summary: `TODO: ${seed.purpose}`,
+        body: "TODO: write the public wiki page.",
+        categories: seed.tags.filter((tag) => !tag.startsWith("audience:")),
+        aliases: [],
+        source_record_ids: [],
+        files: []
+      };
     case "concept":
       return {
         ...base,

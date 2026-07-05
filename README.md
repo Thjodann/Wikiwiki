@@ -11,9 +11,9 @@ CLI for teams that want local, deterministic project knowledge, and it becomes
 more capable when an agentic IDE uses the same commands while code changes.
 
 The core idea is simple: keep structured repo knowledge in plain JSONL records,
-render deterministic Markdown and static HTML from those records, and let agents
-add judgment only when they are useful. No hosted service, database, vector
-store, or hidden memory layer is required.
+make `article` records the public wiki pages, and use concepts, decisions,
+notes, symbols, events, and links as the evidence ledger behind them. No hosted
+service, database, vector store, or hidden memory layer is required.
 
 ## Quick Start
 
@@ -46,6 +46,8 @@ Initialize Wikiwiki in a repo:
 
 ```sh
 wk setup --profile mixed --audience all
+wk theme preview --json
+wk theme init
 ```
 
 Check status and inspect the current working tree:
@@ -55,7 +57,19 @@ wk status --json
 wk spin --profile mixed --json
 ```
 
-Add records as knowledge becomes durable:
+Add a public article as knowledge becomes durable:
+
+```sh
+wk article add \
+  --title "Getting started" \
+  --summary "The first successful path for a new user." \
+  --body "Install the project, run the first command, and verify the expected output." \
+  --categories guides,onboarding \
+  --tags audience:user,getting-started
+```
+
+Add supporting records when they capture evidence, decisions, or maintainer
+context:
 
 ```sh
 wk concept add \
@@ -93,25 +107,26 @@ unchanged.
 ## Docs
 
 - [Concepts](docs/concepts.md): what Wikiwiki stores, renders, and optimizes for.
-- [Setup](docs/setup.md): source install, non-AI setup, and agentic IDE setup.
+- [Setup](docs/setup.md): source install, awesome initial install, agentic IDE setup, and the "Update wk" agent pipeline.
 - [Workflows](docs/workflows.md): dogfooding, JSON-first agent work, revisions, and closeout.
 - [Reference](docs/reference.md): commands, profiles, theming, GitHub Pages, status, and roadmap.
 
 ## Current Status
 
-Wikiwiki is a V1 CLI foundation. It currently includes:
+Wikiwiki is an article-first CLI foundation. It currently includes:
 
 - TypeScript CLI
 - JSONL record storage with append-only revisions and deletion tombstones
+- first-class `article` records with `wk article add`
 - Zod validation
 - Git-aware `spin` with deterministic `user`, `developer`, and `mixed` profile recipes
 - audience tagging and audience-focused site rendering
-- Markdown rendering into `wiki/`
-- static HTML site generation into `wiki-site/`
+- article-led Markdown rendering into `wiki/`
+- article-led static HTML site generation into `wiki-site/`
 - project theme overrides with light, dark, and system-auto support
 - product-identity theme generation through `wk theme`, including paired light/dark palettes
 - agent-mediated UX/DX human wiki compilation
-- local search across active records and rendered docs
+- local search across articles, active records, and rendered docs
 - scriptable non-AI setup through `wk setup`
 - deterministic closeout draft packets through `wk closeout`
 - installable Codex-compatible `wk` agent skill

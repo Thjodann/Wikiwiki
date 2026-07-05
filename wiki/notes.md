@@ -2,7 +2,7 @@
 
 # Notes
 
-## 2026-07-03T23:05:55.774Z
+## Note from 2026-07-03
 
 Generated wiki pages are owned by Wikiwiki; edit structured records instead.
 
@@ -10,7 +10,7 @@ Tags: `renderer`, `docs`
 
 Record: `note_482c1563-27d5-48b3-a8f7-81075cc69b28` | Authority: agent | Confidence: high
 
-## 2026-07-04T00:42:54.319Z
+## Note from 2026-07-04
 
 User chose the supplied Wikiwiki banner image for the README and explicitly allowed an idealistic README draft, including future-facing product language for capabilities that may not exist yet.
 
@@ -18,7 +18,7 @@ Tags: `readme`, `product-direction`, `banner`
 
 Record: `note_e237de63-0391-4d81-8a69-f47666a6dfd7` | Authority: user | Confidence: high
 
-## 2026-07-04T01:12:44.175Z
+## Note from 2026-07-04
 
 User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata.
 

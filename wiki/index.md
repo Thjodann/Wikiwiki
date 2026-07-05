@@ -8,6 +8,7 @@ This is the generated human-readable view of Wikiwiki's structured project knowl
 
 ## Pages
 
+- [Articles](./articles.md)
 - [Concepts](./concepts.md)
 - [Decisions](./decisions.md)
 - [Devlog](./devlog.md)
@@ -17,9 +18,10 @@ This is the generated human-readable view of Wikiwiki's structured project knowl
 
 ## Record Counts
 
+- Article: 0
 - Concept: 7
 - Decision: 16
-- Event: 20
+- Event: 22
 - Note: 3
 - Symbol: 7
 - Link: 2

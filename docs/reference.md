@@ -18,6 +18,7 @@ details that are useful after the first quick start.
 | `wk theme preview\|init [--mood calm\|vivid\|editorial\|utility\|playful\|dark]` | Preview or write light/dark `.wikiwiki/site-theme.json` palettes from project identity |
 | `wk compile draft --role all --json` | Create UX/DX human wiki drafts for an IDE agent |
 | `wk compile apply <draft-id> --json` | Validate and publish a human wiki draft |
+| `wk article add` | Add a public wiki article |
 | `wk concept add` | Add a durable project concept |
 | `wk decision add` | Add an architecture, product, or workflow decision |
 | `wk event add` | Add a development event |
@@ -27,6 +28,42 @@ details that are useful after the first quick start.
 | `wk record list/get/update/delete` | Read and revise active records append-only |
 | `wk validate` | Validate records and references |
 | `wk render` | Render Markdown pages into `wiki/` |
+
+## Article Records
+
+Article records are the public wiki surface. Concepts, decisions, notes,
+events, symbols, and links remain the ledger behind them: evidence, provenance,
+maintainer context, and source anchors.
+
+```sh
+wk article add \
+  --title "Skyrim:Alchemy" \
+  --summary "How alchemy works for players and maintainers." \
+  --body "Alchemy combines ingredients into potions and poisons." \
+  --categories gameplay,crafting \
+  --aliases alchemy,potions \
+  --source-records concept_123,decision_456 \
+  --files src/alchemy.ts \
+  --tags audience:all
+```
+
+If `--slug` is omitted, Wikiwiki generates one from the title. Slugs may use
+namespace-style names such as `Skyrim:Alchemy`; generated files still use safe
+filenames such as `Skyrim-Alchemy.html`. Validation rejects active duplicate
+slugs, duplicate generated filenames, and `source_record_ids` that do not point
+to active records.
+
+Articles render to `wiki/articles/` and `wiki-site/articles/`. Article records
+do not generate `records/article/*` detail pages.
+
+## Agent Requests
+
+When a user asks an agent to "Update wk", the agent should follow the
+[agentic update pipeline](setup.md#agentic-update-pipeline). The short version:
+use npm or the repo's JavaScript package manager to update the CLI when
+available; if npm is not available, refresh only the installed `wk` agent skill
+from GitHub raw files and report that the CLI itself still needs a package
+manager or release artifact.
 
 ## Wiki Profiles
 
@@ -173,6 +210,13 @@ wk theme preview --json
 wk theme init --mood editorial
 ```
 
+`wk theme preview` and `wk theme init` inspect likely visual sources before
+falling back to README copy: app/global CSS, design tokens, theme files, landing
+page styles, and app shell/layout styles. In styled repos, the generated theme
+can infer a likely default color mode, accent spectrum, radius, font family,
+gradients, glass/gloss, shadows, badges, and tag colors. In plain repos, the
+named mood palettes remain the fallback.
+
 `wk theme init` writes `.wikiwiki/site-theme.json` and refuses to overwrite an
 existing theme unless `--force` is explicit. You can also edit
 `.wikiwiki/site-theme.json` by hand, then run `wk site`:
@@ -267,23 +311,24 @@ jobs:
 
 ## Current Status
 
-Wikiwiki is a V1 CLI foundation. It currently includes:
+Wikiwiki is an article-first CLI foundation. It currently includes:
 
 - TypeScript CLI
 - JSONL record storage
+- first-class article records
 - append-only record revisions and deletion tombstones
 - Zod validation
 - Git-aware `spin` with deterministic `user`, `developer`, and `mixed` profile recipes
 - audience tagging with `audience:user`, `audience:developer`, and `audience:all`
-- Markdown rendering for concepts, decisions, events, notes, symbols, and links
-- static HTML site generation into `wiki-site/`
+- Markdown rendering for article pages plus concepts, decisions, events, notes, symbols, and links
+- article-led static HTML site generation into `wiki-site/`
 - audience-focused site rendering with `wk site --audience user|developer|all`
 - project-first generated site UX with curated `guides.html`
 - project theme overrides through `.wikiwiki/site-theme.json`
 - product-identity light/dark theme generation through `wk theme`
 - basic contrast guardrails for common theme overrides
 - agent-mediated UX/DX human wiki compilation
-- local search across active records and rendered docs
+- local search across articles, active records, and rendered docs
 - agent-readable JSON output
 - scriptable non-AI setup through `wk setup` and repo scripts
 - deterministic closeout draft packets through `wk closeout`

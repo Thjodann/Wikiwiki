@@ -161,3 +161,19 @@ Extended product-identity themes so wk theme writes paired light and dark palett
 Files: `src/core/theme.ts`, `src/core/config.ts`, `src/core/site.ts`, `src/cli/commands/theme.ts`, `README.md`, `docs/reference.md`, `docs/setup.md`, `test/cli.test.js`, `test/site.test.js`
 
 Recorded: 2026-07-05T00:24:56.278Z | Record: `event_957eb317-04d9-4cd3-bce3-5b0b58de4bec` | Confidence: high
+
+## Documented the agentic wk update pipeline
+
+Added docs and bundled skill instructions for a user request of Update wk. The pipeline updates the CLI through npm or an equivalent package manager when available, refreshes the installed wk agent skill from GitHub raw files when npm is unavailable, and requires agents to report when only the skill changed and the CLI update is blocked.
+
+Files: `README.md`, `docs/reference.md`, `docs/setup.md`, `skills/wk/SKILL.md`, `test/cli.test.js`
+
+Recorded: 2026-07-05T00:38:26.848Z | Record: `event_617bb76f-e11f-4e65-90dc-a500cb54b08f` | Confidence: high
+
+## Improved first-install branded theme dogfood path
+
+Acted on PRISM dogfood feedback by teaching wk theme preview/init to inspect app CSS and design-token sources, sanitize HTML from inferred descriptions, infer dark-first rich theme palettes from host styling, strengthen theme contrast guardrails, document an awesome initial install workflow, and update the bundled wk skill to inspect real project visual sources before generating a branded site.
+
+Files: `src/core/theme.ts`, `src/core/site.ts`, `src/cli/commands/setup.ts`, `README.md`, `docs/setup.md`, `docs/reference.md`, `skills/wk/SKILL.md`, `test/cli.test.js`, `test/site.test.js`
+
+Recorded: 2026-07-05T01:04:12.866Z | Record: `event_f8c324a7-1f16-44c4-bc69-4584386c1085` | Confidence: high

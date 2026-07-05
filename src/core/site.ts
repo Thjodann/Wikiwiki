@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { articleFileName } from "./articles";
 import { readIntegrations, shouldReportIntegrations, type BeadsIntegrationSummary, type BeadsIssueSummary, type IntegrationSummary } from "./beads";
 import {
   normalizeSourceBaseUrl,
@@ -12,7 +13,7 @@ import {
 } from "./config";
 import { sitePath } from "./paths";
 import { readAllRecords, type RecordsByType } from "./store";
-import { type AnyRecord, type RecordType, recordTypes } from "./schemas";
+import { type AnyRecord, type ArticleRecord, type NoteRecord, type RecordType, recordTypes } from "./schemas";
 import { audienceTags, parseSiteAudience, userMaterialTags, type SiteAudience } from "./profiles";
 
 export const siteGeneratedNotice =
@@ -20,6 +21,7 @@ export const siteGeneratedNotice =
 
 export const siteStaticPageFileNames = [
   "index.html",
+  "articles.html",
   "guides.html",
   "concepts.html",
   "decisions.html",
@@ -63,7 +65,9 @@ type SiteModel = {
   projectInitials: string;
   records: RecordsByType;
   flatRecords: AnyRecord[];
+  sourceRecords: AnyRecord[];
   hrefById: Map<string, string>;
+  articleHrefByLookup: Map<string, string>;
   counts: Record<RecordType, number>;
   visibleCategories: Category[];
   options: ResolvedSiteOptions;
@@ -84,6 +88,7 @@ type RenderContext = {
   root: string;
   currentFile: string;
   hrefById: Map<string, string>;
+  articleHrefByLookup: Map<string, string>;
   sourceBaseUrl?: string;
 };
 
@@ -102,6 +107,13 @@ type SearchEntry = {
 };
 
 const categories: Category[] = [
+  {
+    type: "article",
+    title: "Articles",
+    navLabel: "Articles",
+    fileName: "articles.html",
+    description: "Public wiki articles curated from durable project knowledge."
+  },
   {
     type: "concept",
     title: "Concepts",
@@ -148,6 +160,10 @@ const categories: Category[] = [
 
 const categoryByType = new Map<RecordType, Category>(categories.map((category) => [category.type, category]));
 
+function recordCategories(): Category[] {
+  return categories.filter((category) => category.type !== "article");
+}
+
 export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFile[] {
   const records = readAllRecords(root);
   const model = createSiteModel(root, records, resolveSiteOptions(root, options));
@@ -166,6 +182,18 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
   });
 
   files.push({
+    fileName: "articles.html",
+    content: renderLayout({
+      model,
+      fileName: "articles.html",
+      title: "Articles",
+      description: "Browse public wiki articles for this project.",
+      active: "articles",
+      body: renderArticlesPage(model)
+    })
+  });
+
+  files.push({
     fileName: "guides.html",
     content: renderLayout({
       model,
@@ -177,7 +205,7 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
     })
   });
 
-  for (const category of categories) {
+  for (const category of recordCategories()) {
     files.push({
       fileName: category.fileName,
       content: renderLayout({
@@ -217,7 +245,22 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
     })
   });
 
-  for (const record of model.flatRecords) {
+  for (const article of model.records.article) {
+    const fileName = articleHref(article);
+    files.push({
+      fileName,
+      content: renderLayout({
+        model,
+        fileName,
+        title: article.title,
+        description: article.summary,
+        active: "articles",
+        body: renderArticlePage(article, model, fileName)
+      })
+    });
+  }
+
+  for (const record of model.sourceRecords) {
     const fileName = recordHref(record);
     files.push({
       fileName,
@@ -277,7 +320,9 @@ function createSiteModel(root: string, records: RecordsByType, options: Resolved
     flatRecords.push(...audienceRecords[type]);
   }
   flatRecords.sort(compareRecords);
-  const hrefById = new Map(flatRecords.map((record) => [record.id, recordHref(record)]));
+  const sourceRecords = flatRecords.filter((record) => record.type !== "article");
+  const hrefById = new Map(flatRecords.map((record) => [record.id, record.type === "article" ? articleHref(record) : recordHref(record)]));
+  const articleHrefByLookup = articleLookupMap(audienceRecords.article);
   const counts = Object.fromEntries(recordTypes.map((type) => [type, audienceRecords[type].length])) as Record<RecordType, number>;
   const repoName = options.theme.project_name?.trim() || path.basename(root);
 
@@ -289,13 +334,33 @@ function createSiteModel(root: string, records: RecordsByType, options: Resolved
     projectInitials: initialsForName(repoName),
     records: audienceRecords,
     flatRecords,
+    sourceRecords,
     hrefById,
+    articleHrefByLookup,
     counts,
-    visibleCategories: categories.filter((category) => counts[category.type] > 0),
+    visibleCategories: recordCategories().filter((category) => counts[category.type] > 0),
     options,
     audience: options.audience,
     integrations
   };
+}
+
+function articleLookupMap(articles: ArticleRecord[]): Map<string, string> {
+  const lookup = new Map<string, string>();
+  for (const article of articles) {
+    for (const key of [article.id, article.slug, article.title, ...article.aliases]) {
+      const normalized = normalizeArticleLookup(key);
+      if (normalized && !lookup.has(normalized)) {
+        lookup.set(normalized, articleHref(article));
+      }
+    }
+  }
+
+  return lookup;
+}
+
+function normalizeArticleLookup(value: string): string {
+  return value.trim().toLowerCase();
 }
 
 function renderLayout(options: LayoutOptions): string {
@@ -381,6 +446,7 @@ function renderNav(model: SiteModel, currentFile: string, active: string): strin
   const links = [
     `<p class="nav-heading">Start Here</p>`,
     navLink(currentFile, "index.html", "Home", active === "home"),
+    navLink(currentFile, "articles.html", "Articles", active === "articles", model.counts.article),
     navLink(currentFile, "guides.html", "Guides", active === "guides"),
     navLink(currentFile, "search.html", "Search", active === "search"),
     showBeadsWork(model) ? navLink(currentFile, "work.html", "Project Work", active === "work", beadsNavCount(model.integrations.beads)) : "",
@@ -399,11 +465,12 @@ function navLink(currentFile: string, targetFile: string, label: string, active:
 }
 
 function renderHomePage(model: SiteModel): string {
-  const coreCategories = categories
+  const coreCategories = recordCategories()
     .filter((category) => ["concept", "decision"].includes(category.type) && model.counts[category.type] > 0);
-  const supportCategories = categories
+  const supportCategories = recordCategories()
     .filter((category) => !["concept", "decision"].includes(category.type) && model.counts[category.type] > 0);
   const guideCards = [
+    sectionCard("index.html", "articles.html", "Articles", "Public wiki pages curated from source records and project knowledge.", model.counts.article),
     sectionCard("index.html", "guides.html", "Guides", "Curated paths through user orientation, project concepts, and maintainer context.")
   ].join("\n");
   const primaryCards = coreCategories
@@ -458,10 +525,14 @@ ${workCards || supportCards ? `<section class="section">
 
 function renderGuidesPage(model: SiteModel): string {
   const usedRecords = new Set<string>();
+  const articleRecords = takeUnusedRecords(curatedRecords(model, ["article"], model.records.article.length), usedRecords, 8);
   const userGuideRecords = takeUnusedRecords(userGuideRecordsFor(model), usedRecords, 8);
   const startHereRecords = takeUnusedRecords(homepageRecords(model), usedRecords, 6);
   const conceptRecords = takeUnusedRecords(curatedRecords(model, ["concept"], model.records.concept.length), usedRecords, 6);
   const decisionRecords = takeUnusedRecords(curatedRecords(model, ["decision"], model.records.decision.length), usedRecords, 6);
+  const articleCards = articleRecords
+    .map((record) => recordCard(record, "guides.html", model))
+    .join("\n");
   const userGuideCards = userGuideRecords
     .map((record) => recordCard(record, "guides.html", model))
     .join("\n");
@@ -483,7 +554,7 @@ function renderGuidesPage(model: SiteModel): string {
   const decisionCards = decisionRecords
     .map((record) => recordCard(record, "guides.html", model))
     .join("\n");
-  const maintainerCards = categories
+  const maintainerCards = recordCategories()
     .filter((category) => model.counts[category.type] > 0)
     .map((category) => sectionCard("guides.html", category.fileName, category.title, category.description, model.counts[category.type]))
     .join("\n");
@@ -491,7 +562,17 @@ function renderGuidesPage(model: SiteModel): string {
     ? sectionCard("guides.html", "work.html", "Project Work", "Developer-only Beads task context for planning, blockers, and completed work.", beadsNavCount(model.integrations.beads))
     : "";
 
-  return `${userGuideSection}<section class="section">
+  const articlesSection = articleCards ? `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Articles</p>
+    <h2>Start with the public wiki</h2>
+  </div>
+  <div class="record-list">${articleCards}</div>
+</section>
+
+` : "";
+
+  return `${articlesSection}${userGuideSection}<section class="section">
   <div class="section-heading">
     <p class="eyebrow">Start here</p>
     <h2>Project essentials</h2>
@@ -601,6 +682,78 @@ function beadsIssueCard(issue: BeadsIssueSummary): string {
 </article>`;
 }
 
+function renderArticlesPage(model: SiteModel): string {
+  const articles = [...model.records.article].sort(compareRecords);
+  const cards = articles.map((article) => recordCard(article, "articles.html", model)).join("\n");
+  const categories = articleCategoryCards(model, "articles.html");
+
+  return `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Articles</p>
+    <h2>${articles.length} ${articles.length === 1 ? "article" : "articles"}</h2>
+  </div>
+  <div class="record-list">${cards || emptyState("No articles captured yet. Add article records to make the public wiki lead with curated pages.")}</div>
+</section>
+
+${categories ? `<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Categories</p>
+    <h2>Browse by topic</h2>
+  </div>
+  <div class="card-grid compact">${categories}</div>
+</section>` : ""}`;
+}
+
+function renderArticlePage(article: ArticleRecord, model: SiteModel, currentFile: string): string {
+  const context: RenderContext = {
+    root: model.root,
+    currentFile,
+    hrefById: model.hrefById,
+    articleHrefByLookup: model.articleHrefByLookup,
+    sourceBaseUrl: model.options.sourceBaseUrl
+  };
+  const tagsHtml = tagList(displayTags(article));
+  const tagsLine = tagsHtml ? `\n    ${tagsHtml}` : "";
+  const categories = article.categories.length
+    ? `<h2>Categories</h2><p>${article.categories.map((category) => `<code>${escapeHtml(category)}</code>`).join(" ")}</p>`
+    : "";
+  const aliases = article.aliases.length
+    ? `<h2>Aliases</h2><p>${article.aliases.map((alias) => `<code>${escapeHtml(alias)}</code>`).join(" ")}</p>`
+    : "";
+  const sources = sourceRecordsForArticle(article, model);
+  const sourceList = sources.length
+    ? `<aside class="sources-panel">
+  <h2>Source records</h2>
+  <ul>${sources.map((record) => `<li><a href="${hrefFrom(currentFile, hrefForRecord(record))}">${escapeHtml(recordTitle(record))}</a> <code>${escapeHtml(record.id)}</code></li>`).join("\n")}</ul>
+</aside>`
+    : "";
+  const filesBlock = renderSourcesBlock(article, context);
+  const body = article.body.trim() ? formatText(article.body, context) : "<p>No article body captured yet.</p>";
+  const audienceHtml = audienceLabel(article)
+    ? `<span class="audience-badge">${escapeHtml(audienceLabel(article))}</span>`
+    : "";
+
+  return `<article class="record-page">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="${hrefFrom(currentFile, "index.html")}">Home</a>
+    <span>/</span>
+    <a href="${hrefFrom(currentFile, "articles.html")}">Articles</a>
+  </nav>
+  <div class="record-title-row">
+    <span class="type-badge">Article</span>${audienceHtml}${tagsLine}
+  </div>
+  <section class="prose">
+    <h2>Summary</h2>
+    ${formatText(article.summary, context)}
+    <h2>Article</h2>
+    ${body}
+    ${categories}
+    ${aliases}
+  </section>${sourceList ? `\n  ${sourceList}` : ""}${filesBlock ? `\n  ${filesBlock}` : ""}
+  ${renderRecordMeta(article, context)}
+</article>`;
+}
+
 function renderCategoryPage(model: SiteModel, category: Category): string {
   const records = [...model.records[category.type]].sort(compareRecords);
   const cards = records.map((record) => recordCard(record, category.fileName, model)).join("\n");
@@ -619,7 +772,7 @@ function renderSearchPage(): string {
   <div class="search-panel">
     <label>
       <span>Search this project wiki</span>
-      <input type="search" placeholder="Type a concept, file, tag, or decision" data-search-page-input autofocus>
+      <input type="search" placeholder="Type an article, concept, file, tag, or decision" data-search-page-input autofocus>
     </label>
   </div>
   <div class="search-results" data-search-results></div>
@@ -631,6 +784,7 @@ function renderRecordPage(record: AnyRecord, model: SiteModel, currentFile: stri
     root: model.root,
     currentFile,
     hrefById: model.hrefById,
+    articleHrefByLookup: model.articleHrefByLookup,
     sourceBaseUrl: model.options.sourceBaseUrl
   };
   const category = categoryByType.get(record.type);
@@ -688,6 +842,29 @@ function renderRecordBody(record: AnyRecord, context: RenderContext): string {
     return `<section class="prose">
   <h2>Note</h2>
   ${formatText(record.body, context)}
+</section>`;
+  }
+
+  if (record.type === "article") {
+    const categories = record.categories.length
+      ? `<h2>Categories</h2><p>${record.categories.map((category) => `<code>${escapeHtml(category)}</code>`).join(" ")}</p>`
+      : "";
+    const aliases = record.aliases.length
+      ? `<h2>Aliases</h2><p>${record.aliases.map((alias) => `<code>${escapeHtml(alias)}</code>`).join(" ")}</p>`
+      : "";
+    const sources = record.source_record_ids.length
+      ? `<h2>Source Records</h2><ul>${record.source_record_ids.map((id) => `<li>${endpointLink(id, context)}</li>`).join("")}</ul>`
+      : "";
+    const body = record.body.trim() ? formatText(record.body, context) : "<p>No article body captured yet.</p>";
+
+    return `<section class="prose">
+  <h2>Summary</h2>
+  ${formatText(record.summary, context)}
+  <h2>Article</h2>
+  ${body}
+  ${categories}
+  ${aliases}
+  ${sources}
 </section>`;
   }
 
@@ -757,6 +934,29 @@ function sectionCard(currentFile: string, targetFile: string, title: string, des
 </a>`;
 }
 
+function articleCategoryCards(model: SiteModel, currentFile: string): string {
+  const categoriesByName = new Map<string, ArticleRecord[]>();
+  for (const article of model.records.article) {
+    for (const category of article.categories) {
+      const articles = categoriesByName.get(category) ?? [];
+      articles.push(article);
+      categoriesByName.set(category, articles);
+    }
+  }
+
+  return [...categoriesByName.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([category, articles]) => sectionCard(currentFile, "articles.html", category, `${articles.length} ${articles.length === 1 ? "article" : "articles"} in this topic.`, articles.length))
+    .join("\n");
+}
+
+function sourceRecordsForArticle(article: ArticleRecord, model: SiteModel): AnyRecord[] {
+  const byId = new Map(model.flatRecords.map((record) => [record.id, record]));
+  return article.source_record_ids
+    .map((id) => byId.get(id))
+    .filter((record): record is AnyRecord => record !== undefined);
+}
+
 function recordCard(record: AnyRecord, currentFile: string, _model: SiteModel): string {
   const summary = recordExcerpt(record);
   const tags = displayTags(record).slice(0, 5);
@@ -770,7 +970,7 @@ function recordCard(record: AnyRecord, currentFile: string, _model: SiteModel): 
   <div class="record-card-top">
     <span class="type-badge">${escapeHtml(labelForType(record.type))}</span>${audienceHtml}
   </div>
-  <h3><a href="${hrefFrom(currentFile, recordHref(record))}">${escapeHtml(recordTitle(record))}</a></h3>
+  <h3><a href="${hrefFrom(currentFile, hrefForRecord(record))}">${escapeHtml(recordTitle(record))}</a></h3>
   <p>${escapeHtml(summary)}</p>${tagsLine ? `\n  <footer>${tagsLine}</footer>` : ""}
 </article>`;
 }
@@ -829,6 +1029,11 @@ function endpointLink(endpoint: string, context: RenderContext): string {
     return `<a href="${hrefFrom(context.currentFile, recordHrefForEndpoint)}"><code>${escapeHtml(endpoint)}</code></a>`;
   }
 
+  const articleHrefForEndpoint = context.articleHrefByLookup.get(normalizeArticleLookup(endpoint));
+  if (articleHrefForEndpoint) {
+    return `<a href="${hrefFrom(context.currentFile, articleHrefForEndpoint)}"><code>${escapeHtml(endpoint)}</code></a>`;
+  }
+
   const siteHref = siteHrefForTarget(endpoint, context);
   if (siteHref) {
     return `<a href="${escapeAttribute(siteHref)}"><code>${escapeHtml(endpoint)}</code></a>`;
@@ -860,6 +1065,11 @@ function normalizeContentHref(target: string, context: RenderContext): string {
   const recordHrefForTarget = context.hrefById.get(trimmed);
   if (recordHrefForTarget) {
     return hrefFrom(context.currentFile, recordHrefForTarget);
+  }
+
+  const articleHrefForTarget = context.articleHrefByLookup.get(normalizeArticleLookup(trimmed));
+  if (articleHrefForTarget) {
+    return hrefFrom(context.currentFile, articleHrefForTarget);
   }
 
   const siteHref = siteHrefForTarget(trimmed, context);
@@ -899,6 +1109,8 @@ function markdownRouteToHtml(route: string): string | undefined {
     ["", "index.html"],
     ["index", "index.html"],
     ["index.md", "index.html"],
+    ["articles", "articles.html"],
+    ["articles.md", "articles.html"],
     ["guides", "guides.html"],
     ["guides.md", "guides.html"],
     ["concepts", "concepts.html"],
@@ -950,7 +1162,20 @@ function isDirectoryPath(root: string, file: string): boolean {
 }
 
 function searchIndexJs(model: SiteModel): string {
-  const recordEntries: SearchEntry[] = model.flatRecords.map((record) => ({
+  const articleEntries: SearchEntry[] = model.records.article.map((article) => ({
+    type: "article",
+    typeLabel: "Article",
+    id: article.id,
+    title: article.title,
+    summary: recordExcerpt(article),
+    tags: [...article.categories, ...article.aliases, ...displayTags(article)],
+    authority: article.authority,
+    confidence: article.confidence,
+    audienceLabel: audienceLabel(article),
+    url: articleHref(article),
+    text: recordSearchText(article)
+  }));
+  const recordEntries: SearchEntry[] = model.sourceRecords.map((record) => ({
     type: record.type,
     typeLabel: labelForType(record.type),
     id: record.id,
@@ -990,7 +1215,7 @@ function searchIndexJs(model: SiteModel): string {
       ].filter(Boolean).join(" ")
     }))
     : [];
-  const entries = [...recordEntries, ...workEntries];
+  const entries = [...articleEntries, ...recordEntries, ...workEntries];
 
   return `/* Generated by Wikiwiki from .wikiwiki/records. Edit structured records instead, then run \`wk site\`. */
 window.WIKIWIKI_SEARCH_INDEX = ${JSON.stringify(entries, null, 2)};
@@ -1009,7 +1234,13 @@ function siteManifest(model: SiteModel) {
     theme_file: ".wikiwiki/site-theme.json",
     pages: sitePages(model),
     ...(integrations ? { integrations } : {}),
-    records: model.flatRecords.map((record) => ({
+    articles: model.records.article.map((article) => ({
+      id: article.id,
+      title: article.title,
+      slug: article.slug,
+      url: articleHref(article)
+    })),
+    records: model.sourceRecords.map((record) => ({
       type: record.type,
       id: record.id,
       title: recordTitle(record),
@@ -1050,7 +1281,19 @@ function siteManifestIntegrations(model: SiteModel): IntegrationSummary | undefi
 }
 
 function sitePages(model: SiteModel): string[] {
-  return siteStaticPageFileNames.filter((fileName) => fileName !== "work.html" || showBeadsWork(model));
+  return [
+    ...siteStaticPageFileNames.filter((fileName) => fileName !== "work.html" || showBeadsWork(model)),
+    ...model.records.article.map(articleHref),
+    ...model.sourceRecords.map(recordHref)
+  ];
+}
+
+function hrefForRecord(record: AnyRecord): string {
+  return record.type === "article" ? articleHref(record) : recordHref(record);
+}
+
+function articleHref(record: ArticleRecord): string {
+  return `articles/${articleFileName(record)}`;
 }
 
 function recordHref(record: AnyRecord): string {
@@ -1058,6 +1301,9 @@ function recordHref(record: AnyRecord): string {
 }
 
 function recordTitle(record: AnyRecord): string {
+  if (record.type === "note") {
+    return noteTitle(record);
+  }
   if ("name" in record && typeof record.name === "string") {
     return record.name;
   }
@@ -1068,12 +1314,16 @@ function recordTitle(record: AnyRecord): string {
     return record.summary;
   }
   if ("body" in record && typeof record.body === "string") {
-    return record.body.slice(0, 80);
+    return conciseExcerpt(record.body, 80);
   }
   if ("relationship" in record && typeof record.relationship === "string") {
     return `${record.from} ${record.relationship} ${record.to}`;
   }
   return record.id;
+}
+
+function noteTitle(record: NoteRecord): string {
+  return record.title ?? `Note from ${formatDate(record.created_at)}`;
 }
 
 function recordSummary(record: AnyRecord): string {
@@ -1189,6 +1439,11 @@ function compareRecords(a: AnyRecord, b: AnyRecord): number {
 }
 
 function homepageRecords(model: SiteModel): AnyRecord[] {
+  const articles = curatedRecords(model, ["article"], 6);
+  if (articles.length > 0) {
+    return articles;
+  }
+
   const curated = curatedRecords(model, ["concept", "decision", "note"], 6);
   if (curated.length > 0) {
     return curated;
@@ -1684,6 +1939,26 @@ function themeWithContrastGuardrails(theme: WikiwikiThemePalette, mode: "light" 
   if (guardedPanel && muted && contrastRatio(guardedPanel, muted) < 3) {
     guarded.muted = relativeLuminance(guardedPanel) > 0.5 ? "#4b5563" : "#cbd5e1";
     comments.push(`${mode} mode: Adjusted --muted for readable contrast against --panel.`);
+  }
+
+  const accent = parseHexColor(guarded.accent);
+  if (guardedPanel && accent && contrastRatio(guardedPanel, accent) < 3) {
+    guarded.accent = readableTextFor(guardedPanel);
+    comments.push(`${mode} mode: Adjusted --accent for readable contrast against --panel.`);
+  }
+
+  const badgeBg = parseHexColor(guarded.badge_bg);
+  const badgeText = parseHexColor(guarded.badge_text);
+  if (badgeBg && badgeText && contrastRatio(badgeBg, badgeText) < 4.5) {
+    guarded.badge_text = readableTextFor(badgeBg);
+    comments.push(`${mode} mode: Adjusted --badge-text for readable contrast against --badge-bg.`);
+  }
+
+  const tagBg = parseHexColor(guarded.tag_bg);
+  const tagText = parseHexColor(guarded.tag_text);
+  if (tagBg && tagText && contrastRatio(tagBg, tagText) < 4.5) {
+    guarded.tag_text = readableTextFor(tagBg);
+    comments.push(`${mode} mode: Adjusted --tag-text for readable contrast against --tag-bg.`);
   }
 
   return { theme: guarded, comments };

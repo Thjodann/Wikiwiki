@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { safeFileName } from "./articles";
 import { validateHumanWiki } from "./compiler";
 import { buildWikiPages } from "./renderer";
 import { type AnyRecord, type RecordType, recordTypes } from "./schemas";
@@ -47,6 +48,7 @@ export function validateWikiwiki(root: string): ValidationResult {
   }
 
   validateLinks(root, records, warnings);
+  validateArticles(records, errors);
   errors.push(...validateHumanWiki(root));
 
   try {
@@ -62,6 +64,50 @@ export function validateWikiwiki(root: string): ValidationResult {
     warnings,
     counts
   };
+}
+
+function validateArticles(
+  records: Record<RecordType, AnyRecord[]>,
+  errors: string[]
+): void {
+  const activeByType = Object.fromEntries(
+    recordTypes.map((type) => [type, activeRecords(records[type])])
+  ) as Record<RecordType, AnyRecord[]>;
+  const activeIds = new Set(recordTypes.flatMap((type) => activeByType[type].map((record) => record.id)));
+  const slugs = new Map<string, string>();
+  const fileNames = new Map<string, string>();
+
+  for (const article of activeByType.article) {
+    if (!("slug" in article) || typeof article.slug !== "string") {
+      continue;
+    }
+
+    const normalizedSlug = article.slug.trim().toLowerCase();
+    const normalizedFileName = safeFileName(article.slug).toLowerCase();
+    const existingSlug = slugs.get(normalizedSlug);
+    const existingFileName = fileNames.get(normalizedFileName);
+
+    if (existingSlug) {
+      errors.push(`article ${article.id} duplicates slug "${article.slug}" from ${existingSlug}.`);
+    } else {
+      slugs.set(normalizedSlug, article.id);
+    }
+
+    if (existingFileName) {
+      errors.push(`article ${article.id} duplicates generated filename "${safeFileName(article.slug)}" from ${existingFileName}.`);
+    } else {
+      fileNames.set(normalizedFileName, article.id);
+    }
+
+    const sourceIds = "source_record_ids" in article && Array.isArray(article.source_record_ids)
+      ? article.source_record_ids
+      : [];
+    for (const sourceId of sourceIds) {
+      if (!activeIds.has(sourceId)) {
+        errors.push(`article ${article.id} references missing source record: ${sourceId}`);
+      }
+    }
+  }
 }
 
 function validateRevisionGroups(

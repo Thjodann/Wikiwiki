@@ -121,6 +121,27 @@ function seedRecords(root) {
   });
 }
 
+function seedArticle(root) {
+  appendRecord(root, "article", {
+    type: "article",
+    id: "article_skyrim_alchemy",
+    source: "agent",
+    authority: "agent",
+    confidence: "high",
+    created_at: "2026-01-02T00:00:00.000Z",
+    updated_at: "2026-01-02T00:00:00.000Z",
+    title: "Skyrim:Alchemy",
+    slug: "Skyrim:Alchemy",
+    summary: "Alchemy documents ingredients, effects, and potion crafting.",
+    body: "Alchemy combines ingredients into potions. See [Static wiki site](concept_static_site) for generated-site context.",
+    categories: ["Gameplay", "Skills"],
+    aliases: ["Alchemy", "Potion Crafting"],
+    source_record_ids: ["concept_static_site"],
+    files: ["README.md"],
+    tags: ["audience:all", "wiki"]
+  });
+}
+
 function file(files, fileName) {
   const found = files.find((item) => item.fileName === fileName);
   assert.ok(found, `${fileName} should be generated`);
@@ -137,6 +158,38 @@ function parseSearchIndex(content) {
   );
   assert.ok(match, "search index should be parseable");
   return JSON.parse(match[1]);
+}
+
+function assertNoMissingLocalLinks(root, files) {
+  const generatedFiles = new Set(files.map((item) => item.fileName));
+  const htmlFiles = files.filter((item) => item.fileName.endsWith(".html"));
+  for (const item of htmlFiles) {
+    const directory = path.posix.dirname(item.fileName);
+    const pattern = /\b(?:href|src)="([^"]+)"/g;
+    let match;
+    while ((match = pattern.exec(item.content)) !== null) {
+      const rawTarget = match[1];
+      if (
+        rawTarget.startsWith("#") ||
+        rawTarget.startsWith("http://") ||
+        rawTarget.startsWith("https://") ||
+        rawTarget.startsWith("mailto:") ||
+        rawTarget.startsWith("data:") ||
+        rawTarget.startsWith("javascript:")
+      ) {
+        continue;
+      }
+
+      const target = decodeURIComponent(rawTarget.split("#")[0].split("?")[0]);
+      const generatedTarget = path.posix.normalize(path.posix.join(directory, target));
+      if (!generatedTarget.startsWith("..") && generatedFiles.has(generatedTarget)) {
+        continue;
+      }
+
+      const diskTarget = path.resolve(root, "wiki-site", item.fileName, "..", target);
+      assert.ok(fs.existsSync(diskTarget), `${item.fileName} links to missing local target ${rawTarget}`);
+    }
+  }
 }
 
 function withPath(value, fn) {
@@ -249,6 +302,51 @@ test("buildSiteFiles creates a navigable static wiki without front matter", () =
   assert.match(searchConcept.text, /source links, and publishable assets/);
 });
 
+test("buildSiteFiles renders article-first pages and search entries", () => {
+  const root = tempRoot();
+  seedRecords(root);
+  seedArticle(root);
+
+  const files = buildSiteFiles(root);
+  const index = file(files, "index.html");
+  const guides = file(files, "guides.html");
+  const articles = file(files, "articles.html");
+  const article = file(files, "articles/Skyrim-Alchemy.html");
+  const manifest = JSON.parse(file(files, "site-manifest.json"));
+  const searchIndex = parseSearchIndex(file(files, "assets/search-index.js"));
+
+  assert.match(index, /href="articles\.html"/);
+  assert.match(index, /Skyrim:Alchemy/);
+  assert.match(guides, /Start with the public wiki/);
+  assert.match(articles, /Browse by topic/);
+  assert.match(articles, /Gameplay/);
+  assert.match(articles, /href="articles\/Skyrim-Alchemy\.html"/);
+  assert.match(article, /Alchemy documents ingredients, effects, and potion crafting/);
+  assert.match(article, /Potion Crafting/);
+  assert.match(article, /href="..\/records\/concept\/concept_static_site\.html"/);
+  assert.match(article, /href="..\/..\/README\.md"/);
+  assert.equal(files.some((item) => item.fileName.startsWith("records/article/")), false);
+  assert.ok(manifest.pages.includes("articles/Skyrim-Alchemy.html"));
+  assert.ok(manifest.articles.some((entry) => entry.slug === "Skyrim:Alchemy" && entry.url === "articles/Skyrim-Alchemy.html"));
+  assert.equal(manifest.records.some((entry) => entry.type === "article"), false);
+
+  const articleSearch = searchIndex.find((entry) => entry.id === "article_skyrim_alchemy");
+  assert.equal(searchIndex[0].id, "article_skyrim_alchemy");
+  assert.equal(articleSearch.typeLabel, "Article");
+  assert.equal(articleSearch.url, "articles/Skyrim-Alchemy.html");
+  assert.match(articleSearch.text, /Potion Crafting/);
+});
+
+test("buildSiteFiles generated HTML has no missing local links", () => {
+  const root = tempRoot();
+  seedRecords(root);
+  seedArticle(root);
+
+  const files = buildSiteFiles(root);
+
+  assertNoMissingLocalLinks(root, files);
+});
+
 test("buildSiteFiles filters records for a user-focused audience", () => {
   const root = tempRoot();
   seedRecords(root);
@@ -280,18 +378,37 @@ test("buildSiteFiles preserves note file provenance", () => {
     authority: "agent",
     confidence: "high",
     created_at: "2026-01-01T00:00:00.000Z",
+    title: "Generated file note",
     body: "Notes can point at source files.",
     files: ["README.md"],
     tags: ["audience:developer", "docs"]
   });
+  appendRecord(root, "note", {
+    type: "note",
+    id: "note_untitled",
+    source: "agent",
+    authority: "agent",
+    confidence: "high",
+    created_at: "2026-01-02T00:00:00.000Z",
+    body: "This untitled note should not become a clipped card heading that leaks body text.",
+    files: [],
+    tags: ["audience:developer", "docs"]
+  });
 
   const files = buildSiteFiles(root);
+  const notes = file(files, "notes.html");
   const note = file(files, "records/note/note_files.html");
+  const untitled = file(files, "records/note/note_untitled.html");
   const searchIndex = parseSearchIndex(file(files, "assets/search-index.js"));
 
+  assert.match(notes, /Generated file note/);
+  assert.match(notes, /Note from 2026-01-02/);
+  assert.doesNotMatch(notes, /<h3><a[^>]*>This untitled note should not become a clipped card heading/);
   assert.match(note, /<h2>Related files<\/h2>/);
   assert.match(note, /href="..\/..\/..\/README\.md"/);
+  assert.match(untitled, /<h1>Note from 2026-01-02<\/h1>/);
   assert.ok(searchIndex.some((entry) => entry.id === "note_files" && /README\.md/.test(entry.text)));
+  assert.ok(searchIndex.some((entry) => entry.id === "note_untitled" && entry.title === "Note from 2026-01-02"));
 });
 
 test("buildSiteFiles emits developer-only Beads work page when .beads exists", () => {

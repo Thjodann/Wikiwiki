@@ -15,14 +15,16 @@ wk status --json
 wk spin --profile mixed --json
 ```
 
-Then add structured records from the recipe and current repo evidence:
+Then add public articles first, backed by structured records from the recipe and
+current repo evidence:
 
-- user-facing concepts: product promise, getting started, modes/features,
-  privacy, FAQ, troubleshooting
-- developer-facing concepts: architecture, data model, generated-file workflow
-- decisions: key product, architecture, publishing, and workflow decisions
+- articles: overview, getting started, features/workflows, FAQ/troubleshooting,
+  and developer guide
+- concepts: product promise, architecture, data model, and generated-file workflow
+- decisions: key product, architecture, publishing, and workflow decisions that
+  explain why article guidance is true
 - devlog: only meaningful milestones, not every implementation detail
-- notes: caveats, documentation drift, generated-file reminders
+- notes: titled caveats, documentation drift, generated-file reminders
 - symbols: developer-only source anchors
 
 After adding deliberate records, close the pass:
@@ -44,9 +46,13 @@ inspect contrast on cards, panels, code blocks, and mobile navigation.
 Most add commands support JSON input and JSON output:
 
 ```sh
-wk concept add --json '{
-  "name": "Spin",
-  "summary": "Inspects repo changes and suggests knowledge updates.",
+wk article add --json '{
+  "title": "Spin",
+  "summary": "How Spin orients a maintainer before wiki updates.",
+  "body": "Spin inspects repo changes and suggests knowledge updates.",
+  "categories": ["workflow"],
+  "aliases": ["first-pass recipe"],
+  "source_record_ids": ["concept_spin"],
   "files": ["src/cli/commands/spin.ts"],
   "tags": ["audience:developer", "cli"],
   "source": "agent",
@@ -72,6 +78,12 @@ wk record list concept --json
 wk record get concept concept_123 --json
 wk record update concept concept_123 --json '{"summary":"Updated summary."}'
 wk record delete concept concept_123 --reason "Superseded by decision_456"
+```
+
+The same generic revision flow works for `article` records:
+
+```sh
+wk record update article article_123 --json '{"summary":"Updated public summary."}'
 ```
 
 ## Closeout
@@ -120,10 +132,10 @@ wk spin --profile mixed --json
 ```
 
 Use Beads for task state, blockers, dependencies, ownership, and follow-ups.
-Use Wikiwiki for durable concepts, decisions, notes, events, symbols, links,
-generated Markdown, and the human wiki. During closeout, review the Beads
-context in `.wikiwiki/drafts/closeout/<closeout-id>/summary.md`, but only add
-Wikiwiki records for knowledge that should outlive the task.
+Use Wikiwiki for public articles, durable concepts, decisions, notes, events,
+symbols, links, generated Markdown, and the human wiki. During closeout, review
+the Beads context in `.wikiwiki/drafts/closeout/<closeout-id>/summary.md`, but
+only add Wikiwiki records for knowledge that should outlive the task.
 
 Generated sites also do not publish Beads task details unless
 `integrations.beads.enabled` is `true`. Use that only for internal developer
@@ -131,11 +143,12 @@ sites; user-audience sites omit Beads from pages, manifests, and search data.
 
 ## Search
 
-Search active records and rendered docs:
+Search articles, active records, and rendered docs:
 
 ```sh
 wk search renderer --json
 ```
 
-Search is local and based on the repo's active records plus generated Markdown.
-It is useful for quick orientation before changing code or writing new records.
+Search is local and article-first. It indexes article titles, slugs, aliases,
+categories, source text, active records, and generated Markdown. It is useful
+for quick orientation before changing code or writing new records.

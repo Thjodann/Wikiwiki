@@ -53,6 +53,88 @@ function payload(value) {
   return JSON.stringify(value);
 }
 
+function writePrismLikeFixture(root) {
+  fs.writeFileSync(path.join(root, "README.md"), [
+    "# PRISM",
+    "",
+    "<p align=\"center\"><img src=\"./logo.svg\" alt=\"logo\"></p>",
+    "",
+    "<div><img src=\"./spectrum.svg\" alt=\"mark\"></div>",
+    "",
+    "A private creative workspace for local AI companions and desktop-first workflows."
+  ].join("\n"));
+  fs.mkdirSync(path.join(root, "app"), { recursive: true });
+  fs.writeFileSync(path.join(root, "app/globals.css"), `
+:root {
+  color-scheme: dark;
+  --prism-bg: #120d0f;
+  --prism-panel: #1b1518;
+  --prism-text: #fff4e8;
+  --prism-muted: #c9b8a3;
+  --prism-accent: #ff4d6d;
+  --prism-accent-hot: #ff4d6d;
+  --prism-orange: #ff9f1c;
+  --prism-lime: #b7e63a;
+  --prism-cyan: #2fd3e3;
+  --prism-violet: #7b5cff;
+  --prism-radius-xl: 28px;
+  font-family: "Satoshi", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(255, 77, 109, 0.24), transparent 42%),
+    #120d0f;
+  color: #fff4e8;
+}
+
+.landing-shell {
+  background: linear-gradient(135deg, rgba(255, 77, 109, 0.18), rgba(47, 211, 227, 0.1));
+  border: 1px solid rgba(255, 244, 232, 0.12);
+  border-radius: 28px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.46);
+}
+
+.spectrum {
+  color: #ff4d6d;
+  border-color: #ff4d6d;
+}
+`, "utf8");
+}
+
+function hexToRgb(value) {
+  const match = /^#([0-9a-f]{6})$/i.exec(value);
+  assert.ok(match, `${value} should be a hex color`);
+  return {
+    r: Number.parseInt(match[1].slice(0, 2), 16),
+    g: Number.parseInt(match[1].slice(2, 4), 16),
+    b: Number.parseInt(match[1].slice(4, 6), 16)
+  };
+}
+
+function luminance(color) {
+  const [r, g, b] = [color.r, color.g, color.b].map((channel) => {
+    const value = channel / 255;
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrast(a, b) {
+  const lighter = Math.max(luminance(hexToRgb(a)), luminance(hexToRgb(b)));
+  const darker = Math.min(luminance(hexToRgb(a)), luminance(hexToRgb(b)));
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function assertThemeContrast(palette) {
+  assert.ok(contrast(palette.panel, palette.text) >= 4.5, "text should contrast with panel");
+  assert.ok(contrast(palette.panel, palette.muted) >= 3, "muted text should contrast with panel");
+  assert.ok(contrast(palette.panel, palette.accent) >= 3, "accent should contrast with panel");
+  assert.ok(contrast(palette.badge_bg, palette.badge_text) >= 4.5, "badge text should contrast with badge bg");
+  assert.ok(contrast(palette.tag_bg, palette.tag_text) >= 4.5, "tag text should contrast with tag bg");
+}
+
 function assertPosixPaths(paths) {
   for (const item of paths) {
     assert.equal(item.includes("\\"), false, `${item} should use POSIX separators`);
@@ -179,6 +261,15 @@ test("README documents GitHub source install before npm publish", () => {
   assert.match(readme, /\.\/node_modules\/\.bin\/wk --help/);
   assert.doesNotMatch(readme, /npx wk --help/);
   assert.match(readme, /publishing is still a manual\s+release step/);
+  assert.match(readme, /"Update wk" agent pipeline/);
+  assert.match(setupDoc, /## Agentic Update Pipeline/);
+  assert.match(setupDoc, /If npm and equivalent package managers are not available/);
+  assert.match(setupDoc, /raw\.githubusercontent\.com\/Thjodann\/Wikiwiki\/main\/skills\/wk\/SKILL\.md/);
+  assert.match(setupDoc, /the CLI itself still needs a package manager or release artifact|report the CLI update as blocked/);
+  assert.match(readme, /awesome initial install/);
+  assert.match(setupDoc, /## Awesome Initial Install/);
+  assert.match(setupDoc, /app\/global CSS, design tokens, theme files, landing page styles/);
+  assert.match(setupDoc, /contrast for body text, muted text, accents, badges, and tags/);
 });
 
 test("package prepares dist for GitHub dependency installs", () => {
@@ -192,7 +283,15 @@ test("bundled wk skill includes Beads coordination rules", () => {
 
   assert.match(skill, /bd prime/);
   assert.match(skill, /Use Beads for task state, blockers, dependencies, ownership, and follow-ups/);
-  assert.match(skill, /Use Wikiwiki for durable knowledge, decisions, generated Markdown/);
+  assert.match(skill, /Use Wikiwiki for public articles, durable knowledge, decisions, generated Markdown/);
+  assert.match(skill, /Records are the ledger; articles are the wiki/);
+  assert.match(skill, /## Update wk/);
+  assert.match(skill, /If npm and equivalent package managers are not available/);
+  assert.match(skill, /raw\.githubusercontent\.com\/Thjodann\/Wikiwiki\/main\/skills\/wk\/SKILL\.md/);
+  assert.match(skill, /Never delete lockfiles/);
+  assert.match(skill, /## First Install Style And Substance/);
+  assert.match(skill, /Inspect actual visual sources before writing a theme/);
+  assert.match(skill, /Auto\/Light\/Dark controls/);
 });
 
 test("install-agent codex previews and installs the bundled wk skill", () => {
@@ -265,16 +364,20 @@ test("init creates record files and all generated wiki pages", () => {
 
   assert.equal(result.ok, true);
   assert.equal(result.profile, "user");
-  assert.equal(result.record_files.length, 6);
+  assert.equal(result.record_files.length, 7);
   assertPosixPaths(result.record_files);
   assertPosixPaths(result.rendered_files);
+  assert.ok(result.record_files.includes(".wikiwiki/records/articles.jsonl"));
   assert.ok(result.record_files.includes(".wikiwiki/records/concepts.jsonl"));
   assert.ok(result.rendered_files.includes("wiki/index.md"));
+  assert.ok(result.rendered_files.includes("wiki/articles.md"));
   assert.match(fs.readFileSync(path.join(root, "wiki/index.md"), "utf8"), new RegExp(`# ${path.basename(root)} Wiki`));
   assert.doesNotMatch(fs.readFileSync(path.join(root, "wiki/index.md"), "utf8"), /^# Wikiwiki$/m);
   assert.equal(JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8")).wiki_profile, "user");
+  assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/articles.jsonl")));
   assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/concepts.jsonl")));
   assert.ok(fs.existsSync(path.join(root, "wiki/index.md")));
+  assert.ok(fs.existsSync(path.join(root, "wiki/articles.md")));
   assert.ok(fs.existsSync(path.join(root, "wiki/symbols.md")));
   assert.ok(fs.existsSync(path.join(root, "wiki/links.md")));
 });
@@ -488,8 +591,41 @@ test("record lifecycle commands list, get, update, and delete active records", (
   const noteResult = runJson(root, ["record", "get", "note", note.id, "--json"]).record;
   assert.equal(noteResult.body, "Renderer owns generated Markdown files.");
   assert.deepEqual(noteResult.files, ["README.md"]);
+
+  const article = runJson(root, [
+    "article",
+    "add",
+    "--json",
+    payload({
+      title: "Skyrim:Alchemy",
+      summary: "Alchemy documents ingredients, effects, and potion crafting.",
+      body: "Alchemy combines ingredients into potions.",
+      categories: ["Gameplay", "Skills"],
+      aliases: ["Alchemy"],
+      source_record_ids: [concept.id],
+      files: ["README.md"],
+      tags: ["audience:all", "wiki"],
+      source: "agent",
+      authority: "agent",
+      confidence: "high"
+    })
+  ]).record;
+  assert.equal(article.slug, "Skyrim:Alchemy");
+  runJson(root, [
+    "record",
+    "update",
+    "article",
+    article.id,
+    "--json",
+    payload({ summary: "Alchemy documents ingredients and potion crafting." })
+  ]);
+  const articleResult = runJson(root, ["record", "get", "article", article.id, "--json"]).record;
+  assert.equal(articleResult.summary, "Alchemy documents ingredients and potion crafting.");
+
   run(root, ["render", "--json"]);
   assert.match(fs.readFileSync(path.join(root, "wiki/notes.md"), "utf8"), /Files: `README\.md`/);
+  assert.match(fs.readFileSync(path.join(root, "wiki/articles.md"), "utf8"), /Skyrim:Alchemy/);
+  assert.match(fs.readFileSync(path.join(root, "wiki/articles/Skyrim-Alchemy.md"), "utf8"), /Source Records/);
 
   const link = runJson(root, [
     "link",
@@ -538,6 +674,99 @@ test("record add commands append repeated files and tags flags", () => {
 
   assert.deepEqual(concept.files, ["README.md", "DESIGN.md", "docs/setup.md"]);
   assert.deepEqual(concept.tags, ["audience:all", "overview", "agent"]);
+
+  const article = runJson(root, [
+    "article",
+    "add",
+    "--title",
+    "Game Systems",
+    "--summary",
+    "Public article records support repeatable metadata flags.",
+    "--body",
+    "This article describes game systems.",
+    "--categories",
+    "Gameplay",
+    "--categories",
+    "Systems,Reference",
+    "--aliases",
+    "Systems",
+    "--aliases",
+    "Mechanics",
+    "--source-records",
+    concept.id,
+    "--files",
+    "README.md",
+    "--tags",
+    "audience:all,wiki",
+    "--json"
+  ]).record;
+
+  assert.equal(article.slug, "Game-Systems");
+  assert.deepEqual(article.categories, ["Gameplay", "Systems", "Reference"]);
+  assert.deepEqual(article.aliases, ["Systems", "Mechanics"]);
+  assert.deepEqual(article.source_record_ids, [concept.id]);
+  assert.deepEqual(article.files, ["README.md"]);
+  assert.deepEqual(article.tags, ["audience:all", "wiki"]);
+});
+
+test("validate checks article filenames and source record references", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+
+  const concept = runJson(root, [
+    "concept",
+    "add",
+    "--json",
+    payload({
+      name: "Alchemy",
+      summary: "Alchemy is a source record for the article.",
+      details: "",
+      files: ["README.md"],
+      tags: ["audience:all"],
+      source: "agent",
+      authority: "agent",
+      confidence: "high"
+    })
+  ]).record;
+
+  runJson(root, [
+    "article",
+    "add",
+    "--json",
+    payload({
+      title: "Skyrim:Alchemy",
+      slug: "Skyrim:Alchemy",
+      summary: "Alchemy article.",
+      body: "Alchemy combines ingredients.",
+      source_record_ids: [concept.id],
+      files: [],
+      tags: ["audience:all"],
+      source: "agent",
+      authority: "agent",
+      confidence: "high"
+    })
+  ]);
+  runJson(root, [
+    "article",
+    "add",
+    "--json",
+    payload({
+      title: "Skyrim Alchemy",
+      slug: "Skyrim Alchemy",
+      summary: "Duplicate generated filename.",
+      body: "This should fail validation.",
+      source_record_ids: ["missing_record"],
+      files: [],
+      tags: ["audience:all"],
+      source: "agent",
+      authority: "agent",
+      confidence: "medium"
+    })
+  ]);
+
+  const failed = runFailure(root, ["validate", "--json"]);
+  assert.match(failed, /duplicates generated filename \\?"Skyrim-Alchemy\\?"/);
+  assert.match(failed, /references missing source record: missing_record/);
 });
 
 test("spin returns heuristic draft templates and command hints", () => {
@@ -553,10 +782,12 @@ test("spin returns heuristic draft templates and command hints", () => {
   const result = runJson(root, ["spin", "--json"]);
 
   assert.equal(result.profile.name, "mixed");
+  assert.equal(result.profile.target_counts.article, 5);
   assert.equal(result.profile.target_counts.concept, 8);
-  assert.ok(result.profile.page_emphasis.some((item) => item.includes("user orientation")));
+  assert.ok(result.profile.page_emphasis.some((item) => item.includes("public articles")));
   assert.ok(result.profile.recommended_tags.includes("audience:user"));
   assert.ok(result.profile.recommended_tags.includes("audience:developer"));
+  assert.ok(result.profile.suggested_records.some((record) => record.type === "article" && record.title === "Project overview"));
   assert.ok(result.profile.suggested_records.some((record) => record.title === "FAQ" && record.tags.includes("audience:user")));
   assert.ok(result.profile.suggested_records.some((record) => record.title === "Troubleshooting" && record.tags.includes("troubleshooting")));
   assert.ok(result.profile.suggested_records.some((record) => record.title === "Architecture overview" && record.tags.includes("audience:developer")));
@@ -740,20 +971,42 @@ test("search finds active records and rendered Markdown, excluding deleted recor
       confidence: "high"
     })
   ]).record;
+  const article = runJson(root, [
+    "article",
+    "add",
+    "--json",
+    payload({
+      title: "Renderer Wisdom",
+      summary: "Article search should find public wiki pages.",
+      body: "Renderer wisdom also appears in a nested article Markdown file.",
+      categories: ["Docs"],
+      aliases: ["Render Guide"],
+      source_record_ids: [note.id],
+      files: [],
+      tags: ["audience:all"],
+      source: "agent",
+      authority: "agent",
+      confidence: "high"
+    })
+  ]).record;
   run(root, ["render", "--json"]);
 
   const first = runJson(root, ["search", "renderer", "--json"]);
-  assert.equal(first.records.length, 1);
-  assert.equal(first.records[0].id, note.id);
+  assert.equal(first.records.length, 2);
+  assert.ok(first.records.some((record) => record.id === note.id));
+  assert.ok(first.records.some((record) => record.id === article.id && record.type === "article"));
   assert.ok(first.file_matches.some((match) => match.file === "wiki/notes.md"));
+  assert.ok(first.file_matches.some((match) => match.file === "wiki/articles/Renderer-Wisdom.md"));
   assertPosixPaths(first.file_matches.map((match) => match.file));
 
+  runJson(root, ["record", "delete", "article", article.id, "--reason", "test cleanup", "--json"]);
   runJson(root, ["record", "delete", "note", note.id, "--reason", "test cleanup", "--json"]);
   run(root, ["render", "--json"]);
 
   const second = runJson(root, ["search", "renderer", "--json"]);
   assert.equal(second.records.length, 0);
   assert.equal(second.file_matches.some((match) => match.file === "wiki/notes.md"), false);
+  assert.equal(second.file_matches.some((match) => match.file === "wiki/articles/Renderer-Wisdom.md"), false);
 });
 
 test("theme preview infers identity without writing a theme file", () => {
@@ -779,6 +1032,63 @@ test("theme preview infers identity without writing a theme file", () => {
   assert.equal(result.identity.project_name_source, "readme");
   assert.equal(result.identity.project_description_source, "package");
   assert.equal(fs.existsSync(path.join(root, ".wikiwiki/site-theme.json")), false);
+});
+
+test("theme preview and init inspect app CSS and sanitize README HTML", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+  writePrismLikeFixture(root);
+
+  const preview = runJson(root, ["theme", "preview", "--json"]);
+
+  assert.equal(preview.ok, true);
+  assert.equal(preview.theme.project_name, "PRISM");
+  assert.equal(preview.theme.project_description, "A private creative workspace for local AI companions and desktop-first workflows.");
+  assert.doesNotMatch(preview.theme.project_description, /<img|<p|<div|logo|mark/);
+  assert.equal(preview.theme.default_color_scheme, "dark");
+  assert.deepEqual(preview.style_sources, ["app/globals.css"]);
+  assert.equal(preview.theme.modes.dark.accent, "#ff4d6d");
+  assert.equal(preview.theme.modes.dark.bg, "#120d0f");
+  assert.equal(preview.theme.modes.dark.panel, "#1b1518");
+  assert.equal(preview.theme.modes.dark.text, "#fff4e8");
+  assert.equal(preview.theme.modes.dark.radius, "28px");
+  assert.match(preview.theme.modes.dark.font_family, /Satoshi/);
+  assert.match(preview.theme.modes.dark.hero_gradient, /radial-gradient/);
+  assert.match(preview.theme.modes.dark.card_gradient, /rgba/);
+  assert.match(preview.theme.modes.dark.brand_gradient, /#ff4d6d/);
+  assert.match(preview.theme.modes.dark.brand_gradient, /#7b5cff/);
+  assert.ok(preview.theme.modes.dark.sidebar_bg);
+  assert.ok(preview.theme.modes.dark.focus_ring);
+  assert.ok(preview.theme.modes.dark.gloss);
+  assert.ok(preview.theme.modes.dark.shadow);
+  assert.ok(preview.theme.modes.dark.shadow_strong);
+  assertThemeContrast(preview.theme.modes.dark);
+  assertThemeContrast(preview.theme.modes.light);
+  assert.equal(fs.existsSync(path.join(root, ".wikiwiki/site-theme.json")), false);
+
+  const created = runJson(root, ["theme", "init", "--json"]);
+  const written = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/site-theme.json"), "utf8"));
+  assert.equal(created.written, true);
+  assert.equal(written.default_color_scheme, "dark");
+  assert.equal(written.project_description, preview.theme.project_description);
+  assert.equal(written.modes.dark.bg, "#120d0f");
+  assert.equal(written.modes.dark.radius, "28px");
+
+  runJson(root, ["site", "--json"]);
+  const css = fs.readFileSync(path.join(root, "wiki-site/assets/project-theme.css"), "utf8");
+  const index = fs.readFileSync(path.join(root, "wiki-site/index.html"), "utf8");
+  assert.match(css, /:root,\n:root\[data-theme="light"\]/);
+  assert.match(css, /@media \(prefers-color-scheme: dark\)/);
+  assert.match(css, /:root\[data-theme="dark"\]/);
+  assert.match(css, /--brand-gradient: linear-gradient/);
+  assert.match(css, /--badge-bg:/);
+  assert.match(css, /--tag-bg:/);
+  assert.match(css, /--focus-ring:/);
+  assert.match(css, /--gloss:/);
+  assert.match(index, /data-default-theme="dark" data-theme="dark"/);
+  assert.match(index, /data-theme-choice="auto"/);
+  assert.match(index, /data-theme-choice="light"/);
+  assert.match(index, /data-theme-choice="dark"/);
 });
 
 test("theme init writes, protects, and force-overwrites site-theme.json", () => {

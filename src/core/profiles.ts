@@ -7,7 +7,7 @@ export type WikiProfile = (typeof wikiProfiles)[number];
 export type SiteAudience = (typeof siteAudiences)[number];
 
 export type ProfileSeed = {
-  type: "concept" | "decision" | "event" | "note" | "symbol";
+  type: "article" | "concept" | "decision" | "event" | "note" | "symbol";
   title: string;
   purpose: string;
   audience: SiteAudience;
@@ -42,6 +42,7 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
     name: "mixed",
     description: "Balanced first-pass wiki for users and maintainers.",
     target_counts: {
+      article: 5,
       concept: 8,
       decision: 4,
       event: 2,
@@ -49,9 +50,9 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
       symbol: 4
     },
     page_emphasis: [
-      "Home starts with user orientation and shared project essentials.",
-      "Guides include user-facing setup, FAQ, troubleshooting, and developer architecture.",
-      "Record indexes remain available for maintainers and agents."
+      "Home starts with public articles for user orientation and shared project essentials.",
+      "Guides prioritize article-led setup, FAQ, troubleshooting, and developer architecture.",
+      "Agent record indexes remain available as evidence and maintainer context."
     ],
     recommended_tags: [
       audienceTags.all,
@@ -60,6 +61,11 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
       ...userMaterialTags
     ],
     seeds: [
+      articleSeed("Project overview", "Write the public entry article: what this is, who it is for, and why it matters.", "all", ["product", "overview", "homepage"]),
+      articleSeed("Getting started", "Write the first successful user path with concrete setup or first-run steps.", "user", ["getting-started", "instructions", "homepage"]),
+      articleSeed("Features and workflows", "Explain the main user-facing modes, workflows, or feature areas.", "user", ["features", "instructions"]),
+      articleSeed("FAQ and troubleshooting", "Answer common user questions and first fixes in a browseable public page.", "user", ["faq", "troubleshooting"]),
+      articleSeed("Developer guide", "Explain architecture, generated-file rules, and the maintainer/agent workflow.", "developer", ["architecture", "dx", "maintenance"]),
       conceptSeed("Product promise", "Explain what the project is, who it is for, and the core value in plain language.", "all", ["product", "overview", "homepage"]),
       conceptSeed("Install and first start", "Explain how a new user gets from download/install to the first useful session.", "user", ["getting-started", "instructions", "homepage"]),
       conceptSeed("Modes and features", "Describe the main user-facing modes, workflows, or feature areas.", "user", ["features", "instructions"]),
@@ -87,6 +93,7 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
     name: "user",
     description: "First-pass wiki focused on product orientation and support.",
     target_counts: {
+      article: 5,
       concept: 6,
       decision: 2,
       event: 1,
@@ -94,8 +101,8 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
       symbol: 0
     },
     page_emphasis: [
-      "Home explains the product, who it is for, and how to begin.",
-      "Guides prioritize getting started, modes/features, privacy, FAQ, and troubleshooting.",
+      "Home leads with public articles that explain the product, who it is for, and how to begin.",
+      "Guides prioritize article-led getting started, modes/features, privacy, FAQ, and troubleshooting.",
       "Developer-only records stay out of the primary reader journey."
     ],
     recommended_tags: [
@@ -104,6 +111,11 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
       ...userMaterialTags
     ],
     seeds: [
+      articleSeed("Overview", "Write the public entry article for the product promise and audience.", "all", ["product", "overview", "homepage"]),
+      articleSeed("Getting started", "Write the first successful user path.", "user", ["getting-started", "instructions", "homepage"]),
+      articleSeed("Features", "Explain what users can do and when to use each feature area.", "user", ["features", "instructions"]),
+      articleSeed("Privacy and data", "Explain user-visible privacy and storage behavior.", "user", ["privacy", "faq"]),
+      articleSeed("FAQ and troubleshooting", "Answer common questions and fixes.", "user", ["faq", "troubleshooting"]),
       conceptSeed("Product promise", "Explain what the project is, who it is for, and why it matters.", "all", ["product", "overview", "homepage"]),
       conceptSeed("Getting started", "Explain the first successful user path.", "user", ["getting-started", "instructions", "homepage"]),
       conceptSeed("Core modes and features", "Describe what users can do and when to use each mode.", "user", ["features", "instructions"]),
@@ -122,6 +134,7 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
     name: "developer",
     description: "First-pass wiki focused on architecture, maintenance, and agent workflows.",
     target_counts: {
+      article: 3,
       concept: 7,
       decision: 5,
       event: 3,
@@ -129,8 +142,8 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
       symbol: 6
     },
     page_emphasis: [
-      "Home leads with architecture and source-of-truth rules.",
-      "Guides prioritize data model, workflow, decisions, and symbol anchors.",
+      "Home leads with developer articles for architecture and source-of-truth rules.",
+      "Guides prioritize article-led data model, workflow, decisions, and symbol anchors.",
       "User-facing records are included only when they clarify product intent."
     ],
     recommended_tags: [
@@ -142,6 +155,9 @@ export const profileRecipes: Record<WikiProfile, WikiProfileRecipe> = {
       "maintenance"
     ],
     seeds: [
+      articleSeed("Architecture overview", "Write the maintainer entry article for modules and boundaries.", "developer", ["architecture", "homepage"]),
+      articleSeed("Data model", "Write the article for persisted records, generated artifacts, and source-of-truth rules.", "developer", ["architecture", "data-model"]),
+      articleSeed("Development workflow", "Write the article for build/test/render/closeout and agent expectations.", "developer", ["dx", "maintenance", "agents"]),
       conceptSeed("Architecture overview", "Summarize the main modules and boundaries.", "developer", ["architecture", "homepage"]),
       conceptSeed("Data model", "Explain persisted records, generated artifacts, and source-of-truth rules.", "developer", ["architecture", "data-model"]),
       conceptSeed("Development workflow", "Document the daily build/test/render workflow.", "developer", ["dx", "maintenance"]),
@@ -191,6 +207,16 @@ export function parseSiteAudience(value: string | undefined, fallback: SiteAudie
   }
 
   throw new Error(`Unknown site audience: ${value}. Expected one of: ${siteAudiences.join(", ")}.`);
+}
+
+function articleSeed(title: string, purpose: string, audience: SiteAudience, tags: string[]): ProfileSeed {
+  return {
+    type: "article",
+    title,
+    purpose,
+    audience,
+    tags: withAudience(tags, audience)
+  };
 }
 
 function conceptSeed(title: string, purpose: string, audience: SiteAudience, tags: string[]): ProfileSeed {

@@ -537,6 +537,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "event",
     "typeLabel": "Devlog",
+    "id": "event_617bb76f-e11f-4e65-90dc-a500cb54b08f",
+    "title": "Documented the agentic wk update pipeline",
+    "summary": "Documented the agentic wk update pipeline",
+    "tags": [
+      "devlog",
+      "agent-workflow",
+      "setup",
+      "update"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_617bb76f-e11f-4e65-90dc-a500cb54b08f.html",
+    "text": "event_617bb76f-e11f-4e65-90dc-a500cb54b08f agent agent high 2026-07-05T00:38:26.848Z event Documented the agentic wk update pipeline Added docs and bundled skill instructions for a user request of Update wk. The pipeline updates the CLI through npm or an equivalent package manager when available, refreshes the installed wk agent skill from GitHub raw files when npm is unavailable, and requires agents to report when only the skill changed and the CLI update is blocked. README.md docs/reference.md docs/setup.md skills/wk/SKILL.md test/cli.test.js audience:developer devlog agent-workflow setup update"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_410942e4-5e5f-445a-88be-db5aa7cfa176",
     "title": "Drafted aspirational README",
     "summary": "Drafted aspirational README",
@@ -611,6 +629,25 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "audienceLabel": "",
     "url": "records/event/event_bc62fab0-ba40-4a0e-8d3a-b816ea356345.html",
     "text": "event_bc62fab0-ba40-4a0e-8d3a-b816ea356345 agent agent high 2026-07-04T01:12:55.540Z event Implemented Wikiwiki V1 CLI loop Added append-only record revisions and tombstones, generic record lifecycle commands, symbol add, local search, richer spin draft templates, symbols and links rendering, package-ready metadata, CI, and Node test coverage. src/core/schemas.ts src/core/store.ts src/core/validator.ts src/cli/commands/record.ts src/cli/commands/search.ts src/cli/commands/symbol.ts src/cli/commands/spin.ts src/core/renderer.ts package.json .github/workflows/ci.yml test/cli.test.js test/store.test.js"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_f8c324a7-1f16-44c4-bc69-4584386c1085",
+    "title": "Improved first-install branded theme dogfood path",
+    "summary": "Improved first-install branded theme dogfood path",
+    "tags": [
+      "devlog",
+      "dogfood",
+      "theme",
+      "setup",
+      "agent-workflow"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_f8c324a7-1f16-44c4-bc69-4584386c1085.html",
+    "text": "event_f8c324a7-1f16-44c4-bc69-4584386c1085 agent agent high 2026-07-05T01:04:12.866Z event Improved first-install branded theme dogfood path Acted on PRISM dogfood feedback by teaching wk theme preview/init to inspect app CSS and design-token sources, sanitize HTML from inferred descriptions, infer dark-first rich theme palettes from host styling, strengthen theme contrast guardrails, document an awesome initial install workflow, and update the bundled wk skill to inspect real project visual sources before generating a branded site. src/core/theme.ts src/core/site.ts src/cli/commands/setup.ts README.md docs/setup.md docs/reference.md skills/wk/SKILL.md test/cli.test.js test/site.test.js audience:developer devlog dogfood theme setup agent-workflow"
   },
   {
     "type": "event",
@@ -723,7 +760,7 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "type": "note",
     "typeLabel": "Note",
     "id": "note_482c1563-27d5-48b3-a8f7-81075cc69b28",
-    "title": "Generated wiki pages are owned by Wikiwiki; edit structured records instead.",
+    "title": "Note from 2026-07-03",
     "summary": "Generated wiki pages are owned by Wikiwiki; edit structured records instead.",
     "tags": [
       "renderer",
@@ -738,8 +775,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "note",
     "typeLabel": "Note",
+    "id": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92",
+    "title": "Note from 2026-07-04",
+    "summary": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle...",
+    "tags": [
+      "v1",
+      "user-intent"
+    ],
+    "authority": "user",
+    "confidence": "high",
+    "audienceLabel": "",
+    "url": "records/note/note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92.html",
+    "text": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92 manual user high 2026-07-04T01:12:44.175Z note User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata. v1 user-intent"
+  },
+  {
+    "type": "note",
+    "typeLabel": "Note",
     "id": "note_e237de63-0391-4d81-8a69-f47666a6dfd7",
-    "title": "User chose the supplied Wikiwiki banner image for the README and explicitly allo",
+    "title": "Note from 2026-07-04",
     "summary": "User chose the supplied Wikiwiki banner image for the README and explicitly allowed an idealistic README draft, including future-facing product...",
     "tags": [
       "readme",
@@ -751,22 +804,6 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "audienceLabel": "",
     "url": "records/note/note_e237de63-0391-4d81-8a69-f47666a6dfd7.html",
     "text": "note_e237de63-0391-4d81-8a69-f47666a6dfd7 manual user high 2026-07-04T00:42:54.319Z note User chose the supplied Wikiwiki banner image for the README and explicitly allowed an idealistic README draft, including future-facing product language for capabilities that may not exist yet. readme product-direction banner"
-  },
-  {
-    "type": "note",
-    "typeLabel": "Note",
-    "id": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92",
-    "title": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model",
-    "summary": "User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle...",
-    "tags": [
-      "v1",
-      "user-intent"
-    ],
-    "authority": "user",
-    "confidence": "high",
-    "audienceLabel": "",
-    "url": "records/note/note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92.html",
-    "text": "note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92 manual user high 2026-07-04T01:12:44.175Z note User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata. v1 user-intent"
   },
   {
     "type": "symbol",
