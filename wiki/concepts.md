@@ -38,6 +38,18 @@ Tags: `cli`, `v1`, `agent-workflow`
 
 Record: `concept_4fde0906-d53a-4b9f-b977-3fe964a9d447` | Authority: agent | Confidence: high
 
+## GitHub Pages scaffolding
+
+wk pages init creates a repo-local GitHub Actions publishing workflow for Wikiwiki static sites.
+
+The pages workflow writes .github/workflows/wikiwiki-pages.yml, persists the resolved site audience and source_base_url in .wikiwiki/config.json, preserves unrelated config, refuses to overwrite different workflows unless --force is explicit, and leaves GitHub repository Pages settings as a manual step.
+
+Files: `src/core/pages.ts`, `src/cli/commands/pages.ts`, `docs/reference.md`, `docs/setup.md`, `test/cli.test.js`
+
+Tags: `audience:developer`, `pages`, `publishing`, `github-actions`
+
+Record: `concept_ef402c62-f2a9-4123-a2c4-da7069a16f90` | Authority: agent | Confidence: high
+
 ## Human-facing static wiki site
 
 Wikiwiki generates a first-class static HTML site for humans while preserving Markdown and JSONL artifacts for agents.

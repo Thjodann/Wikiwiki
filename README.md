@@ -17,22 +17,19 @@ service, database, vector store, or hidden memory layer is required.
 
 ## Quick Start
 
-Wikiwiki is package-ready as `@thjodann/wk`; publishing is still a manual
-release step. Until the npm package is published, install it from GitHub in a
-target repo:
+Install Wikiwiki as `@thjodann/wk` in the repo that should keep a wiki:
 
 ```sh
 test "$(npm prefix)" = "$PWD" || npm init -y
-npm install --prefix "$PWD" --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
+npm install --prefix "$PWD" --save-dev @thjodann/wk
 ./node_modules/.bin/wk --help
 ```
 
+The public package is published on npm as `@thjodann/wk@1.0.0`.
+
 The `npm prefix` check prevents npm from climbing into an ancestor project
-when the target repo has no local `package.json`. `--package-lock=false` is
-intentional for this temporary GitHub source install: npm currently writes
-GitHub git dependencies into `package-lock.json` as `git+ssh` URLs. Once
-`@thjodann/wk` is published to npm, use the package name and your normal
-lockfile workflow.
+when the target repo has no local `package.json`. Use your repo's normal
+lockfile policy after the package is installed.
 
 For local development on Wikiwiki itself, install and run from source:
 
@@ -48,6 +45,7 @@ Initialize Wikiwiki in a repo:
 wk setup --profile mixed --audience all
 wk theme preview --json
 wk theme init
+wk pages init
 ```
 
 Check status and inspect the current working tree:
@@ -84,7 +82,7 @@ Render the wiki and site:
 ```sh
 wk validate
 wk render
-wk site --audience all
+wk site --audience user
 open wiki-site/index.html
 ```
 
@@ -109,7 +107,7 @@ unchanged.
 - [Concepts](docs/concepts.md): what Wikiwiki stores, renders, and optimizes for.
 - [Setup](docs/setup.md): source install, awesome initial install, agentic IDE setup, and the "Update wk" agent pipeline.
 - [Workflows](docs/workflows.md): dogfooding, JSON-first agent work, revisions, and closeout.
-- [Reference](docs/reference.md): commands, profiles, theming, GitHub Pages, status, and roadmap.
+- [Reference](docs/reference.md): commands, profiles, theming, GitHub Pages, npm releases, status, and roadmap.
 
 ## Current Status
 
@@ -128,13 +126,16 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - agent-mediated UX/DX human wiki compilation
 - local search across articles, active records, and rendered docs
 - scriptable non-AI setup through `wk setup`
+- user-focused GitHub Pages workflow scaffolding through `wk pages init`
 - deterministic closeout draft packets through `wk closeout`
 - installable Codex-compatible `wk` agent skill
 - optional read-only Beads integration for developer work context
-- CI, tests, and package metadata for `@thjodann/wk`
+- npm package published as `@thjodann/wk@1.0.0`
+- GitHub Release-based npm publishing through Trusted Publishing
+- CI and tests
 
 Some planned pieces are not built yet: richer symbol extraction, draft review
-flows, watch mode, and actual npm publishing.
+flows, and watch mode.
 
 Generated `wiki/` and `wiki-site/` are intentionally not shipped in the npm
 package. Installed users generate their own copies from their own records.
@@ -165,6 +166,11 @@ Verify package contents:
 npm run pack:dry-run
 ```
 
+Release process:
+
+GitHub Releases trigger npm publishing through Trusted Publishing. See
+[npm Releases](docs/reference.md#npm-releases) for the version/tag checklist.
+
 Run the CLI in development:
 
 ```sh
@@ -178,7 +184,6 @@ not release commitments.
 
 | Planned feature | Completion | Notes |
 | --- | ---: | --- |
-| Actual npm publishing | 85% | Package metadata, build, tests, and dry-run packaging are in place; publishing remains manual. |
 | Richer symbol extraction | 20% | Symbol records and pages exist, but important symbols are still captured manually. |
 | Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are still early. |
 | Watch mode | 10% | Batch commands exist for `status`, `spin`, and `closeout`; no file watcher is built yet. |
@@ -186,14 +191,14 @@ not release commitments.
 | `press` render alias | 30% | `render`, `site`, and `closeout` cover the workflow; the friendlier alias is not implemented. |
 | `crate` rebuild/index command | 35% | Markdown, static site, and search indexes can be rebuilt; no unified rebuild/retrieval command exists yet. |
 | `ask` repo knowledge query | 25% | `wk search` provides local lookup; answer synthesis over repo knowledge is not built yet. |
-| GitHub Pages scaffolding | 55% | Static output, `.nojekyll`, and workflow docs exist; one-command Pages setup is not built. |
+| GitHub Pages scaffolding | 85% | `wk pages init` writes a GitHub Actions workflow for the user-facing site, persists user audience/source URL defaults, and reports the manual Pages settings step; authenticated settings and custom-domain automation remain future work. |
 | Product-identity theme generation | 90% | `wk theme preview` and `wk theme init` create mood-based light/dark project themes with Auto/Light/Dark site controls; richer logo and layout customization remains future work. |
 
 Shared completion snapshot:
 
 - V1 package readiness: about 80%
-- Named future roadmap: about 42%
-- Blended overall product vision: about 70%
+- Named future roadmap: about 45%
+- Blended overall product vision: about 72%
 
 ## License
 

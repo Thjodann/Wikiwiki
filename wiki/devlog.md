@@ -177,3 +177,11 @@ Acted on PRISM dogfood feedback by teaching wk theme preview/init to inspect app
 Files: `src/core/theme.ts`, `src/core/site.ts`, `src/cli/commands/setup.ts`, `README.md`, `docs/setup.md`, `docs/reference.md`, `skills/wk/SKILL.md`, `test/cli.test.js`, `test/site.test.js`
 
 Recorded: 2026-07-05T01:04:12.866Z | Record: `event_f8c324a7-1f16-44c4-bc69-4584386c1085` | Confidence: high
+
+## Published @thjodann/wk 1.0.0 to npm
+
+Published the first public npm release as @thjodann/wk with wk and wikiwiki binaries, npm install documentation, and the current GitHub Pages scaffolding support. Verified registry metadata, public package access, a fresh registry install, package tarball contents, and the 63-test suite after publish.
+
+Files: `package.json`, `README.md`, `docs/setup.md`, `docs/reference.md`, `src/index.ts`, `src/cli/commands/pages.ts`, `src/core/pages.ts`, `test/cli.test.js`
+
+Recorded: 2026-07-05T01:52:02.648Z | Record: `event_27daec8b-1546-41d7-867a-66ee93138ae7` | Confidence: high

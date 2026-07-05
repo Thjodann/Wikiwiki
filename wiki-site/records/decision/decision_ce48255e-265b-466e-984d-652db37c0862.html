@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Note from 2026-07-04 - Wikiwiki Wiki</title>
+  <title>Publish npm releases through GitHub trusted publishing - Wikiwiki Wiki</title>
   <script>(function(){try{var m=localStorage.getItem("wikiwiki-theme-mode")||"auto";if(m==="light"||m==="dark"){document.documentElement.dataset.theme=m;}else{delete document.documentElement.dataset.theme;}}catch(e){}}());</script>
   <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
@@ -41,9 +41,9 @@
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
 <a class="nav-link" href="../../concepts.html">Concepts<span>8</span></a>
-<a class="nav-link" href="../../decisions.html">Decisions<span>17</span></a>
+<a class="nav-link active" href="../../decisions.html" aria-current="page">Decisions<span>17</span></a>
 <a class="nav-link" href="../../devlog.html">Devlog<span>23</span></a>
-<a class="nav-link active" href="../../notes.html" aria-current="page">Notes<span>3</span></a>
+<a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
 </nav>
@@ -51,33 +51,46 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Note from 2026-07-04</h1>
-        <p>User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata.</p>
+        <h1>Publish npm releases through GitHub trusted publishing</h1>
+        <p>Use .github/workflows/publish-npm.yml to publish @thjodann/wk only when a GitHub Release is published. The workflow relies on npm Trusted Publishing/OIDC instead of an NPM_TOKEN secret and runs install, tests, Wikiwiki validation, and npm publish --access public.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../notes.html">Notes</a>
+    <a href="../../decisions.html">Decisions</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Note</span>
-    <span class="tag-list"><span>v1</span><span>user-intent</span></span>
+    <span class="type-badge">Decision</span><span class="audience-badge">For developers</span>
+    <span class="tag-list"><span>release</span><span>npm</span><span>github-actions</span><span>trusted-publishing</span></span>
   </div>
   <section class="prose">
-  <h2>Note</h2>
-  <p>User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata.</p>
+  <h2>Context</h2>
+  <p>The npm package now has a trusted publisher relationship for GitHub Actions, and npm requires 2FA or an approved automation path for package publishing.</p>
+  <h2>Decision</h2>
+  <p>Use .github/workflows/publish-npm.yml to publish @thjodann/wk only when a GitHub Release is published. The workflow relies on npm Trusted Publishing/OIDC instead of an NPM_TOKEN secret and runs install, tests, Wikiwiki validation, and npm publish --access public.</p>
+  <h2>Consequences</h2>
+  <p>Normal pushes to main do not publish npm updates. Maintainers must bump package.json to a new immutable npm version, push the tag, and publish a GitHub Release for the trusted workflow to publish the package.</p>
 </section>
+  <aside class="sources-panel">
+  <h2>Related files</h2>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/.github/workflows/publish-npm.yml"><code>.github/workflows/publish-npm.yml</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/package.json"><code>package.json</code></a></li></ul>
+</aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92</code></dd></div>
-    <div><dt>Source</dt><dd>manual</dd></div>
-    <div><dt>Authority</dt><dd>user</dd></div>
+    <div><dt>ID</dt><dd><code>decision_ce48255e-265b-466e-984d-652db37c0862</code></dd></div>
+    <div><dt>Source</dt><dd>agent</dd></div>
+    <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T01:12:44.175Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd><code>v1</code> <code>user-intent</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li>None</li></ul></dd></div>
+    <div><dt>Created</dt><dd><time datetime="2026-07-05T02:00:14.213Z">2026-07-05</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-05T02:00:14.213Z">2026-07-05</time></dd></div>
+    <div><dt>Tags</dt><dd><code>audience:developer</code> <code>release</code> <code>npm</code> <code>github-actions</code> <code>trusted-publishing</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/.github/workflows/publish-npm.yml"><code>.github/workflows/publish-npm.yml</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/package.json"><code>package.json</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

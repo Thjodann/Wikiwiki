@@ -3,15 +3,13 @@
 Wikiwiki works without AI tools. Agentic IDE setup is optional and uses the
 same deterministic CLI commands as the non-AI path.
 
-## Install From Source
+## Install From npm
 
-Wikiwiki is package-ready as `@thjodann/wk`; publishing is still a manual
-release step. Until the npm package is published, install it from GitHub in the
-repo that should use Wikiwiki:
+Install Wikiwiki as `@thjodann/wk` in the repo that should use Wikiwiki:
 
 ```sh
 test "$(npm prefix)" = "$PWD" || npm init -y
-npm install --prefix "$PWD" --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
+npm install --prefix "$PWD" --save-dev @thjodann/wk
 ./node_modules/.bin/wk --help
 ```
 
@@ -22,10 +20,8 @@ manifest first, and `--prefix "$PWD"` keeps the install rooted in the repo you
 are setting up.
 
 Expect npm to create or update `package.json` and `node_modules/`. In non-JS
-repos, add `node_modules/` to `.gitignore` if it is not already ignored. The
-temporary `--package-lock=false` flag avoids committing npm's current `git+ssh`
-lockfile normalization for GitHub source dependencies. Once `@thjodann/wk` is
-published to npm, install the package normally and keep your lockfile.
+repos, add `node_modules/` to `.gitignore` if it is not already ignored. Use
+the repo's normal lockfile policy after the package is installed.
 
 For local development on Wikiwiki itself, install from source:
 
@@ -58,6 +54,7 @@ docs current:
 ```sh
 wk setup --profile mixed --audience all
 wk theme init
+wk pages init
 npm run wiki:check
 npm run wiki:site
 ```
@@ -103,6 +100,13 @@ with project-specific colors, typography, surface treatment, and paired
 light/dark palettes. Generated sites default to Auto, so they follow the user's
 system appearance until the reader chooses Light or Dark.
 
+`wk pages init` is optional for local use, but it is the fastest path to
+publishing the generated user site. It writes a GitHub Actions workflow for
+`wiki-site/`, saves `site_audience: "user"` and the resolved source-link base
+URL, and prints the manual GitHub Settings > Pages step when GitHub needs the
+repository source set to GitHub Actions. If the repo is not hosted on GitHub,
+pass `--source-base-url` explicitly.
+
 The first public page should usually be an article record:
 
 ```sh
@@ -126,10 +130,11 @@ of a merely valid wiki:
 wk setup --profile mixed --audience all
 wk theme preview --json
 wk theme init
+wk pages init
 wk spin --profile mixed --json
 wk validate
 wk render
-wk site --audience all
+wk site --audience user
 ```
 
 Before running `wk theme init`, the agent should inspect the host repo's actual
@@ -245,20 +250,17 @@ wk --version || true
 git status --short
 ```
 
-If npm is available, update from the current GitHub source package until
-`@thjodann/wk` is published:
+If npm is available, update from the published npm package:
 
 ```sh
 test "$(npm prefix)" = "$PWD" || npm init -y
-npm install --prefix "$PWD" --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
+npm install --prefix "$PWD" --save-dev @thjodann/wk@latest
 ./node_modules/.bin/wk --version
 ./node_modules/.bin/wk install-agent codex --yes
 ```
 
-After npm publishing, replace the GitHub URL with `@thjodann/wk@latest` and use
-the repo's normal lockfile policy. If the repo uses `pnpm`, `yarn`, or another
-JavaScript package manager, use the closest equivalent and keep the install
-rooted in the target repo.
+If the repo uses `pnpm`, `yarn`, or another JavaScript package manager, use the
+closest equivalent and keep the install rooted in the target repo.
 
 If npm and equivalent package managers are not available, the agent cannot
 rebuild or replace the CLI from source because the generated `dist/` files are

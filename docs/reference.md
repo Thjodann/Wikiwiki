@@ -12,6 +12,7 @@ details that are useful after the first quick start.
 | `wk closeout [--profile mixed\|user\|developer] [--audience all\|user\|developer] --json` | Create a deterministic closeout draft packet, then validate and render docs |
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
 | `wk install-agent codex [--yes] [--force]` | Install the bundled wk skill for Codex-compatible agents |
+| `wk pages init [--branch <branch>] [--source-base-url <url>]` | Scaffold GitHub Pages publishing for the user-facing `wiki-site/` |
 | `wk spin [--profile mixed\|user\|developer] --json` | Inspect repo changes and emit a deterministic first-pass wiki recipe |
 | `wk search <query> --json` | Search active records and rendered Markdown |
 | `wk site [--audience all\|user\|developer] [--source-base-url <url>]` | Render a browseable static HTML wiki into `wiki-site/` |
@@ -275,39 +276,56 @@ results, set `bg`, `panel`, `panel_soft`, `text`, `muted`, `border`, and
 
 `wk site` writes static files and a `.nojekyll` marker into `wiki-site/`, so
 GitHub Pages can publish the folder without Jekyll-specific routing. Use
-`--source-base-url` so source links work when `wiki-site/` is published by
-itself. Once the package is published, a minimal workflow can build and upload
-that folder:
+`wk pages init` to create the publishing workflow:
 
-```yaml
-name: Publish Wikiwiki Site
-
-on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npx @thjodann/wk render
-      - run: npx @thjodann/wk site --audience all --source-base-url https://github.com/OWNER/REPO/blob/main/
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: wiki-site
-      - uses: actions/deploy-pages@v4
+```sh
+wk pages init
 ```
+
+The command writes `.github/workflows/wikiwiki-pages.yml`, saves
+`site_audience: "user"` and the resolved `source_base_url` in
+`.wikiwiki/config.json`, and reports the repository Settings > Pages URL when it
+can infer one from `origin`. Pages publishing is intentionally user-facing: the
+generated workflow always runs `wk site --audience user`.
+
+Defaults are designed for low ceremony:
+
+- branch comes from `--branch`, `origin/HEAD`, then `main`
+- source links come from `--source-base-url`, config, then a GitHub `origin`
+
+If the repo is not hosted on GitHub, pass `--source-base-url` explicitly. The
+workflow path defaults to `.github/workflows/wikiwiki-pages.yml`; existing
+different workflows are preserved unless `--force` is explicit. Wikiwiki does
+not call `gh`, change repository settings, create deployment branches, or
+configure custom domains. On GitHub, set Pages Build and deployment Source to
+GitHub Actions if it is not already selected.
+
+The generated workflow uses Node 22, installs project dependencies when present,
+falls back to a direct GitHub source install for `wk`, runs
+`wk validate`, `wk render`, and `wk site`, then publishes `wiki-site/` through
+the official Pages artifact and deploy actions.
+
+## npm Releases
+
+The npm package publishes from `.github/workflows/publish-npm.yml` through npm
+Trusted Publishing. The workflow runs only when a GitHub Release is published,
+not on every push to `main`; npm versions are immutable, so each release needs a
+new `package.json` version first.
+
+For the initial `v1.0.0` GitHub Release, tag the commit that matches the
+already-published `@thjodann/wk@1.0.0` npm package.
+
+Release checklist:
+
+```sh
+npm version patch
+git push
+git push --tags
+```
+
+Then publish a GitHub Release for that tag. GitHub Actions runs install, tests,
+Wikiwiki validation, and `npm publish --access public` using the trusted
+publisher OIDC relationship. No `NPM_TOKEN` secret is required.
 
 ## Current Status
 
@@ -331,16 +349,18 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - local search across articles, active records, and rendered docs
 - agent-readable JSON output
 - scriptable non-AI setup through `wk setup` and repo scripts
+- user-focused GitHub Pages workflow scaffolding through `wk pages init`
 - deterministic closeout draft packets through `wk closeout`
 - optional read-only Beads integration with developer-only `work.html`
-- CI, tests, and package metadata for `@thjodann/wk`
+- npm package published as `@thjodann/wk@1.0.0`
+- GitHub Release-based npm publishing through Trusted Publishing
+- CI and tests
 
 Some planned pieces are not built yet:
 
 - richer symbol extraction
 - draft review flows
 - watch mode
-- actual npm publishing
 
 Generated `wiki/` and `wiki-site/` are intentionally not shipped in the npm
 package. Installed users generate their own copies from their own records.

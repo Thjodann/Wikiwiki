@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Note from 2026-07-04 - Wikiwiki Wiki</title>
+  <title>GitHub Pages scaffolding - Wikiwiki Wiki</title>
   <script>(function(){try{var m=localStorage.getItem("wikiwiki-theme-mode")||"auto";if(m==="light"||m==="dark"){document.documentElement.dataset.theme=m;}else{delete document.documentElement.dataset.theme;}}catch(e){}}());</script>
   <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
@@ -40,10 +40,10 @@
 <a class="nav-link" href="../../guides.html">Guides</a>
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
-<a class="nav-link" href="../../concepts.html">Concepts<span>8</span></a>
+<a class="nav-link active" href="../../concepts.html" aria-current="page">Concepts<span>8</span></a>
 <a class="nav-link" href="../../decisions.html">Decisions<span>17</span></a>
 <a class="nav-link" href="../../devlog.html">Devlog<span>23</span></a>
-<a class="nav-link active" href="../../notes.html" aria-current="page">Notes<span>3</span></a>
+<a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
 </nav>
@@ -51,33 +51,47 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Note from 2026-07-04</h1>
-        <p>User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata.</p>
+        <h1>GitHub Pages scaffolding</h1>
+        <p>wk pages init creates a repo-local GitHub Actions publishing workflow for Wikiwiki static sites.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../notes.html">Notes</a>
+    <a href="../../concepts.html">Concepts</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Note</span>
-    <span class="tag-list"><span>v1</span><span>user-intent</span></span>
+    <span class="type-badge">Concept</span><span class="audience-badge">For developers</span>
+    <span class="tag-list"><span>pages</span><span>publishing</span><span>github-actions</span></span>
   </div>
   <section class="prose">
-  <h2>Note</h2>
-  <p>User requested implementation of the Wikiwiki V1 creation plan: CLI-first, model-agnostic daily agent loop with append-only revisions, lifecycle commands, search, spin drafts, symbol/link coverage, tests, CI, and package-ready metadata.</p>
+  <h2>Summary</h2>
+  <p>wk pages init creates a repo-local GitHub Actions publishing workflow for Wikiwiki static sites.</p>
+  <h2>Details</h2><p>The pages workflow writes .github/workflows/wikiwiki-pages.yml, persists the resolved site audience and source_base_url in .wikiwiki/config.json, preserves unrelated config, refuses to overwrite different workflows unless --force is explicit, and leaves GitHub repository Pages settings as a manual step.</p>
 </section>
+  <aside class="sources-panel">
+  <h2>Related files</h2>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/pages.ts"><code>src/core/pages.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/pages.ts"><code>src/cli/commands/pages.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul>
+</aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>note_db87ad39-e2dd-4cda-8da2-d11e7f1bbb92</code></dd></div>
-    <div><dt>Source</dt><dd>manual</dd></div>
-    <div><dt>Authority</dt><dd>user</dd></div>
+    <div><dt>ID</dt><dd><code>concept_ef402c62-f2a9-4123-a2c4-da7069a16f90</code></dd></div>
+    <div><dt>Source</dt><dd>agent</dd></div>
+    <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T01:12:44.175Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd><code>v1</code> <code>user-intent</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li>None</li></ul></dd></div>
+    <div><dt>Created</dt><dd><time datetime="2026-07-05T01:52:02.648Z">2026-07-05</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-05T01:52:02.648Z">2026-07-05</time></dd></div>
+    <div><dt>Tags</dt><dd><code>audience:developer</code> <code>pages</code> <code>publishing</code> <code>github-actions</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/pages.ts"><code>src/core/pages.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/pages.ts"><code>src/cli/commands/pages.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li></ul></dd></div>
   </dl>
 </details>
 </article>

@@ -20,6 +20,7 @@
     "records/concept/concept_17ca8065-a8d3-4373-9afe-b47b51a424d3.html",
     "records/concept/concept_650e0409-9414-4667-8b40-f36c406a1cb0.html",
     "records/concept/concept_4fde0906-d53a-4b9f-b977-3fe964a9d447.html",
+    "records/concept/concept_ef402c62-f2a9-4123-a2c4-da7069a16f90.html",
     "records/concept/concept_9014ffe0-3948-4333-b6c9-f02896f81f84.html",
     "records/concept/concept_2f7f15b0-5a10-4097-9d78-93a24c060f39.html",
     "records/concept/concept_4e17c000-edc9-4895-9da1-85cde9756eab.html",
@@ -33,6 +34,7 @@
     "records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html",
     "records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html",
     "records/decision/decision_e5333a83-7321-4a65-b040-12c1487f60e7.html",
+    "records/decision/decision_ce48255e-265b-466e-984d-652db37c0862.html",
     "records/decision/decision_aea0762f-b222-4ea3-971d-bfba768255a7.html",
     "records/decision/decision_45f2d29a-3140-40f6-b62c-8e299621419b.html",
     "records/decision/decision_3d66370d-a7b5-4741-b8d6-3c5bfc2e9747.html",
@@ -58,6 +60,7 @@
     "records/event/event_f8c324a7-1f16-44c4-bc69-4584386c1085.html",
     "records/event/event_2c53f001-eb63-4e55-82d3-fc9df43b53f2.html",
     "records/event/event_6c360d34-0e2b-414e-9445-af1fe597103a.html",
+    "records/event/event_27daec8b-1546-41d7-867a-66ee93138ae7.html",
     "records/event/event_d67ebd8e-e9f4-4c08-a011-72295a6e7210.html",
     "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html",
     "records/event/event_e38dffad-d6eb-4d9b-9833-967ed2a947b6.html",
@@ -94,6 +97,12 @@
       "id": "concept_4fde0906-d53a-4b9f-b977-3fe964a9d447",
       "title": "Daily agent loop",
       "url": "records/concept/concept_4fde0906-d53a-4b9f-b977-3fe964a9d447.html"
+    },
+    {
+      "type": "concept",
+      "id": "concept_ef402c62-f2a9-4123-a2c4-da7069a16f90",
+      "title": "GitHub Pages scaffolding",
+      "url": "records/concept/concept_ef402c62-f2a9-4123-a2c4-da7069a16f90.html"
     },
     {
       "type": "concept",
@@ -172,6 +181,12 @@
       "id": "decision_e5333a83-7321-4a65-b040-12c1487f60e7",
       "title": "Prepare scoped npm package without publishing",
       "url": "records/decision/decision_e5333a83-7321-4a65-b040-12c1487f60e7.html"
+    },
+    {
+      "type": "decision",
+      "id": "decision_ce48255e-265b-466e-984d-652db37c0862",
+      "title": "Publish npm releases through GitHub trusted publishing",
+      "url": "records/decision/decision_ce48255e-265b-466e-984d-652db37c0862.html"
     },
     {
       "type": "decision",
@@ -322,6 +337,12 @@
       "id": "event_6c360d34-0e2b-414e-9445-af1fe597103a",
       "title": "Initialized Wikiwiki CLI MVP",
       "url": "records/event/event_6c360d34-0e2b-414e-9445-af1fe597103a.html"
+    },
+    {
+      "type": "event",
+      "id": "event_27daec8b-1546-41d7-867a-66ee93138ae7",
+      "title": "Published @thjodann/wk 1.0.0 to npm",
+      "url": "records/event/event_27daec8b-1546-41d7-867a-66ee93138ae7.html"
     },
     {
       "type": "event",

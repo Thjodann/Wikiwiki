@@ -10,6 +10,7 @@ import { registerInitCommand } from "./cli/commands/init";
 import { registerInstallAgentCommand } from "./cli/commands/installAgent";
 import { registerLinkCommand } from "./cli/commands/link";
 import { registerNoteCommand } from "./cli/commands/note";
+import { registerPagesCommand } from "./cli/commands/pages";
 import { registerRecordCommand } from "./cli/commands/record";
 import { registerRenderCommand } from "./cli/commands/render";
 import { registerSearchCommand } from "./cli/commands/search";
@@ -34,6 +35,7 @@ export function createProgram(): Command {
   registerCloseoutCommand(program);
   registerInstallAgentCommand(program);
   registerStatusCommand(program);
+  registerPagesCommand(program);
   registerArticleCommand(program);
   registerNoteCommand(program);
   registerConceptCommand(program);

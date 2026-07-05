@@ -225,3 +225,17 @@ Files: `src/core/theme.ts`, `src/core/config.ts`, `src/core/site.ts`, `src/cli/c
 Tags: `audience:all`, `theme`, `customization`, `cli`, `ux`
 
 Record: `decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500` | Authority: agent | Confidence: high
+
+## Publish npm releases through GitHub trusted publishing
+
+Context: The npm package now has a trusted publisher relationship for GitHub Actions, and npm requires 2FA or an approved automation path for package publishing.
+
+Decision: Use .github/workflows/publish-npm.yml to publish @thjodann/wk only when a GitHub Release is published. The workflow relies on npm Trusted Publishing/OIDC instead of an NPM_TOKEN secret and runs install, tests, Wikiwiki validation, and npm publish --access public.
+
+Consequences: Normal pushes to main do not publish npm updates. Maintainers must bump package.json to a new immutable npm version, push the tag, and publish a GitHub Release for the trusted workflow to publish the package.
+
+Files: `.github/workflows/publish-npm.yml`, `docs/reference.md`, `package.json`
+
+Tags: `audience:developer`, `release`, `npm`, `github-actions`, `trusted-publishing`
+
+Record: `decision_ce48255e-265b-466e-984d-652db37c0862` | Authority: agent | Confidence: high

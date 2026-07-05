@@ -26,6 +26,16 @@ function commitAll(root, message) {
   ], { cwd: root, stdio: "ignore" });
 }
 
+function setOrigin(root, url, headBranch) {
+  execFileSync("git", ["remote", "add", "origin", url], { cwd: root, stdio: "ignore" });
+  if (headBranch) {
+    execFileSync("git", ["symbolic-ref", "refs/remotes/origin/HEAD", `refs/remotes/origin/${headBranch}`], {
+      cwd: root,
+      stdio: "ignore"
+    });
+  }
+}
+
 function run(root, args, options = {}) {
   return execFileSync(process.execPath, [cli, ...args], {
     cwd: root,
@@ -244,23 +254,27 @@ test("package publishes runtime build files, package docs, and the wk skill", ()
   assert.equal(pkg.files.includes("assets/wikiwiki-banner.png"), false);
 });
 
-test("README documents GitHub source install before npm publish", () => {
+test("README and setup docs document npm package install", () => {
   const readme = fs.readFileSync(path.join(process.cwd(), "README.md"), "utf8");
   const setupDoc = fs.readFileSync(path.join(process.cwd(), "docs/setup.md"), "utf8");
 
   assert.match(readme, /test "\$\(npm prefix\)" = "\$PWD" \|\| npm init -y/);
   assert.match(setupDoc, /test "\$\(npm prefix\)" = "\$PWD" \|\| npm init -y/);
-  assert.match(readme, /npm install --prefix "\$PWD" --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
-  assert.match(setupDoc, /npm install --prefix "\$PWD" --save-dev --package-lock=false git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.match(readme, /npm install --prefix "\$PWD" --save-dev @thjodann\/wk/);
+  assert.match(setupDoc, /npm install --prefix "\$PWD" --save-dev @thjodann\/wk/);
+  assert.match(setupDoc, /npm install --prefix "\$PWD" --save-dev @thjodann\/wk@latest/);
   assert.match(setupDoc, /no local `package\.json`/);
   assert.match(setupDoc, /add `node_modules\/` to `\.gitignore`/);
-  assert.match(readme, /git\+ssh/);
-  assert.match(setupDoc, /git\+ssh/);
+  assert.match(readme, /normal\s+lockfile policy/);
+  assert.match(setupDoc, /normal\s+lockfile policy/);
+  assert.doesNotMatch(readme, /git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.doesNotMatch(setupDoc, /git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
   assert.doesNotMatch(readme, /npm install --save-dev github:Thjodann\/Wikiwiki/);
   assert.doesNotMatch(setupDoc, /npm install --save-dev github:Thjodann\/Wikiwiki/);
   assert.match(readme, /\.\/node_modules\/\.bin\/wk --help/);
   assert.doesNotMatch(readme, /npx wk --help/);
-  assert.match(readme, /publishing is still a manual\s+release step/);
+  assert.doesNotMatch(readme, /publishing is still a manual\s+release step/);
+  assert.doesNotMatch(readme, /actual npm publishing/);
   assert.match(readme, /"Update wk" agent pipeline/);
   assert.match(setupDoc, /## Agentic Update Pipeline/);
   assert.match(setupDoc, /If npm and equivalent package managers are not available/);
@@ -451,6 +465,115 @@ test("setup refuses conflicting scripts unless forced", () => {
 
   assert.equal(result.package_json.scripts_overwritten.includes("wiki:site"), true);
   assert.equal(pkg.scripts["wiki:site"], "wk validate && wk render && wk site --audience all");
+});
+
+test("pages init writes workflow, persists resolved config, and preserves unrelated config", () => {
+  const root = tempRepo();
+  setOrigin(root, "https://github.com/acme/project.git", "trunk");
+  fs.mkdirSync(path.join(root, ".wikiwiki"), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, ".wikiwiki/config.json"),
+    `${JSON.stringify({
+      wiki_profile: "mixed",
+      site_audience: "all",
+      integrations: { beads: { enabled: true } }
+    }, null, 2)}\n`
+  );
+
+  const result = runJson(root, ["pages", "init", "--json"]);
+  const config = JSON.parse(fs.readFileSync(path.join(root, ".wikiwiki/config.json"), "utf8"));
+  const workflow = fs.readFileSync(path.join(root, ".github/workflows/wikiwiki-pages.yml"), "utf8");
+
+  assert.equal(result.ok, true);
+  assert.equal(result.workflow_path, ".github/workflows/wikiwiki-pages.yml");
+  assert.equal(result.created, true);
+  assert.equal(result.overwritten, false);
+  assert.equal(result.already_current, false);
+  assert.equal(result.branch, "trunk");
+  assert.equal(result.audience, "user");
+  assert.equal(result.source_base_url, "https://github.com/acme/project/blob/trunk/");
+  assert.equal(result.pages_settings_url, "https://github.com/acme/project/settings/pages");
+  assert.equal(result.next_steps.some((step) => step.includes("Build and deployment Source to GitHub Actions")), true);
+
+  assert.equal(config.wiki_profile, "mixed");
+  assert.equal(config.integrations.beads.enabled, true);
+  assert.equal(config.site_audience, "user");
+  assert.equal(config.source_base_url, "https://github.com/acme/project/blob/trunk/");
+  assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/articles.jsonl")));
+
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.match(workflow, /branches:\n      - 'trunk'/);
+  assert.match(workflow, /node-version: 22/);
+  assert.match(workflow, /git\+https:\/\/github\.com\/Thjodann\/Wikiwiki\.git/);
+  assert.match(workflow, /actions\/configure-pages@v6/);
+  assert.match(workflow, /actions\/upload-pages-artifact@v5/);
+  assert.match(workflow, /actions\/deploy-pages@v4/);
+  assert.match(workflow, /path: wiki-site/);
+  assert.match(workflow, /wk site --audience user --source-base-url 'https:\/\/github\.com\/acme\/project\/blob\/trunk\/'/);
+});
+
+test("pages init is idempotent and refuses different workflows unless forced", () => {
+  const root = tempRepo();
+  setOrigin(root, "git@github.com:octo/Wikiwiki.git");
+
+  runJson(root, ["pages", "init", "--branch", "docs", "--json"]);
+  const currentWorkflow = fs.readFileSync(path.join(root, ".github/workflows/wikiwiki-pages.yml"), "utf8");
+  const current = runJson(root, ["pages", "init", "--branch", "docs", "--json"]);
+  assert.equal(current.created, false);
+  assert.equal(current.overwritten, false);
+  assert.equal(current.already_current, true);
+  assert.equal(current.source_base_url, "https://github.com/octo/Wikiwiki/blob/docs/");
+
+  fs.writeFileSync(path.join(root, ".github/workflows/wikiwiki-pages.yml"), "name: Custom Pages\n", "utf8");
+  const failed = runFailure(root, ["pages", "init", "--branch", "docs", "--json"]);
+  assert.match(failed, /Refusing to overwrite existing Pages workflow/);
+  assert.equal(fs.readFileSync(path.join(root, ".github/workflows/wikiwiki-pages.yml"), "utf8"), "name: Custom Pages\n");
+
+  const forced = runJson(root, ["pages", "init", "--branch", "docs", "--force", "--json"]);
+  assert.equal(forced.created, false);
+  assert.equal(forced.overwritten, true);
+  assert.equal(forced.already_current, false);
+  assert.equal(fs.readFileSync(path.join(root, ".github/workflows/wikiwiki-pages.yml"), "utf8"), currentWorkflow);
+});
+
+test("pages init does not expose non-user audience publishing", () => {
+  const root = tempRepo();
+
+  const failed = runFailure(root, ["pages", "init", "--audience", "all"]);
+
+  assert.match(failed, /unknown option '--audience'/);
+});
+
+test("pages init handles GitHub remote forms and requires source URL for non-GitHub remotes", () => {
+  const httpsRoot = tempRepo();
+  setOrigin(httpsRoot, "https://github.com/acme/project");
+  const httpsResult = runJson(httpsRoot, ["pages", "init", "--branch", "release", "--json"]);
+  assert.equal(httpsResult.source_base_url, "https://github.com/acme/project/blob/release/");
+  assert.equal(httpsResult.pages_settings_url, "https://github.com/acme/project/settings/pages");
+
+  const sshRoot = tempRepo();
+  setOrigin(sshRoot, "ssh://git@github.com/octo/wikiwiki.git");
+  const sshResult = runJson(sshRoot, ["pages", "init", "--branch", "main", "--json"]);
+  assert.equal(sshResult.source_base_url, "https://github.com/octo/wikiwiki/blob/main/");
+
+  const otherRoot = tempRepo();
+  setOrigin(otherRoot, "https://gitlab.com/acme/project.git");
+  const failed = runFailure(otherRoot, ["pages", "init", "--branch", "main", "--json"]);
+  assert.match(failed, /Could not infer a GitHub source URL/);
+  assert.equal(fs.existsSync(path.join(otherRoot, ".github/workflows/wikiwiki-pages.yml")), false);
+
+  const explicit = runJson(otherRoot, [
+    "pages",
+    "init",
+    "--branch",
+    "main",
+    "--source-base-url",
+    "https://example.test/source",
+    "--json"
+  ]);
+  assert.equal(explicit.source_base_url, "https://example.test/source/");
+  assert.equal(explicit.pages_settings_url, undefined);
+  assert.ok(fs.existsSync(path.join(otherRoot, ".github/workflows/wikiwiki-pages.yml")));
 });
 
 test("setup, status, and spin skip detailed Beads reads in auto mode", () => {

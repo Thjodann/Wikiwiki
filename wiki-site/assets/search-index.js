@@ -53,6 +53,23 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "concept",
     "typeLabel": "Concept",
+    "id": "concept_ef402c62-f2a9-4123-a2c4-da7069a16f90",
+    "title": "GitHub Pages scaffolding",
+    "summary": "wk pages init creates a repo-local GitHub Actions publishing workflow for Wikiwiki static sites.",
+    "tags": [
+      "pages",
+      "publishing",
+      "github-actions"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/concept/concept_ef402c62-f2a9-4123-a2c4-da7069a16f90.html",
+    "text": "concept_ef402c62-f2a9-4123-a2c4-da7069a16f90 agent agent high 2026-07-05T01:52:02.648Z 2026-07-05T01:52:02.648Z concept GitHub Pages scaffolding wk pages init creates a repo-local GitHub Actions publishing workflow for Wikiwiki static sites. The pages workflow writes .github/workflows/wikiwiki-pages.yml, persists the resolved site audience and source_base_url in .wikiwiki/config.json, preserves unrelated config, refuses to overwrite different workflows unless --force is explicit, and leaves GitHub repository Pages settings as a manual step. src/core/pages.ts src/cli/commands/pages.ts docs/reference.md docs/setup.md test/cli.test.js audience:developer pages publishing github-actions"
+  },
+  {
+    "type": "concept",
+    "typeLabel": "Concept",
     "id": "concept_9014ffe0-3948-4333-b6c9-f02896f81f84",
     "title": "Human-facing static wiki site",
     "summary": "Wikiwiki generates a first-class static HTML site for humans while preserving Markdown and JSONL artifacts for agents.",
@@ -285,6 +302,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "audienceLabel": "",
     "url": "records/decision/decision_e5333a83-7321-4a65-b040-12c1487f60e7.html",
     "text": "decision_e5333a83-7321-4a65-b040-12c1487f60e7 agent agent high 2026-07-04T01:12:44.175Z 2026-07-04T02:00:09.037Z decision Prepare scoped npm package without publishing V1 should be package-ready without forcing a publish step; after naming discussion, the package identity is shortened for agent ergonomics. Use @thjodann/wk as the scoped npm package name, expose wk as the primary binary, keep wikiwiki as a compatibility alias, and verify package contents with npm pack --dry-run. Agents get the short wk command while existing wikiwiki usage keeps working; actual npm publishing remains an explicit manual release action. package.json package-lock.json .github/workflows/ci.yml README.md package ci v1 rename"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
+    "id": "decision_ce48255e-265b-466e-984d-652db37c0862",
+    "title": "Publish npm releases through GitHub trusted publishing",
+    "summary": "Use .github/workflows/publish-npm.yml to publish @thjodann/wk only when a GitHub Release is published.",
+    "tags": [
+      "release",
+      "npm",
+      "github-actions",
+      "trusted-publishing"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/decision/decision_ce48255e-265b-466e-984d-652db37c0862.html",
+    "text": "decision_ce48255e-265b-466e-984d-652db37c0862 agent agent high 2026-07-05T02:00:14.213Z 2026-07-05T02:00:14.213Z decision Publish npm releases through GitHub trusted publishing The npm package now has a trusted publisher relationship for GitHub Actions, and npm requires 2FA or an approved automation path for package publishing. Use .github/workflows/publish-npm.yml to publish @thjodann/wk only when a GitHub Release is published. The workflow relies on npm Trusted Publishing/OIDC instead of an NPM_TOKEN secret and runs install, tests, Wikiwiki validation, and npm publish --access public. Normal pushes to main do not publish npm updates. Maintainers must bump package.json to a new immutable npm version, push the tag, and publish a GitHub Release for the trusted workflow to publish the package. .github/workflows/publish-npm.yml docs/reference.md package.json audience:developer release npm github-actions trusted-publishing"
   },
   {
     "type": "decision",
@@ -674,6 +709,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "audienceLabel": "",
     "url": "records/event/event_6c360d34-0e2b-414e-9445-af1fe597103a.html",
     "text": "event_6c360d34-0e2b-414e-9445-af1fe597103a agent agent high 2026-07-03T23:04:28.065Z event Initialized Wikiwiki CLI MVP Created the TypeScript package, schemas, JSONL store, CLI commands, validation, spin heuristics, and Markdown renderer. src/index.ts src/cli/commands src/core src/templates"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_27daec8b-1546-41d7-867a-66ee93138ae7",
+    "title": "Published @thjodann/wk 1.0.0 to npm",
+    "summary": "Published @thjodann/wk 1.0.0 to npm",
+    "tags": [
+      "devlog",
+      "release",
+      "npm",
+      "pages"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_27daec8b-1546-41d7-867a-66ee93138ae7.html",
+    "text": "event_27daec8b-1546-41d7-867a-66ee93138ae7 agent agent high 2026-07-05T01:52:02.648Z event Published @thjodann/wk 1.0.0 to npm Published the first public npm release as @thjodann/wk with wk and wikiwiki binaries, npm install documentation, and the current GitHub Pages scaffolding support. Verified registry metadata, public package access, a fresh registry install, package tarball contents, and the 63-test suite after publish. package.json README.md docs/setup.md docs/reference.md src/index.ts src/cli/commands/pages.ts src/core/pages.ts test/cli.test.js audience:developer devlog release npm pages"
   },
   {
     "type": "event",
