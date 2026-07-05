@@ -30,5 +30,25 @@ jobs:
       - name: Validate
         run: npm run check
 
+      - name: Read package version
+        id: package
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check published version
+        id: published
+        run: |
+          if npm view "@thjodann/wk@${{ steps.package.outputs.version }}" version >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip existing version
+        if: steps.published.outputs.exists == 'true'
+        run: echo "@thjodann/wk@${{ steps.package.outputs.version }} is already published; skipping npm publish."
+
       - name: Publish
+        if: steps.published.outputs.exists != 'true'
         run: npm publish --access public

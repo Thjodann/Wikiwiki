@@ -310,7 +310,8 @@ the official Pages artifact and deploy actions.
 The npm package publishes from `.github/workflows/publish-npm.yml` through npm
 Trusted Publishing. The workflow runs only when a GitHub Release is published,
 not on every push to `main`; npm versions are immutable, so each release needs a
-new `package.json` version first.
+new `package.json` version first. If a release is re-run for a version that is
+already on npm, the workflow skips `npm publish` after tests and validation pass.
 
 For the initial `v1.0.0` GitHub Release, tag the commit that matches the
 already-published `@thjodann/wk@1.0.0` npm package.
