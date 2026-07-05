@@ -245,6 +245,16 @@ test("package exposes wk primary binary and wikiwiki compatibility alias", () =>
   assert.equal(pkg.bin.wikiwiki, "dist/index.js");
 });
 
+test("CLI version follows package metadata", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
+  const output = execFileSync(process.execPath, [cli, "--version"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+
+  assert.equal(output.trim(), pkg.version);
+});
+
 test("package publishes runtime build files, package docs, and the wk skill", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
 

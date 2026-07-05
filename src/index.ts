@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { registerArticleCommand } from "./cli/commands/article";
 import { registerCloseoutCommand } from "./cli/commands/closeout";
 import { registerCompileCommand } from "./cli/commands/compile";
@@ -22,13 +24,28 @@ import { registerSymbolCommand } from "./cli/commands/symbol";
 import { registerThemeCommand } from "./cli/commands/theme";
 import { registerValidateCommand } from "./cli/commands/validate";
 
+function readPackageVersion(): string {
+  const packageJsonPath = join(__dirname, "..", "package.json");
+
+  try {
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as { version?: unknown };
+    if (typeof packageJson.version === "string") {
+      return packageJson.version;
+    }
+  } catch {
+    // Fall back to a clearly invalid version if package metadata cannot be read.
+  }
+
+  return "0.0.0";
+}
+
 export function createProgram(): Command {
   const program = new Command();
 
   program
     .name("wk")
     .description("Wikiwiki is an agent-native living documentation system for code repos.")
-    .version("1.0.0");
+    .version(readPackageVersion());
 
   registerInitCommand(program);
   registerSetupCommand(program);
