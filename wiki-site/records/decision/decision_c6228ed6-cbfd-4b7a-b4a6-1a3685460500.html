@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
-  <title>Added optional Beads coordination for Wikiwiki - Wikiwiki Wiki</title>
+  <title>Generate project themes through an explicit theme command - Wikiwiki Wiki</title>
   <script>(function(){try{var m=localStorage.getItem("wikiwiki-theme-mode")||"auto";if(m==="light"||m==="dark"){document.documentElement.dataset.theme=m;}else{delete document.documentElement.dataset.theme;}}catch(e){}}());</script>
   <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../../assets/wikiwiki.css">
@@ -40,8 +40,8 @@
 <a class="nav-link" href="../../search.html">Search</a>
 <p class="nav-heading">Agent records</p>
 <a class="nav-link" href="../../concepts.html">Concepts<span>7</span></a>
-<a class="nav-link" href="../../decisions.html">Decisions<span>16</span></a>
-<a class="nav-link active" href="../../devlog.html" aria-current="page">Devlog<span>20</span></a>
+<a class="nav-link active" href="../../decisions.html" aria-current="page">Decisions<span>16</span></a>
+<a class="nav-link" href="../../devlog.html">Devlog<span>20</span></a>
 <a class="nav-link" href="../../notes.html">Notes<span>3</span></a>
 <a class="nav-link" href="../../symbols.html">Symbols<span>7</span></a>
 <a class="nav-link" href="../../links.html">Links<span>2</span></a>
@@ -50,49 +50,58 @@
     </aside>
     <main id="content" class="content">
       <header class="page-header">
-        <h1>Added optional Beads coordination for Wikiwiki</h1>
-        <p>Added optional Beads coordination for Wikiwiki</p>
+        <h1>Generate project themes through an explicit theme command</h1>
+        <p>Add wk theme preview and wk theme init as the explicit surface for product-identity theme generation. Preview infers a theme without writing files; init writes .wikiwiki/site-theme.json, supports named moods, writes paired light and dark palettes with default_color_scheme auto, and refuses to overwrite existing themes unless --force is explicit.</p>
       </header>
       <article class="record-page">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="../../index.html">Home</a>
     <span>/</span>
-    <a href="../../devlog.html">Devlog</a>
+    <a href="../../decisions.html">Decisions</a>
   </nav>
   <div class="record-title-row">
-    <span class="type-badge">Devlog</span><span class="audience-badge">For developers</span>
-    <span class="tag-list"><span>devlog</span><span>beads</span><span>agentic-ide</span></span>
+    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
+    <span class="tag-list"><span>theme</span><span>customization</span><span>cli</span><span>ux</span></span>
   </div>
   <section class="prose">
-  <h2>What happened</h2>
-  <p>Wikiwiki now documents and tests a zero-friction Beads integration: status, spin, setup, closeout, and the developer-facing site can include read-only Beads context when .beads/ and bd are present. The bundled wk skill and README setup flow now explain how agents should coordinate Beads task state with Wikiwiki durable knowledge.</p>
+  <h2>Context</h2>
+  <p>Customization should make generated Wikiwiki sites feel like the host project without making setup or site rendering surprising.</p>
+  <h2>Decision</h2>
+  <p>Add wk theme preview and wk theme init as the explicit surface for product-identity theme generation. Preview infers a theme without writing files; init writes .wikiwiki/site-theme.json, supports named moods, writes paired light and dark palettes with default_color_scheme auto, and refuses to overwrite existing themes unless --force is explicit.</p>
+  <h2>Consequences</h2>
+  <p>Normal wk setup and wk site stay predictable, while users get a deliberate customization path that keeps .wikiwiki/site-theme.json as the source of truth for generated CSS. Generated sites support Auto, Light, and Dark mode controls, and legacy flat theme files are still consumed with derived dark-mode output.</p>
 </section>
   <aside class="sources-panel">
   <h2>Related files</h2>
-  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/concepts.md"><code>docs/concepts.md</code></a></li>
+  <ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/theme.ts"><code>src/core/theme.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/config.ts"><code>src/core/config.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/theme.ts"><code>src/cli/commands/theme.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/index.ts"><code>src/index.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/workflows.md"><code>docs/workflows.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li></ul>
 </aside>
   <details class="record-meta">
   <summary>Agent details</summary>
   <dl>
-    <div><dt>ID</dt><dd><code>event_4683be8c-c419-472d-b2fe-c7ef2456b713</code></dd></div>
+    <div><dt>ID</dt><dd><code>decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500</code></dd></div>
     <div><dt>Source</dt><dd>agent</dd></div>
     <div><dt>Authority</dt><dd>agent</dd></div>
     <div><dt>Confidence</dt><dd>high</dd></div>
-    <div><dt>Created</dt><dd><time datetime="2026-07-04T20:31:26.533Z">2026-07-04</time></dd></div>
-    <div><dt>Tags</dt><dd><code>audience:developer</code> <code>devlog</code> <code>beads</code> <code>agentic-ide</code></dd></div>
-    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/concepts.md"><code>docs/concepts.md</code></a></li>
+    <div><dt>Created</dt><dd><time datetime="2026-07-04T23:40:38.682Z">2026-07-04</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime="2026-07-05T00:24:56.280Z">2026-07-05</time></dd></div>
+    <div><dt>Tags</dt><dd><code>audience:all</code> <code>theme</code> <code>customization</code> <code>cli</code> <code>ux</code></dd></div>
+    <div><dt>Files</dt><dd><ul><li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/theme.ts"><code>src/core/theme.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/config.ts"><code>src/core/config.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/core/site.ts"><code>src/core/site.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/cli/commands/theme.ts"><code>src/cli/commands/theme.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/src/index.ts"><code>src/index.ts</code></a></li>
+<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/README.md"><code>README.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/reference.md"><code>docs/reference.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/setup.md"><code>docs/setup.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/docs/workflows.md"><code>docs/workflows.md</code></a></li>
-<li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/skills/wk/SKILL.md"><code>skills/wk/SKILL.md</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/cli.test.js"><code>test/cli.test.js</code></a></li>
 <li><a class="source-link" href="https://github.com/Thjodann/Wikiwiki/blob/main/test/site.test.js"><code>test/site.test.js</code></a></li></ul></dd></div>
   </dl>

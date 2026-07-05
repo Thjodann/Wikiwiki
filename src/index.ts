@@ -17,6 +17,7 @@ import { registerSiteCommand } from "./cli/commands/site";
 import { registerSpinCommand } from "./cli/commands/spin";
 import { registerStatusCommand } from "./cli/commands/status";
 import { registerSymbolCommand } from "./cli/commands/symbol";
+import { registerThemeCommand } from "./cli/commands/theme";
 import { registerValidateCommand } from "./cli/commands/validate";
 
 export function createProgram(): Command {
@@ -41,6 +42,7 @@ export function createProgram(): Command {
   registerRecordCommand(program);
   registerSearchCommand(program);
   registerSpinCommand(program);
+  registerThemeCommand(program);
   registerCompileCommand(program);
   registerSiteCommand(program);
   registerValidateCommand(program);

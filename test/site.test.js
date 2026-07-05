@@ -418,9 +418,12 @@ test("buildSiteFiles supports project theme overrides", () => {
   assert.match(index, /<title>Acme Docs Wiki<\/title>/);
   assert.match(index, /Human docs for Acme\./);
   assert.match(index, /href="assets\/project-theme\.css"/);
+  assert.match(index, /data-theme-choice="auto"/);
   assert.match(theme, /--accent: #123456;/);
   assert.match(theme, /--font-family: Georgia, serif;/);
   assert.match(theme, /--radius: 4px;/);
+  assert.match(theme, /@media \(prefers-color-scheme: dark\)/);
+  assert.match(theme, /:root\[data-theme="dark"\]/);
   assert.equal(manifest.project_name, "Acme Docs");
   assert.equal(manifest.theme_file, ".wikiwiki/site-theme.json");
 });

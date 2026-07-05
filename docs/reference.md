@@ -15,6 +15,7 @@ details that are useful after the first quick start.
 | `wk spin [--profile mixed\|user\|developer] --json` | Inspect repo changes and emit a deterministic first-pass wiki recipe |
 | `wk search <query> --json` | Search active records and rendered Markdown |
 | `wk site [--audience all\|user\|developer] [--source-base-url <url>]` | Render a browseable static HTML wiki into `wiki-site/` |
+| `wk theme preview\|init [--mood calm\|vivid\|editorial\|utility\|playful\|dark]` | Preview or write light/dark `.wikiwiki/site-theme.json` palettes from project identity |
 | `wk compile draft --role all --json` | Create UX/DX human wiki drafts for an IDE agent |
 | `wk compile apply <draft-id> --json` | Validate and publish a human wiki draft |
 | `wk concept add` | Add a durable project concept |
@@ -163,34 +164,68 @@ Fallback behavior is intentionally calm:
 ## Project Theme
 
 Agents can make the generated site feel like the project without changing the
-layout. Add `.wikiwiki/site-theme.json`, then run `wk site`:
+layout. Generated themes include light and dark palettes, and the static site
+ships with Auto, Light, and Dark controls. Preview or create a theme from repo
+identity:
+
+```sh
+wk theme preview --json
+wk theme init --mood editorial
+```
+
+`wk theme init` writes `.wikiwiki/site-theme.json` and refuses to overwrite an
+existing theme unless `--force` is explicit. You can also edit
+`.wikiwiki/site-theme.json` by hand, then run `wk site`:
 
 ```json
 {
   "project_name": "PRISM",
   "project_description": "A project wiki for PRISM.",
+  "default_color_scheme": "auto",
   "accent": "#7c3aed",
   "accent_strong": "#4c1d95",
   "bg": "#faf9ff",
-  "panel": "#ffffff",
+  "panel": "#fffaff",
   "panel_soft": "#f3f0ff",
   "text": "#1f1b2e",
   "muted": "#655f75",
   "border": "#ded7f2",
   "code_bg": "#f1edf8",
   "radius": "8px",
-  "font_family": "Inter, ui-sans-serif, system-ui, sans-serif"
+  "font_family": "Inter, ui-sans-serif, system-ui, sans-serif",
+  "modes": {
+    "light": {
+      "accent": "#7c3aed",
+      "accent_strong": "#4c1d95",
+      "bg": "#faf9ff",
+      "panel": "#fffaff"
+    },
+    "dark": {
+      "accent": "#c4b5fd",
+      "accent_strong": "#ede9fe",
+      "bg": "#171225",
+      "panel": "#211936",
+      "text": "#f7f2ff"
+    }
+  }
 }
 ```
 
-Wikiwiki writes those values into `wiki-site/assets/project-theme.css`. Keep
-that file generated; edit `.wikiwiki/site-theme.json` instead.
+Top-level color values are treated as the light/default palette for backwards
+compatibility. `modes.light` and `modes.dark` can override them with richer
+visual tokens such as `hero_gradient`, `card_gradient`, `sidebar_bg`, `shadow`,
+`shadow_strong`, `brand_gradient`, `badge_bg`, `tag_bg`, `focus_ring`, and
+`gloss`.
+
+Wikiwiki writes those values into `wiki-site/assets/project-theme.css`, including
+`prefers-color-scheme` rules and explicit `data-theme` overrides. Keep that file
+generated; edit `.wikiwiki/site-theme.json` instead.
 
 Wikiwiki applies basic contrast guardrails for common hex-color themes. For
 example, if a dark `bg` or `panel` would leave text unreadable, generated theme
 CSS adjusts dependent text/surface variables and comments why. For safest
 results, set `bg`, `panel`, `panel_soft`, `text`, `muted`, `border`, and
-`code_bg` together.
+`code_bg` together inside each mode.
 
 ## GitHub Pages
 
@@ -245,6 +280,7 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - audience-focused site rendering with `wk site --audience user|developer|all`
 - project-first generated site UX with curated `guides.html`
 - project theme overrides through `.wikiwiki/site-theme.json`
+- product-identity light/dark theme generation through `wk theme`
 - basic contrast guardrails for common theme overrides
 - agent-mediated UX/DX human wiki compilation
 - local search across active records and rendered docs

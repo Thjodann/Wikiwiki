@@ -179,6 +179,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "decision",
     "typeLabel": "Decision",
+    "id": "decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500",
+    "title": "Generate project themes through an explicit theme command",
+    "summary": "Add wk theme preview and wk theme init as the explicit surface for product-identity theme generation.",
+    "tags": [
+      "theme",
+      "customization",
+      "cli",
+      "ux"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For everyone",
+    "url": "records/decision/decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500.html",
+    "text": "decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500 agent agent high 2026-07-04T23:40:38.682Z 2026-07-05T00:24:56.280Z decision Generate project themes through an explicit theme command Customization should make generated Wikiwiki sites feel like the host project without making setup or site rendering surprising. Add wk theme preview and wk theme init as the explicit surface for product-identity theme generation. Preview infers a theme without writing files; init writes .wikiwiki/site-theme.json, supports named moods, writes paired light and dark palettes with default_color_scheme auto, and refuses to overwrite existing themes unless --force is explicit. Normal wk setup and wk site stay predictable, while users get a deliberate customization path that keeps .wikiwiki/site-theme.json as the source of truth for generated CSS. Generated sites support Auto, Light, and Dark mode controls, and legacy flat theme files are still consumed with derived dark-mode output. src/core/theme.ts src/core/config.ts src/core/site.ts src/cli/commands/theme.ts src/index.ts README.md docs/reference.md docs/setup.md test/cli.test.js test/site.test.js audience:all theme customization cli ux"
+  },
+  {
+    "type": "decision",
+    "typeLabel": "Decision",
     "id": "decision_e439798d-6980-44d3-9f91-500c0cc31abe",
     "title": "Integrate Beads as optional developer work context",
     "summary": "Detect .beads automatically, but skip detailed bd reads in auto mode.",
@@ -423,6 +441,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "event",
     "typeLabel": "Devlog",
+    "id": "event_957eb317-04d9-4cd3-bce3-5b0b58de4bec",
+    "title": "Added light/dark/auto support to generated themes",
+    "summary": "Added light/dark/auto support to generated themes",
+    "tags": [
+      "devlog",
+      "theme",
+      "customization",
+      "site"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_957eb317-04d9-4cd3-bce3-5b0b58de4bec.html",
+    "text": "event_957eb317-04d9-4cd3-bce3-5b0b58de4bec agent agent high 2026-07-05T00:24:56.278Z event Added light/dark/auto support to generated themes Extended product-identity themes so wk theme writes paired light and dark palettes with default_color_scheme auto. The static site now includes Auto, Light, and Dark controls, richer visual tokens for gradients, gloss, badges, shadows, and focus rings, and backwards-compatible rendering for flat legacy theme files. src/core/theme.ts src/core/config.ts src/core/site.ts src/cli/commands/theme.ts README.md docs/reference.md docs/setup.md test/cli.test.js test/site.test.js audience:developer devlog theme customization site"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_4683be8c-c419-472d-b2fe-c7ef2456b713",
     "title": "Added optional Beads coordination for Wikiwiki",
     "summary": "Added optional Beads coordination for Wikiwiki",
@@ -453,6 +489,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "audienceLabel": "For everyone",
     "url": "records/event/event_1d0da54d-a525-45ce-8060-592f4fece547.html",
     "text": "event_1d0da54d-a525-45ce-8060-592f4fece547 agent agent high 2026-07-04T19:55:50.024Z event Added setup and closeout automation Implemented wk setup for repo defaults and safe package scripts, plus wk closeout for deterministic status/spin/draft/validate/render/site closeout packets. Updated README, agent skill, protocol guidance, and CLI tests for the new automation flow. src/core/automation.ts src/core/spin.ts src/cli/commands/setup.ts src/cli/commands/closeout.ts src/index.ts test/cli.test.js README.md skills/wk/SKILL.md AGENTS.md audience:all automation milestone closeout"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_45056ffe-30bc-4251-9de0-3566f289f059",
+    "title": "Added wk theme generation",
+    "summary": "Added wk theme generation",
+    "tags": [
+      "devlog",
+      "theme",
+      "customization",
+      "cli"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_45056ffe-30bc-4251-9de0-3566f289f059.html",
+    "text": "event_45056ffe-30bc-4251-9de0-3566f289f059 agent agent high 2026-07-04T23:40:38.683Z event Added wk theme generation Implemented wk theme preview and wk theme init for product-identity site themes, including mood palettes, repo identity inference, safe overwrite behavior, documentation, and CLI/site regression tests. src/core/theme.ts src/cli/commands/theme.ts src/index.ts README.md docs/reference.md docs/setup.md test/cli.test.js audience:developer devlog theme customization cli"
   },
   {
     "type": "event",

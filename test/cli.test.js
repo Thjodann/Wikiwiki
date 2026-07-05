@@ -756,6 +756,98 @@ test("search finds active records and rendered Markdown, excluding deleted recor
   assert.equal(second.file_matches.some((match) => match.file === "wiki/notes.md"), false);
 });
 
+test("theme preview infers identity without writing a theme file", () => {
+  const root = tempRepo();
+  fs.writeFileSync(path.join(root, "README.md"), "# Cosmic Notes\n\nA playful music knowledge base for artists.\n");
+  fs.writeFileSync(path.join(root, "package.json"), `${JSON.stringify({
+    name: "@acme/fallback-name",
+    description: "Package description wins for site copy."
+  }, null, 2)}\n`);
+
+  const result = runJson(root, ["theme", "preview", "--mood", "calm", "--json"]);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.mode, "preview");
+  assert.equal(result.mood, "calm");
+  assert.equal(result.theme.project_name, "Cosmic Notes");
+  assert.equal(result.theme.project_description, "Package description wins for site copy.");
+  assert.equal(result.theme.default_color_scheme, "auto");
+  assert.equal(result.theme.accent, "#2f7d6d");
+  assert.equal(result.theme.modes.light.accent, "#2f7d6d");
+  assert.equal(result.theme.modes.dark.accent, "#74d4bd");
+  assert.notEqual(result.theme.modes.light.bg, result.theme.modes.dark.bg);
+  assert.equal(result.identity.project_name_source, "readme");
+  assert.equal(result.identity.project_description_source, "package");
+  assert.equal(fs.existsSync(path.join(root, ".wikiwiki/site-theme.json")), false);
+});
+
+test("theme init writes, protects, and force-overwrites site-theme.json", () => {
+  const root = tempRepo();
+
+  const created = runJson(root, [
+    "theme",
+    "init",
+    "--mood",
+    "dark",
+    "--project-name",
+    "Night Docs",
+    "--description",
+    "Docs for night work.",
+    "--json"
+  ]);
+  const themePath = path.join(root, ".wikiwiki/site-theme.json");
+  const theme = JSON.parse(fs.readFileSync(themePath, "utf8"));
+
+  assert.equal(created.ok, true);
+  assert.equal(created.mode, "init");
+  assert.equal(created.written, true);
+  assert.equal(created.overwritten, false);
+  assert.equal(created.theme_path, ".wikiwiki/site-theme.json");
+  assert.equal(theme.project_name, "Night Docs");
+  assert.equal(theme.project_description, "Docs for night work.");
+  assert.equal(theme.default_color_scheme, "auto");
+  assert.equal(theme.accent, "#2563eb");
+  assert.equal(theme.modes.light.accent, "#2563eb");
+  assert.equal(theme.modes.dark.accent, "#38bdf8");
+  assert.equal(theme.modes.dark.bg, "#0f172a");
+
+  const failed = runFailure(root, ["theme", "init", "--mood", "vivid", "--json"]);
+  assert.match(failed, /Theme already exists at \.wikiwiki\/site-theme\.json/);
+  assert.equal(JSON.parse(fs.readFileSync(themePath, "utf8")).modes.dark.accent, "#38bdf8");
+
+  const overwritten = runJson(root, ["theme", "init", "--mood", "vivid", "--force", "--json"]);
+  assert.equal(overwritten.overwritten, true);
+  assert.equal(JSON.parse(fs.readFileSync(themePath, "utf8")).modes.dark.accent, "#fb7aad");
+});
+
+test("theme init output is consumed by generated site CSS", () => {
+  const root = tempRepo();
+  run(root, ["init", "--json"]);
+  runJson(root, ["theme", "init", "--mood", "editorial", "--project-name", "Field Notes", "--json"]);
+
+  const result = runJson(root, ["site", "--json"]);
+  const css = fs.readFileSync(path.join(root, "wiki-site/assets/project-theme.css"), "utf8");
+  const index = fs.readFileSync(path.join(root, "wiki-site/index.html"), "utf8");
+
+  assert.ok(result.rendered_files.includes("wiki-site/assets/project-theme.css"));
+  assert.match(css, /--accent: #8a5a2b;/);
+  assert.match(css, /--hero-gradient: linear-gradient/);
+  assert.match(css, /--font-family: Charter, Georgia, serif;/);
+  assert.match(css, /@media \(prefers-color-scheme: dark\)/);
+  assert.match(css, /:root\[data-theme="dark"\]/);
+  assert.match(index, /data-theme-choice="auto"/);
+  assert.match(index, /data-default-theme="auto"/);
+  assert.match(index, /<title>Field Notes Wiki<\/title>/);
+});
+
+test("theme rejects unknown moods", () => {
+  const root = tempRepo();
+
+  const failed = runFailure(root, ["theme", "preview", "--mood", "sepia", "--json"]);
+
+  assert.match(failed, /Unknown theme mood: sepia/);
+});
+
 test("site command creates a browseable static wiki", () => {
   const root = tempRepo();
   run(root, ["init", "--json"]);

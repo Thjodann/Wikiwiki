@@ -211,3 +211,17 @@ Files: `src/core/beads.ts`, `src/core/git.ts`, `src/core/spin.ts`, `src/core/aut
 Tags: `audience:developer`, `beads`, `integration`, `workflow`, `dogfood`, `safety`
 
 Record: `decision_e439798d-6980-44d3-9f91-500c0cc31abe` | Authority: agent | Confidence: high
+
+## Generate project themes through an explicit theme command
+
+Context: Customization should make generated Wikiwiki sites feel like the host project without making setup or site rendering surprising.
+
+Decision: Add wk theme preview and wk theme init as the explicit surface for product-identity theme generation. Preview infers a theme without writing files; init writes .wikiwiki/site-theme.json, supports named moods, writes paired light and dark palettes with default_color_scheme auto, and refuses to overwrite existing themes unless --force is explicit.
+
+Consequences: Normal wk setup and wk site stay predictable, while users get a deliberate customization path that keeps .wikiwiki/site-theme.json as the source of truth for generated CSS. Generated sites support Auto, Light, and Dark mode controls, and legacy flat theme files are still consumed with derived dark-mode output.
+
+Files: `src/core/theme.ts`, `src/core/config.ts`, `src/core/site.ts`, `src/cli/commands/theme.ts`, `src/index.ts`, `README.md`, `docs/reference.md`, `docs/setup.md`, `test/cli.test.js`, `test/site.test.js`
+
+Tags: `audience:all`, `theme`, `customization`, `cli`, `ux`
+
+Record: `decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500` | Authority: agent | Confidence: high

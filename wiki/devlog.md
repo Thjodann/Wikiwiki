@@ -145,3 +145,19 @@ Wikiwiki now documents and tests a zero-friction Beads integration: status, spin
 Files: `README.md`, `docs/concepts.md`, `docs/reference.md`, `docs/setup.md`, `docs/workflows.md`, `skills/wk/SKILL.md`, `test/cli.test.js`, `test/site.test.js`
 
 Recorded: 2026-07-04T20:31:26.533Z | Record: `event_4683be8c-c419-472d-b2fe-c7ef2456b713` | Confidence: high
+
+## Added wk theme generation
+
+Implemented wk theme preview and wk theme init for product-identity site themes, including mood palettes, repo identity inference, safe overwrite behavior, documentation, and CLI/site regression tests.
+
+Files: `src/core/theme.ts`, `src/cli/commands/theme.ts`, `src/index.ts`, `README.md`, `docs/reference.md`, `docs/setup.md`, `test/cli.test.js`
+
+Recorded: 2026-07-04T23:40:38.683Z | Record: `event_45056ffe-30bc-4251-9de0-3566f289f059` | Confidence: high
+
+## Added light/dark/auto support to generated themes
+
+Extended product-identity themes so wk theme writes paired light and dark palettes with default_color_scheme auto. The static site now includes Auto, Light, and Dark controls, richer visual tokens for gradients, gloss, badges, shadows, and focus rings, and backwards-compatible rendering for flat legacy theme files.
+
+Files: `src/core/theme.ts`, `src/core/config.ts`, `src/core/site.ts`, `src/cli/commands/theme.ts`, `README.md`, `docs/reference.md`, `docs/setup.md`, `test/cli.test.js`, `test/site.test.js`
+
+Recorded: 2026-07-05T00:24:56.278Z | Record: `event_957eb317-04d9-4cd3-bce3-5b0b58de4bec` | Confidence: high

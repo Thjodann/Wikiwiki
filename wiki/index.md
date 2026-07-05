@@ -18,8 +18,8 @@ This is the generated human-readable view of Wikiwiki's structured project knowl
 ## Record Counts
 
 - Concept: 7
-- Decision: 15
-- Event: 18
+- Decision: 16
+- Event: 20
 - Note: 3
 - Symbol: 7
 - Link: 2

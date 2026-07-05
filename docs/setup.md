@@ -57,6 +57,7 @@ docs current:
 
 ```sh
 wk setup --profile mixed --audience all
+wk theme init
 npm run wiki:check
 npm run wiki:site
 ```
@@ -96,7 +97,11 @@ before publishing docs:
 ```
 
 This gives users a browseable local wiki in `wiki-site/` and deterministic
-Markdown in `wiki/` without asking a model to summarize anything.
+Markdown in `wiki/` without asking a model to summarize anything. `wk theme init`
+is optional; it creates `.wikiwiki/site-theme.json` so the generated site starts
+with project-specific colors, typography, surface treatment, and paired
+light/dark palettes. Generated sites default to Auto, so they follow the user's
+system appearance until the reader chooses Light or Dark.
 
 ## Agentic IDE Setup
 

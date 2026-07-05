@@ -80,6 +80,12 @@
     },
     {
       "type": "decision",
+      "id": "decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500",
+      "title": "Generate project themes through an explicit theme command",
+      "url": "records/decision/decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500.html"
+    },
+    {
+      "type": "decision",
       "id": "decision_e439798d-6980-44d3-9f91-500c0cc31abe",
       "title": "Integrate Beads as optional developer work context",
       "url": "records/decision/decision_e439798d-6980-44d3-9f91-500c0cc31abe.html"
@@ -164,6 +170,12 @@
     },
     {
       "type": "event",
+      "id": "event_957eb317-04d9-4cd3-bce3-5b0b58de4bec",
+      "title": "Added light/dark/auto support to generated themes",
+      "url": "records/event/event_957eb317-04d9-4cd3-bce3-5b0b58de4bec.html"
+    },
+    {
+      "type": "event",
       "id": "event_4683be8c-c419-472d-b2fe-c7ef2456b713",
       "title": "Added optional Beads coordination for Wikiwiki",
       "url": "records/event/event_4683be8c-c419-472d-b2fe-c7ef2456b713.html"
@@ -173,6 +185,12 @@
       "id": "event_1d0da54d-a525-45ce-8060-592f4fece547",
       "title": "Added setup and closeout automation",
       "url": "records/event/event_1d0da54d-a525-45ce-8060-592f4fece547.html"
+    },
+    {
+      "type": "event",
+      "id": "event_45056ffe-30bc-4251-9de0-3566f289f059",
+      "title": "Added wk theme generation",
+      "url": "records/event/event_45056ffe-30bc-4251-9de0-3566f289f059.html"
     },
     {
       "type": "event",

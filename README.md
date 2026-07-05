@@ -108,7 +108,8 @@ Wikiwiki is a V1 CLI foundation. It currently includes:
 - audience tagging and audience-focused site rendering
 - Markdown rendering into `wiki/`
 - static HTML site generation into `wiki-site/`
-- project theme overrides and basic contrast guardrails
+- project theme overrides with light, dark, and system-auto support
+- product-identity theme generation through `wk theme`, including paired light/dark palettes
 - agent-mediated UX/DX human wiki compilation
 - local search across active records and rendered docs
 - scriptable non-AI setup through `wk setup`
@@ -171,13 +172,13 @@ not release commitments.
 | `crate` rebuild/index command | 35% | Markdown, static site, and search indexes can be rebuilt; no unified rebuild/retrieval command exists yet. |
 | `ask` repo knowledge query | 25% | `wk search` provides local lookup; answer synthesis over repo knowledge is not built yet. |
 | GitHub Pages scaffolding | 55% | Static output, `.nojekyll`, and workflow docs exist; one-command Pages setup is not built. |
-| Initial product-identity theme generation | 25% | Theme overrides and contrast guardrails exist; setup does not infer or create a custom product theme yet. |
+| Product-identity theme generation | 90% | `wk theme preview` and `wk theme init` create mood-based light/dark project themes with Auto/Light/Dark site controls; richer logo and layout customization remains future work. |
 
 Shared completion snapshot:
 
 - V1 package readiness: about 80%
-- Named future roadmap: about 35%
-- Blended overall product vision: about 65%
+- Named future roadmap: about 42%
+- Blended overall product vision: about 70%
 
 ## License
 

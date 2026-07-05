@@ -1,7 +1,15 @@
 import fs from "fs";
 import path from "path";
 import { readIntegrations, shouldReportIntegrations, type BeadsIntegrationSummary, type BeadsIssueSummary, type IntegrationSummary } from "./beads";
-import { normalizeSourceBaseUrl, readWikiwikiConfig, readWikiwikiSiteTheme, type WikiwikiSiteTheme } from "./config";
+import {
+  normalizeSourceBaseUrl,
+  readWikiwikiConfig,
+  readWikiwikiSiteTheme,
+  siteThemePaletteKeys,
+  type WikiwikiColorScheme,
+  type WikiwikiSiteTheme,
+  type WikiwikiThemePalette
+} from "./config";
 import { sitePath } from "./paths";
 import { readAllRecords, type RecordsByType } from "./store";
 import { type AnyRecord, type RecordType, recordTypes } from "./schemas";
@@ -295,15 +303,18 @@ function renderLayout(options: LayoutOptions): string {
   const htmlTitle = options.title === options.model.siteTitle
     ? options.title
     : `${options.title} - ${options.model.siteTitle}`;
+  const defaultColorScheme = defaultThemeColorScheme(options.model.options.theme);
+  const defaultThemeAttribute = defaultColorScheme === "auto" ? "" : ` data-theme="${defaultColorScheme}"`;
 
   return `${siteGeneratedNotice}
 <!doctype html>
-<html lang="en">
+<html lang="en" data-default-theme="${defaultColorScheme}"${defaultThemeAttribute}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Wikiwiki">
   <title>${escapeHtml(htmlTitle)}</title>
+  <script>${themeBootScript(defaultColorScheme)}</script>
   <link rel="icon" href="${prefix}favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="${prefix}assets/wikiwiki.css">
   <link rel="stylesheet" href="${prefix}assets/project-theme.css">
@@ -324,6 +335,11 @@ function renderLayout(options: LayoutOptions): string {
         </a>
         <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false">Menu</button>
       </div>
+      <div class="theme-control" role="group" aria-label="Color theme">
+        ${themeChoiceButton("auto", "Auto", "Use system theme", defaultColorScheme)}
+        ${themeChoiceButton("light", "Light", "Use light theme", defaultColorScheme)}
+        ${themeChoiceButton("dark", "Dark", "Use dark theme", defaultColorScheme)}
+      </div>
       <div class="sidebar-nav" data-sidebar-nav>
         ${renderNav(options.model, options.fileName, options.active)}
       </div>
@@ -340,6 +356,19 @@ function renderLayout(options: LayoutOptions): string {
 </body>
 </html>
 `;
+}
+
+function defaultThemeColorScheme(theme: WikiwikiSiteTheme): WikiwikiColorScheme {
+  return theme.default_color_scheme ?? "auto";
+}
+
+function themeBootScript(defaultColorScheme: WikiwikiColorScheme): string {
+  return `(function(){try{var m=localStorage.getItem("wikiwiki-theme-mode")||"${defaultColorScheme}";if(m==="light"||m==="dark"){document.documentElement.dataset.theme=m;}else{delete document.documentElement.dataset.theme;}}catch(e){}}());`;
+}
+
+function themeChoiceButton(mode: WikiwikiColorScheme, label: string, title: string, defaultColorScheme: WikiwikiColorScheme): string {
+  const pressed = mode === defaultColorScheme ? "true" : "false";
+  return `<button type="button" data-theme-choice="${mode}" aria-pressed="${pressed}" title="${escapeAttribute(title)}">${escapeHtml(label)}</button>`;
 }
 
 function renderNav(model: SiteModel, currentFile: string, active: string): string {
@@ -1425,10 +1454,173 @@ function escapeAttribute(value: string): string {
 }
 
 function projectThemeCss(theme: WikiwikiSiteTheme): string {
-  const guardedTheme = themeWithContrastGuardrails(theme);
-  const variables: [keyof WikiwikiSiteTheme, string][] = [
+  const resolved = resolveThemePalettes(theme);
+  if (!resolved.hasTheme) {
+    return "/* Optional project theme. Add .wikiwiki/site-theme.json to override CSS custom properties. */\n";
+  }
+
+  const light = themeWithContrastGuardrails(resolved.light, "light");
+  const dark = themeWithContrastGuardrails(resolved.dark, "dark");
+  const comments = [...light.comments, ...dark.comments];
+  const commentBlock = comments.length
+    ? `\n${comments.map((comment) => `/* ${comment} */`).join("\n")}`
+    : "";
+
+  return `/* Generated from .wikiwiki/site-theme.json. Edit the theme file, then run \`wk site\`. */${commentBlock}
+${themeCssBlock(":root,\n:root[data-theme=\"light\"]", light.theme, "light")}
+
+@media (prefers-color-scheme: dark) {
+${themeCssBlock(":root:not([data-theme=\"light\"])", dark.theme, "dark", "  ")}
+}
+
+${themeCssBlock(":root[data-theme=\"dark\"]", dark.theme, "dark")}
+`;
+}
+
+function resolveThemePalettes(theme: WikiwikiSiteTheme): {
+  hasTheme: boolean;
+  light: WikiwikiThemePalette;
+  dark: WikiwikiThemePalette;
+} {
+  const flat = themePaletteFrom(theme);
+  const modeLight = theme.modes?.light ?? {};
+  const modeDark = theme.modes?.dark ?? {};
+  const hasFlat = hasThemePaletteValues(flat);
+  const hasLight = hasThemePaletteValues(modeLight);
+  const hasDark = hasThemePaletteValues(modeDark);
+  if (!hasFlat && !hasLight && !hasDark) {
+    return { hasTheme: false, light: {}, dark: {} };
+  }
+
+  const common = commonPaletteValues(flat);
+  const light = hasLight || hasFlat
+    ? { ...flat, ...modeLight }
+    : { ...deriveLightPalette(modeDark), ...common };
+  const dark = hasDark
+    ? { ...deriveDarkPalette(light), ...common, ...modeDark }
+    : deriveDarkPalette(light);
+
+  return { hasTheme: true, light, dark };
+}
+
+function themePaletteFrom(theme: WikiwikiSiteTheme): WikiwikiThemePalette {
+  const palette: Record<string, string> = {};
+  for (const key of siteThemePaletteKeys) {
+    const value = theme[key];
+    if (value) {
+      palette[key] = value;
+    }
+  }
+
+  return palette as WikiwikiThemePalette;
+}
+
+function hasThemePaletteValues(theme: WikiwikiThemePalette): boolean {
+  return siteThemePaletteKeys.some((key) => Boolean(theme[key]?.trim()));
+}
+
+function commonPaletteValues(theme: WikiwikiThemePalette): WikiwikiThemePalette {
+  return {
+    ...(theme.radius ? { radius: theme.radius } : {}),
+    ...(theme.font_family ? { font_family: theme.font_family } : {})
+  };
+}
+
+function deriveLightPalette(theme: WikiwikiThemePalette): WikiwikiThemePalette {
+  const accent = parseHexColor(theme.accent) ?? parseHexColor(theme.accent_strong) ?? { r: 36, g: 107, b: 98 };
+  const accentHex = theme.accent ?? colorToHex(accent);
+  const accentStrong = theme.accent_strong ?? colorToHex(mixRgb(accent, { r: 29, g: 48, b: 44 }, 0.64));
+  const secondary = theme.secondary ?? colorToHex(mixRgb(accent, { r: 196, g: 63, b: 125 }, 0.45));
+
+  return {
+    accent: accentHex,
+    accent_strong: accentStrong,
+    secondary,
+    bg: colorToHex(mixRgb(accent, { r: 249, g: 248, b: 242 }, 0.08)),
+    panel: colorToHex(mixRgb(accent, { r: 253, g: 252, b: 247 }, 0.04)),
+    panel_soft: colorToHex(mixRgb(accent, { r: 238, g: 241, b: 232 }, 0.12)),
+    text: "#242521",
+    muted: "#63675e",
+    border: colorToHex(mixRgb(accent, { r: 220, g: 223, b: 214 }, 0.18)),
+    code_bg: colorToHex(mixRgb(accent, { r: 236, g: 238, b: 232 }, 0.12)),
+    shadow: `0 18px 45px ${rgba({ r: 35, g: 38, b: 31 }, 0.08)}`,
+    shadow_strong: `0 24px 70px ${rgba({ r: 35, g: 38, b: 31 }, 0.14)}`,
+    radius: theme.radius ?? "8px",
+    font_family: theme.font_family,
+    sidebar_bg: `linear-gradient(180deg, ${rgba({ r: 253, g: 252, b: 247 }, 0.94)}, ${rgba(mixRgb(accent, { r: 238, g: 241, b: 232 }, 0.12), 0.88)})`,
+    hero_gradient: `linear-gradient(135deg, ${colorToHex(mixRgb(accent, { r: 253, g: 252, b: 247 }, 0.06))} 0%, ${colorToHex(mixRgb(accent, { r: 244, g: 246, b: 238 }, 0.18))} 100%)`,
+    card_gradient: `linear-gradient(180deg, ${colorToHex(mixRgb(accent, { r: 253, g: 252, b: 247 }, 0.04))} 0%, ${colorToHex(mixRgb(accent, { r: 248, g: 247, b: 242 }, 0.05))} 100%)`,
+    brand_gradient: `linear-gradient(135deg, ${accentHex}, ${accentStrong})`,
+    brand_mark_text: "#fffaf0",
+    badge_bg: colorToHex(mixRgb(accent, { r: 229, g: 240, b: 237 }, 0.22)),
+    badge_text: accentStrong,
+    tag_bg: colorToHex(mixRgb(parseHexColor(secondary) ?? accent, { r: 248, g: 232, b: 241 }, 0.18)),
+    tag_text: "#743050",
+    success_bg: "#e7f3df",
+    success_text: "#2d5c1f",
+    warning_bg: "#f5e7df",
+    warning_text: "#7a3c1d",
+    focus_ring: rgba(accent, 0.18),
+    gloss: rgba(accent, 0.14)
+  };
+}
+
+function deriveDarkPalette(theme: WikiwikiThemePalette): WikiwikiThemePalette {
+  const accent = parseHexColor(theme.accent) ?? parseHexColor(theme.accent_strong) ?? { r: 56, g: 189, b: 248 };
+  const accentHex = theme.accent ?? colorToHex(accent);
+  const accentStrong = theme.accent_strong ?? colorToHex(mixRgb(accent, { r: 186, g: 230, b: 253 }, 0.72));
+  const secondary = theme.secondary ?? colorToHex(mixRgb(accent, { r: 244, g: 114, b: 182 }, 0.36));
+  const bg = mixRgb(accent, { r: 12, g: 18, b: 31 }, 0.13);
+  const panel = mixRgb(accent, { r: 18, g: 25, b: 42 }, 0.11);
+  const panelSoft = mixRgb(accent, { r: 28, g: 38, b: 58 }, 0.14);
+
+  return {
+    accent: accentHex,
+    accent_strong: accentStrong,
+    secondary,
+    bg: colorToHex(bg),
+    panel: colorToHex(panel),
+    panel_soft: colorToHex(panelSoft),
+    text: "#f7f2e8",
+    muted: "#c9d0dc",
+    border: colorToHex(mixRgb(accent, { r: 51, g: 65, b: 85 }, 0.16)),
+    code_bg: colorToHex(mixRgb(accent, { r: 10, g: 16, b: 28 }, 0.1)),
+    shadow: `0 22px 60px ${rgba({ r: 4, g: 8, b: 16 }, 0.34)}`,
+    shadow_strong: `0 30px 90px ${rgba({ r: 4, g: 8, b: 16 }, 0.48)}`,
+    radius: theme.radius ?? "8px",
+    font_family: theme.font_family,
+    sidebar_bg: `linear-gradient(180deg, ${rgba(mixRgb(accent, { r: 18, g: 25, b: 42 }, 0.14), 0.94)}, ${rgba(mixRgb(accent, { r: 12, g: 18, b: 31 }, 0.16), 0.9)})`,
+    hero_gradient: `linear-gradient(135deg, ${colorToHex(mixRgb(accent, { r: 21, g: 28, b: 46 }, 0.16))} 0%, ${colorToHex(mixRgb(accent, { r: 9, g: 14, b: 25 }, 0.1))} 100%)`,
+    card_gradient: `linear-gradient(180deg, ${colorToHex(mixRgb(accent, { r: 20, g: 28, b: 45 }, 0.12))} 0%, ${colorToHex(mixRgb(accent, { r: 14, g: 20, b: 34 }, 0.1))} 100%)`,
+    brand_gradient: `linear-gradient(135deg, ${accentHex}, ${accentStrong})`,
+    brand_mark_text: "#fffaf0",
+    badge_bg: rgba(accent, 0.18),
+    badge_text: "#f7f2e8",
+    tag_bg: rgba(parseHexColor(secondary) ?? accent, 0.2),
+    tag_text: "#f7d8e8",
+    success_bg: "rgba(134, 239, 172, 0.16)",
+    success_text: "#bbf7d0",
+    warning_bg: "rgba(253, 186, 116, 0.16)",
+    warning_text: "#fed7aa",
+    focus_ring: rgba(accent, 0.28),
+    gloss: rgba(accent, 0.18)
+  };
+}
+
+function themeCssBlock(selector: string, theme: WikiwikiThemePalette, colorScheme: "light" | "dark", indent = ""): string {
+  const lines = themeVariableLines(theme)
+    .map((line) => `${indent}${line}`);
+  return `${indent}${selector} {
+${indent}  color-scheme: ${colorScheme};
+${lines.join("\n")}
+${indent}}`;
+}
+
+function themeVariableLines(theme: WikiwikiThemePalette): string[] {
+  const variables: [keyof WikiwikiThemePalette, string][] = [
     ["accent", "--accent"],
     ["accent_strong", "--accent-strong"],
+    ["secondary", "--secondary"],
     ["bg", "--bg"],
     ["panel", "--panel"],
     ["panel_soft", "--panel-soft"],
@@ -1436,34 +1628,37 @@ function projectThemeCss(theme: WikiwikiSiteTheme): string {
     ["muted", "--muted"],
     ["border", "--border"],
     ["code_bg", "--code-bg"],
+    ["shadow", "--shadow"],
+    ["shadow_strong", "--shadow-strong"],
     ["radius", "--radius"],
-    ["font_family", "--font-family"]
+    ["font_family", "--font-family"],
+    ["sidebar_bg", "--sidebar-bg"],
+    ["hero_gradient", "--hero-gradient"],
+    ["card_gradient", "--card-gradient"],
+    ["brand_gradient", "--brand-gradient"],
+    ["brand_mark_text", "--brand-mark-text"],
+    ["badge_bg", "--badge-bg"],
+    ["badge_text", "--badge-text"],
+    ["tag_bg", "--tag-bg"],
+    ["tag_text", "--tag-text"],
+    ["success_bg", "--success-bg"],
+    ["success_text", "--success-text"],
+    ["warning_bg", "--warning-bg"],
+    ["warning_text", "--warning-text"],
+    ["focus_ring", "--focus-ring"],
+    ["gloss", "--gloss"]
   ];
-  const lines = variables
-    .flatMap(([key, variable]) => {
-      const value = guardedTheme.theme[key]?.trim();
-      return value ? [`  ${variable}: ${cssValue(value)};`] : [];
-    });
-
-  if (lines.length === 0) {
-    return "/* Optional project theme. Add .wikiwiki/site-theme.json to override CSS custom properties. */\n";
-  }
-
-  const comments = guardedTheme.comments.length
-    ? `\n${guardedTheme.comments.map((comment) => `/* ${comment} */`).join("\n")}`
-    : "";
-  return `/* Generated from .wikiwiki/site-theme.json. Edit the theme file, then run \`wk site\`. */${comments}
-:root {
-${lines.join("\n")}
-}
-`;
+  return variables.flatMap(([key, variable]) => {
+    const value = theme[key]?.trim();
+    return value ? [`  ${variable}: ${cssValue(value)};`] : [];
+  });
 }
 
-function themeWithContrastGuardrails(theme: WikiwikiSiteTheme): {
-  theme: WikiwikiSiteTheme;
+function themeWithContrastGuardrails(theme: WikiwikiThemePalette, mode: "light" | "dark"): {
+  theme: WikiwikiThemePalette;
   comments: string[];
 } {
-  const guarded: WikiwikiSiteTheme = { ...theme };
+  const guarded: WikiwikiThemePalette = { ...theme };
   const comments: string[] = [];
   const bg = parseHexColor(guarded.bg);
 
@@ -1474,21 +1669,21 @@ function themeWithContrastGuardrails(theme: WikiwikiSiteTheme): {
     guarded.muted = guarded.muted ?? "#cbd5e1";
     guarded.border = guarded.border ?? "#334155";
     guarded.code_bg = guarded.code_bg ?? "#0f172a";
-    comments.push("Applied dark-theme surface defaults so text remains readable.");
+    comments.push(`${mode} mode: Applied dark-theme surface defaults so text remains readable.`);
   }
 
-  const panel = parseHexColor(guarded.panel ?? "#ffffff");
-  const text = parseHexColor(guarded.text ?? "#242521");
+  const panel = parseHexColor(guarded.panel ?? (mode === "dark" ? "#111827" : "#fffdf7"));
+  const text = parseHexColor(guarded.text ?? (mode === "dark" ? "#f8fafc" : "#242521"));
   if (panel && text && contrastRatio(panel, text) < 4.5) {
     guarded.text = readableTextFor(panel);
-    comments.push("Adjusted --text for readable contrast against --panel.");
+    comments.push(`${mode} mode: Adjusted --text for readable contrast against --panel.`);
   }
 
-  const muted = parseHexColor(guarded.muted ?? "#63675e");
-  const guardedPanel = parseHexColor(guarded.panel ?? "#ffffff");
+  const muted = parseHexColor(guarded.muted ?? (mode === "dark" ? "#cbd5e1" : "#63675e"));
+  const guardedPanel = parseHexColor(guarded.panel ?? (mode === "dark" ? "#111827" : "#fffdf7"));
   if (guardedPanel && muted && contrastRatio(guardedPanel, muted) < 3) {
     guarded.muted = relativeLuminance(guardedPanel) > 0.5 ? "#4b5563" : "#cbd5e1";
-    comments.push("Adjusted --muted for readable contrast against --panel.");
+    comments.push(`${mode} mode: Adjusted --muted for readable contrast against --panel.`);
   }
 
   return { theme: guarded, comments };
@@ -1543,6 +1738,27 @@ function readableTextFor(background: Rgb): string {
   return relativeLuminance(background) > 0.5 ? "#111827" : "#f8fafc";
 }
 
+function mixRgb(a: Rgb, b: Rgb, aWeight: number): Rgb {
+  const clampedWeight = Math.max(0, Math.min(1, aWeight));
+  const bWeight = 1 - clampedWeight;
+  return {
+    r: Math.round(a.r * clampedWeight + b.r * bWeight),
+    g: Math.round(a.g * clampedWeight + b.g * bWeight),
+    b: Math.round(a.b * clampedWeight + b.b * bWeight)
+  };
+}
+
+function colorToHex(color: Rgb): string {
+  return `#${[color.r, color.g, color.b]
+    .map((channel) => Math.max(0, Math.min(255, channel)).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function rgba(color: Rgb, alpha: number): string {
+  const clampedAlpha = Math.max(0, Math.min(1, alpha));
+  return `rgba(${color.r}, ${color.g}, ${color.b}, ${Number(clampedAlpha.toFixed(3))})`;
+}
+
 function cssValue(value: string): string {
   return value.replace(/[;\n\r]/g, "").trim();
 }
@@ -1562,18 +1778,102 @@ function siteCss(): string {
 :root {
   color-scheme: light;
   --bg: #f7f7f4;
-  --panel: #ffffff;
+  --panel: #fffdf7;
   --panel-soft: #f0f2ed;
   --text: #242521;
   --muted: #63675e;
   --border: #dcdfd6;
   --accent: #246b62;
   --accent-strong: #163f3a;
-  --pink: #c43f7d;
+  --secondary: #c43f7d;
   --code-bg: #eceee8;
   --shadow: 0 18px 45px rgba(35, 38, 31, 0.08);
+  --shadow-strong: 0 24px 70px rgba(35, 38, 31, 0.14);
   --radius: 8px;
   --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sidebar-bg: linear-gradient(180deg, rgba(255, 253, 247, 0.94), rgba(240, 242, 237, 0.88));
+  --hero-gradient: linear-gradient(135deg, #fffdf7 0%, #f4f6f0 100%);
+  --card-gradient: linear-gradient(180deg, #fffdf7 0%, #faf9f3 100%);
+  --brand-gradient: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  --brand-mark-text: #fffaf0;
+  --badge-bg: #e5f0ed;
+  --badge-text: var(--accent-strong);
+  --tag-bg: #f8e8f1;
+  --tag-text: #743050;
+  --success-bg: #e7f3df;
+  --success-text: #2d5c1f;
+  --warning-bg: #f5e7df;
+  --warning-text: #7a3c1d;
+  --focus-ring: rgba(36, 107, 98, 0.18);
+  --gloss: rgba(36, 107, 98, 0.13);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111914;
+    --panel: #18221d;
+    --panel-soft: #223029;
+    --text: #f7f2e8;
+    --muted: #c7d0c9;
+    --border: #34463d;
+    --accent: #6ee7c7;
+    --accent-strong: #a7f3d0;
+    --secondary: #f0abfc;
+    --code-bg: #0d1511;
+    --shadow: 0 22px 60px rgba(4, 8, 16, 0.34);
+    --shadow-strong: 0 30px 90px rgba(4, 8, 16, 0.48);
+    --sidebar-bg: linear-gradient(180deg, rgba(24, 34, 29, 0.95), rgba(17, 25, 20, 0.9));
+    --hero-gradient: linear-gradient(135deg, #1c2b24 0%, #0f1713 100%);
+    --card-gradient: linear-gradient(180deg, #1a261f 0%, #141e18 100%);
+    --brand-gradient: linear-gradient(135deg, var(--accent), #2dd4bf);
+    --brand-mark-text: #101914;
+    --badge-bg: rgba(110, 231, 199, 0.16);
+    --badge-text: #d1fae5;
+    --tag-bg: rgba(240, 171, 252, 0.18);
+    --tag-text: #f5d0fe;
+    --success-bg: rgba(134, 239, 172, 0.16);
+    --success-text: #bbf7d0;
+    --warning-bg: rgba(253, 186, 116, 0.16);
+    --warning-text: #fed7aa;
+    --focus-ring: rgba(110, 231, 199, 0.28);
+    --gloss: rgba(110, 231, 199, 0.16);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111914;
+  --panel: #18221d;
+  --panel-soft: #223029;
+  --text: #f7f2e8;
+  --muted: #c7d0c9;
+  --border: #34463d;
+  --accent: #6ee7c7;
+  --accent-strong: #a7f3d0;
+  --secondary: #f0abfc;
+  --code-bg: #0d1511;
+  --shadow: 0 22px 60px rgba(4, 8, 16, 0.34);
+  --shadow-strong: 0 30px 90px rgba(4, 8, 16, 0.48);
+  --sidebar-bg: linear-gradient(180deg, rgba(24, 34, 29, 0.95), rgba(17, 25, 20, 0.9));
+  --hero-gradient: linear-gradient(135deg, #1c2b24 0%, #0f1713 100%);
+  --card-gradient: linear-gradient(180deg, #1a261f 0%, #141e18 100%);
+  --brand-gradient: linear-gradient(135deg, var(--accent), #2dd4bf);
+  --brand-mark-text: #101914;
+  --badge-bg: rgba(110, 231, 199, 0.16);
+  --badge-text: #d1fae5;
+  --tag-bg: rgba(240, 171, 252, 0.18);
+  --tag-text: #f5d0fe;
+  --success-bg: rgba(134, 239, 172, 0.16);
+  --success-text: #bbf7d0;
+  --warning-bg: rgba(253, 186, 116, 0.16);
+  --warning-text: #fed7aa;
+  --focus-ring: rgba(110, 231, 199, 0.28);
+  --gloss: rgba(110, 231, 199, 0.16);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 * {
@@ -1586,7 +1886,10 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 18% -10%, var(--gloss), transparent 34rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--secondary) 13%, transparent), transparent 28rem),
+    var(--bg);
   color: var(--text);
   font-family: var(--font-family);
   line-height: 1.55;
@@ -1614,7 +1917,7 @@ code {
   z-index: 10;
   border-radius: 6px;
   background: var(--text);
-  color: white;
+  color: var(--panel);
   padding: 0.55rem 0.8rem;
 }
 
@@ -1634,8 +1937,10 @@ code {
   height: 100vh;
   overflow: auto;
   border-right: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--sidebar-bg);
+  box-shadow: 12px 0 40px rgba(20, 24, 20, 0.04);
   padding: 1.1rem;
+  backdrop-filter: blur(18px);
 }
 
 .sidebar-top {
@@ -1659,8 +1964,9 @@ code {
   width: 2.4rem;
   height: 2.4rem;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  color: white;
+  background: var(--brand-gradient);
+  box-shadow: var(--shadow);
+  color: var(--brand-mark-text);
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -1685,11 +1991,50 @@ code {
   display: none;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--panel);
+  background: var(--card-gradient);
   color: var(--text);
   padding: 0.45rem 0.65rem;
   font: inherit;
   font-weight: 700;
+}
+
+.theme-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.18rem;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-soft);
+  padding: 0.18rem;
+}
+
+.theme-control button {
+  min-width: 0;
+  border: 0;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  padding: 0.34rem 0.2rem;
+}
+
+.theme-control button[aria-pressed="true"] {
+  background: var(--card-gradient);
+  box-shadow: var(--shadow);
+  color: var(--accent-strong);
+}
+
+.theme-control button:focus-visible,
+.nav-toggle:focus-visible,
+.nav-link:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 input[type="search"] {
@@ -1704,7 +2049,7 @@ input[type="search"] {
 
 input[type="search"]:focus {
   border-color: var(--accent);
-  outline: 3px solid rgba(36, 107, 98, 0.16);
+  outline: 3px solid var(--focus-ring);
 }
 
 .nav {
@@ -1773,8 +2118,8 @@ input[type="search"]:focus {
   align-items: stretch;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: linear-gradient(135deg, #ffffff 0%, #f4f6f0 100%);
-  box-shadow: var(--shadow);
+  background: var(--hero-gradient);
+  box-shadow: var(--shadow-strong);
   padding: clamp(1.1rem, 3vw, 2rem);
 }
 
@@ -1800,7 +2145,7 @@ input[type="search"]:focus {
 .stats-grid div {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.72);
+  background: color-mix(in srgb, var(--panel) 82%, transparent);
   padding: 0.9rem;
 }
 
@@ -1842,7 +2187,7 @@ input[type="search"]:focus {
 .sources-panel {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--panel);
+  background: var(--card-gradient);
 }
 
 .section-card {
@@ -1857,12 +2202,12 @@ input[type="search"]:focus {
 .section-card:hover,
 .record-card:hover,
 .search-result:hover {
-  border-color: rgba(36, 107, 98, 0.4);
-  box-shadow: var(--shadow);
+  border-color: var(--focus-ring);
+  box-shadow: var(--shadow-strong);
 }
 
 .section-card span {
-  color: var(--pink);
+  color: var(--secondary);
   font-size: 0.8rem;
   font-weight: 700;
 }
@@ -1960,8 +2305,8 @@ input[type="search"]:focus {
 }
 
 .type-badge {
-  background: #e5f0ed;
-  color: var(--accent-strong);
+  background: var(--badge-bg);
+  color: var(--badge-text);
 }
 
 .audience-badge {
@@ -1975,13 +2320,13 @@ input[type="search"]:focus {
 }
 
 .confidence.high {
-  background: #e7f3df;
-  color: #2d5c1f;
+  background: var(--success-bg);
+  color: var(--success-text);
 }
 
 .confidence.low {
-  background: #f5e7df;
-  color: #7a3c1d;
+  background: var(--warning-bg);
+  color: var(--warning-text);
 }
 
 .tag-list {
@@ -1991,8 +2336,8 @@ input[type="search"]:focus {
 }
 
 .tag-list span {
-  background: #f8e8f1;
-  color: #743050;
+  background: var(--tag-bg);
+  color: var(--tag-text);
 }
 
 .record-page {
@@ -2025,7 +2370,7 @@ input[type="search"]:focus {
 
 .prose p,
 .prose ul {
-  color: #373933;
+  color: var(--text);
 }
 
 .record-meta {
@@ -2235,6 +2580,8 @@ function siteJs(): string {
   return `/* Generated by Wikiwiki from .wikiwiki/records. Edit structured records instead, then run \`wk site\`. */
 (function () {
   const entries = Array.isArray(window.WIKIWIKI_SEARCH_INDEX) ? window.WIKIWIKI_SEARCH_INDEX : [];
+  const themeStorageKey = "wikiwiki-theme-mode";
+  const validThemeModes = ["auto", "light", "dark"];
 
   function escapeHtml(value) {
     return String(value)
@@ -2247,6 +2594,30 @@ function siteJs(): string {
 
   function normalize(value) {
     return String(value || "").toLowerCase();
+  }
+
+  function normalizeThemeMode(value) {
+    return validThemeModes.includes(value) ? value : "auto";
+  }
+
+  function applyThemeMode(mode, persist) {
+    const normalizedMode = normalizeThemeMode(mode);
+    if (normalizedMode === "light" || normalizedMode === "dark") {
+      document.documentElement.dataset.theme = normalizedMode;
+    } else {
+      delete document.documentElement.dataset.theme;
+    }
+    document.documentElement.dataset.themeMode = normalizedMode;
+    document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+      button.setAttribute("aria-pressed", button.getAttribute("data-theme-choice") === normalizedMode ? "true" : "false");
+    });
+    if (persist) {
+      try {
+        localStorage.setItem(themeStorageKey, normalizedMode);
+      } catch (error) {
+        // Ignore localStorage failures in file previews and locked-down browsers.
+      }
+    }
   }
 
   function resultHtml(entry) {
@@ -2329,6 +2700,20 @@ function siteJs(): string {
       }
       const isOpen = nav.classList.toggle("open");
       button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  });
+
+  const defaultThemeMode = normalizeThemeMode(document.documentElement.getAttribute("data-default-theme") || "auto");
+  let savedThemeMode = "";
+  try {
+    savedThemeMode = localStorage.getItem(themeStorageKey) || "";
+  } catch (error) {
+    savedThemeMode = "";
+  }
+  applyThemeMode(savedThemeMode || defaultThemeMode, false);
+  document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      applyThemeMode(button.getAttribute("data-theme-choice") || "auto", true);
     });
   });
 }());

@@ -13,11 +13,14 @@ export type WikiwikiConfig = {
   };
 };
 
-export type WikiwikiSiteTheme = {
-  project_name?: string;
-  project_description?: string;
+export const wikiwikiColorSchemes = ["auto", "light", "dark"] as const;
+
+export type WikiwikiColorScheme = (typeof wikiwikiColorSchemes)[number];
+
+export type WikiwikiThemePalette = {
   accent?: string;
   accent_strong?: string;
+  secondary?: string;
   bg?: string;
   panel?: string;
   panel_soft?: string;
@@ -25,8 +28,35 @@ export type WikiwikiSiteTheme = {
   muted?: string;
   border?: string;
   code_bg?: string;
+  shadow?: string;
+  shadow_strong?: string;
   radius?: string;
   font_family?: string;
+  sidebar_bg?: string;
+  hero_gradient?: string;
+  card_gradient?: string;
+  brand_gradient?: string;
+  brand_mark_text?: string;
+  badge_bg?: string;
+  badge_text?: string;
+  tag_bg?: string;
+  tag_text?: string;
+  success_bg?: string;
+  success_text?: string;
+  warning_bg?: string;
+  warning_text?: string;
+  focus_ring?: string;
+  gloss?: string;
+};
+
+export type WikiwikiSiteTheme = WikiwikiThemePalette & {
+  project_name?: string;
+  project_description?: string;
+  default_color_scheme?: WikiwikiColorScheme;
+  modes?: {
+    light?: WikiwikiThemePalette;
+    dark?: WikiwikiThemePalette;
+  };
 };
 
 export function configPath(root: string): string {
@@ -89,14 +119,44 @@ export function readWikiwikiSiteTheme(root: string): WikiwikiSiteTheme {
   }
 
   const theme = parsed as Record<string, unknown>;
-  const result: WikiwikiSiteTheme = {};
-  for (const key of siteThemeKeys) {
+  const result: WikiwikiSiteTheme = readThemePalette(theme, ".wikiwiki/site-theme.json");
+
+  for (const key of siteThemeIdentityKeys) {
     const value = theme[key];
     if (value !== undefined) {
       if (typeof value !== "string") {
         throw new Error(`.wikiwiki/site-theme.json ${key} must be a string.`);
       }
       result[key] = value;
+    }
+  }
+
+  const defaultColorScheme = theme.default_color_scheme;
+  if (defaultColorScheme !== undefined) {
+    if (typeof defaultColorScheme !== "string" || !(wikiwikiColorSchemes as readonly string[]).includes(defaultColorScheme)) {
+      throw new Error(`.wikiwiki/site-theme.json default_color_scheme must be one of: ${wikiwikiColorSchemes.join(", ")}.`);
+    }
+    result.default_color_scheme = defaultColorScheme as WikiwikiColorScheme;
+  }
+
+  if (theme.modes !== undefined) {
+    if (!theme.modes || typeof theme.modes !== "object" || Array.isArray(theme.modes)) {
+      throw new Error(".wikiwiki/site-theme.json modes must be an object.");
+    }
+    const modes = theme.modes as Record<string, unknown>;
+    const resultModes: NonNullable<WikiwikiSiteTheme["modes"]> = {};
+    for (const mode of ["light", "dark"] as const) {
+      const value = modes[mode];
+      if (value === undefined) {
+        continue;
+      }
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new Error(`.wikiwiki/site-theme.json modes.${mode} must be an object.`);
+      }
+      resultModes[mode] = readThemePalette(value as Record<string, unknown>, `.wikiwiki/site-theme.json modes.${mode}`);
+    }
+    if (Object.keys(resultModes).length > 0) {
+      result.modes = resultModes;
     }
   }
 
@@ -141,11 +201,15 @@ function parseIntegrationsConfig(value: unknown): WikiwikiConfig["integrations"]
   return Object.keys(result).length > 0 ? result : undefined;
 }
 
-const siteThemeKeys = [
+const siteThemeIdentityKeys = [
   "project_name",
-  "project_description",
+  "project_description"
+] as const;
+
+export const siteThemePaletteKeys = [
   "accent",
   "accent_strong",
+  "secondary",
   "bg",
   "panel",
   "panel_soft",
@@ -153,6 +217,38 @@ const siteThemeKeys = [
   "muted",
   "border",
   "code_bg",
+  "shadow",
+  "shadow_strong",
   "radius",
-  "font_family"
+  "font_family",
+  "sidebar_bg",
+  "hero_gradient",
+  "card_gradient",
+  "brand_gradient",
+  "brand_mark_text",
+  "badge_bg",
+  "badge_text",
+  "tag_bg",
+  "tag_text",
+  "success_bg",
+  "success_text",
+  "warning_bg",
+  "warning_text",
+  "focus_ring",
+  "gloss"
 ] as const;
+
+function readThemePalette(theme: Record<string, unknown>, context: string): WikiwikiThemePalette {
+  const result: Record<string, string> = {};
+  for (const key of siteThemePaletteKeys) {
+    const value = theme[key];
+    if (value !== undefined) {
+      if (typeof value !== "string") {
+        throw new Error(`${context} ${key} must be a string.`);
+      }
+      result[key] = value;
+    }
+  }
+
+  return result as WikiwikiThemePalette;
+}
