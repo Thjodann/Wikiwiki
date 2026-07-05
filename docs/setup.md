@@ -206,6 +206,11 @@ while overwriting the bundled `wk` skill files:
 wk install-agent codex --yes --force
 ```
 
+Once installed, a bare `wk`, `/wk`, `$wk`, or linked `$wk` request means "show
+me the generated wiki site." The skill should return one concise link to an
+existing `wiki-site/index.html`; it should not run status/spin, generate files,
+start a server, or explain the skill for that bare invocation.
+
 To install manually on macOS or Linux:
 
 ```sh

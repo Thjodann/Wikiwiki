@@ -36,7 +36,7 @@
         <nav class="nav">
 <p class="nav-heading">Start Here</p>
 <a class="nav-link" href="index.html">Home</a>
-<a class="nav-link" href="articles.html">Articles<span>0</span></a>
+<a class="nav-link" href="articles.html">Articles<span>5</span></a>
 <a class="nav-link active" href="guides.html" aria-current="page">Guides</a>
 <a class="nav-link" href="search.html">Search</a>
 <p class="nav-heading">Agent records</p>
@@ -56,63 +56,62 @@
       </header>
       <section class="section">
   <div class="section-heading">
-    <p class="eyebrow">Start here</p>
-    <h2>Project essentials</h2>
+    <p class="eyebrow">Articles</p>
+    <h2>Start with the public wiki</h2>
   </div>
   <div class="record-list"><article class="record-card" data-search-card>
   <div class="record-card-top">
-    <span class="type-badge">Decision</span>
+    <span class="type-badge">Article</span><span class="audience-badge">For users</span>
   </div>
-  <h3><a href="records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html">Make generated sites project-first</a></h3>
-  <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer...</p>
+  <h3><a href="articles/Getting-Started.html">Getting started</a></h3>
+  <p>Install the npm package, set up a repo wiki, generate the site, and verify the first local output.</p>
   <footer>
-    <span class="tag-list"><span>site</span><span>ux</span><span>human-wiki</span><span>theme</span><span>homepage</span></span></footer>
+    <span class="tag-list"><span>getting-started</span><span>instructions</span><span>homepage</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
-    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
+    <span class="type-badge">Article</span><span class="audience-badge">For everyone</span>
   </div>
-  <h3><a href="records/decision/decision_4054b35e-c388-4e72-b116-c7efdb7e2d77.html">Use deterministic wiki profiles for first-pass seeding</a></h3>
-  <p>Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates.</p>
+  <h3><a href="articles/Project-Overview.html">Project overview</a></h3>
+  <p>Wikiwiki keeps local article-first project wikis beside the code, with structured records as the durable source of truth.</p>
   <footer>
-    <span class="tag-list"><span>product</span><span>dogfood</span><span>profiles</span><span>docs</span></span></footer>
+    <span class="tag-list"><span>product</span><span>overview</span><span>homepage</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
-    <span class="type-badge">Decision</span>
+    <span class="type-badge">Article</span><span class="audience-badge">For everyone</span>
   </div>
-  <h3><a href="records/decision/decision_5ad8c2cf-266c-4824-8833-1d40103933b9.html">Compile UX and DX human wikis through agent-mediated drafts</a></h3>
-  <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile...</p>
+  <h3><a href="articles/Agent-Setup.html">Agent setup</a></h3>
+  <p>Install the Codex-compatible wk skill so agents can run the same local wiki protocol as the CLI.</p>
   <footer>
-    <span class="tag-list"><span>compile</span><span>ux</span><span>dx</span><span>agent-workflow</span><span>agentic-ide</span></span></footer>
+    <span class="tag-list"><span>agent</span><span>codex</span><span>instructions</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
-    <span class="type-badge">Decision</span>
+    <span class="type-badge">Article</span><span class="audience-badge">For users</span>
   </div>
-  <h3><a href="records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html">Generate a static HTML site for human wiki browsing</a></h3>
-  <p>Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/...</p>
+  <h3><a href="articles/FAQ-Troubleshooting.html">FAQ and troubleshooting</a></h3>
+  <p>Common fixes for npm installs, missing generated sites, Beads coordination, and npm Trusted Publishing releases.</p>
   <footer>
-    <span class="tag-list"><span>site</span><span>ux</span><span>dx</span><span>human-wiki</span><span>static</span></span></footer>
+    <span class="tag-list"><span>faq</span><span>troubleshooting</span><span>release</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
-    <span class="type-badge">Decision</span>
+    <span class="type-badge">Article</span><span class="audience-badge">For everyone</span>
   </div>
-  <h3><a href="records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html">Make generated sites publishable without adjacent repo files</a></h3>
-  <p>Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and...</p>
+  <h3><a href="articles/Workflows.html">Workflows</a></h3>
+  <p>Use status/spin for orientation, records for durable knowledge, render/site for output, and closeout for reviewable end-of-work packets.</p>
   <footer>
-    <span class="tag-list"><span>site</span><span>github-pages</span><span>source-links</span><span>dx</span></span></footer>
-</article>
-<article class="record-card" data-search-card>
-  <div class="record-card-top">
-    <span class="type-badge">Decision</span>
-  </div>
-  <h3><a href="records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html">Support script-first wiki automation</a></h3>
-  <p>Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture...</p>
-  <footer>
-    <span class="tag-list"><span>product</span><span>automation</span><span>agents</span><span>docs</span></span></footer>
+    <span class="tag-list"><span>workflow</span><span>instructions</span><span>maintenance</span></span></footer>
 </article></div>
+</section>
+
+<section class="section">
+  <div class="section-heading">
+    <p class="eyebrow">Start here</p>
+    <h2>Project essentials</h2>
+  </div>
+  <div class="record-list"><div class="empty-state">No high-signal records captured yet.</div></div>
 </section>
 
 <section class="section">
@@ -185,55 +184,55 @@
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_e28e5351-dd00-4ba1-841d-278b639ae1c8.html">Use wk as primary CLI identity</a></h3>
-  <p>Keep Wikiwiki as the brand, rename the scoped package to @thjodann/wk, make wk the primary CLI binary and Commander display name, and preserve...</p>
+  <h3><a href="records/decision/decision_364c44ff-012c-4d15-b978-5e91adf73521.html">Make generated sites project-first</a></h3>
+  <p>Render generated sites as the user project wiki first: use project identity in titles and navigation, keep only a small Created with Wikiwiki footer...</p>
   <footer>
-    <span class="tag-list"><span>cli</span><span>rename</span><span>agent-workflow</span></span></footer>
+    <span class="tag-list"><span>site</span><span>ux</span><span>human-wiki</span><span>theme</span><span>homepage</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
   </div>
-  <h3><a href="records/decision/decision_b4c51da7-cbb6-4cf9-9b38-cac451cdd517.html">Add setup and closeout automation commands</a></h3>
-  <p>Add wk setup to persist profile/audience defaults and safe package scripts, and add wk closeout to create reviewable draft packets before validating...</p>
+  <h3><a href="records/decision/decision_4054b35e-c388-4e72-b116-c7efdb7e2d77.html">Use deterministic wiki profiles for first-pass seeding</a></h3>
+  <p>Add user, developer, and mixed wiki profiles that define target record counts, audience tags, page emphasis, and stable first-pass seed templates.</p>
   <footer>
-    <span class="tag-list"><span>automation</span><span>setup</span><span>closeout</span><span>agents</span></span></footer>
-</article>
-<article class="record-card" data-search-card>
-  <div class="record-card-top">
-    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
-  </div>
-  <h3><a href="records/decision/decision_c6228ed6-cbfd-4b7a-b4a6-1a3685460500.html">Generate project themes through an explicit theme command</a></h3>
-  <p>Add wk theme preview and wk theme init as the explicit surface for product-identity theme generation.</p>
-  <footer>
-    <span class="tag-list"><span>theme</span><span>customization</span><span>cli</span><span>ux</span></span></footer>
-</article>
-<article class="record-card" data-search-card>
-  <div class="record-card-top">
-    <span class="type-badge">Decision</span><span class="audience-badge">For everyone</span>
-  </div>
-  <h3><a href="records/decision/decision_aea0762f-b222-4ea3-971d-bfba768255a7.html">Render audience-focused wiki sites</a></h3>
-  <p>Support wk site --audience user, developer, or all.</p>
-  <footer>
-    <span class="tag-list"><span>site</span><span>ux</span><span>dx</span></span></footer>
+    <span class="tag-list"><span>product</span><span>dogfood</span><span>profiles</span><span>docs</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_4afeedee-2022-4cc3-bfd7-ddaa93e4733f.html">Make agent skill installation safe by default</a></h3>
-  <p>Install bundled wk skill files in place, refuse unknown destination files by default, and require explicit --force intent before installing into a...</p>
+  <h3><a href="records/decision/decision_5ad8c2cf-266c-4824-8833-1d40103933b9.html">Compile UX and DX human wikis through agent-mediated drafts</a></h3>
+  <p>Generate both UX and DX compile drafts by default, let the active IDE agent author the prose, then validate and publish the result with wk compile...</p>
   <footer>
-    <span class="tag-list"><span>cli</span><span>safety</span><span>agents</span><span>install</span></span></footer>
+    <span class="tag-list"><span>compile</span><span>ux</span><span>dx</span><span>agent-workflow</span><span>agentic-ide</span></span></footer>
 </article>
 <article class="record-card" data-search-card>
   <div class="record-card-top">
     <span class="type-badge">Decision</span>
   </div>
-  <h3><a href="records/decision/decision_3b942fb5-f31d-4ffb-ae25-4c3d2dfab1bd.html">Use JSONL for MVP storage</a></h3>
-  <p>Store each record type in an append-only JSONL file under .wikiwiki/records.</p>
+  <h3><a href="records/decision/decision_92c5a4f4-121d-4146-bb7d-9e0c3f780574.html">Generate a static HTML site for human wiki browsing</a></h3>
+  <p>Add wk site as a separate static site generator that reads structured records, preserves wk render Markdown output, and writes a browsable wiki-site/...</p>
   <footer>
-    <span class="tag-list"><span>storage</span><span>mvp</span></span></footer>
+    <span class="tag-list"><span>site</span><span>ux</span><span>dx</span><span>human-wiki</span><span>static</span></span></footer>
+</article>
+<article class="record-card" data-search-card>
+  <div class="record-card-top">
+    <span class="type-badge">Decision</span>
+  </div>
+  <h3><a href="records/decision/decision_da8b0beb-5ff7-440b-b4bf-0f27194f92f5.html">Make generated sites publishable without adjacent repo files</a></h3>
+  <p>Support .wikiwiki/config.json source_base_url and wk site --source-base-url, with CLI override winning; use remote source URLs when configured and...</p>
+  <footer>
+    <span class="tag-list"><span>site</span><span>github-pages</span><span>source-links</span><span>dx</span></span></footer>
+</article>
+<article class="record-card" data-search-card>
+  <div class="record-card-top">
+    <span class="type-badge">Decision</span>
+  </div>
+  <h3><a href="records/decision/decision_d7a1f846-57be-4c31-9fd6-27dc704622ab.html">Support script-first wiki automation</a></h3>
+  <p>Position Wikiwiki as a deterministic CLI and scriptable wiki generator first, with optional agentic IDE instructions that expand record capture...</p>
+  <footer>
+    <span class="tag-list"><span>product</span><span>automation</span><span>agents</span><span>docs</span></span></footer>
 </article></div>
 </section>
 

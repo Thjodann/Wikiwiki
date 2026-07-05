@@ -17,6 +17,11 @@
     "symbols.html",
     "links.html",
     "search.html",
+    "articles/Project-Overview.html",
+    "articles/Getting-Started.html",
+    "articles/Agent-Setup.html",
+    "articles/Workflows.html",
+    "articles/FAQ-Troubleshooting.html",
     "records/concept/concept_17ca8065-a8d3-4373-9afe-b47b51a424d3.html",
     "records/concept/concept_650e0409-9414-4667-8b40-f36c406a1cb0.html",
     "records/concept/concept_4fde0906-d53a-4b9f-b977-3fe964a9d447.html",
@@ -78,7 +83,59 @@
     "records/symbol/symbol_a4be37e1-62ce-45b4-a7bf-0735943a0959.html",
     "records/symbol/symbol_dfd8c0d0-170a-4a61-bf39-2ab1335c1ba5.html"
   ],
-  "articles": [],
+  "integrations": {
+    "beads": {
+      "detected": true,
+      "enabled": true,
+      "available": false,
+      "configured": "auto",
+      "error": "beads_auto_read_skipped",
+      "warnings": [
+        "Beads workspace detected; detailed bd reads are skipped in auto mode to avoid dirtying .beads. Set integrations.beads.enabled to true to opt in."
+      ],
+      "counts": {
+        "ready": 0,
+        "in_progress": 0,
+        "recent_closed": 0
+      },
+      "issue_ids": [],
+      "ready": [],
+      "in_progress": [],
+      "recent_closed": []
+    }
+  },
+  "articles": [
+    {
+      "id": "article_14111689-8c21-4e67-a8ce-af01bf169e38",
+      "title": "Project overview",
+      "slug": "Project-Overview",
+      "url": "articles/Project-Overview.html"
+    },
+    {
+      "id": "article_1e1ed20d-081b-4fa0-9cf5-3a6c06331325",
+      "title": "Getting started",
+      "slug": "Getting-Started",
+      "url": "articles/Getting-Started.html"
+    },
+    {
+      "id": "article_d2716fa1-9e38-45c4-a428-4e14b8ee399e",
+      "title": "Agent setup",
+      "slug": "Agent-Setup",
+      "url": "articles/Agent-Setup.html"
+    },
+    {
+      "id": "article_d44352a8-8230-403f-9176-12d6d1a648c2",
+      "title": "Workflows",
+      "slug": "Workflows",
+      "url": "articles/Workflows.html"
+    },
+    {
+      "id": "article_0813c454-1df9-4ec4-b19a-dde8223e03f8",
+      "title": "FAQ and troubleshooting",
+      "slug": "FAQ-Troubleshooting",
+      "url": "articles/FAQ-Troubleshooting.html"
+    }
+  ],
   "records": [
     {
       "type": "concept",

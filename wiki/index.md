@@ -18,7 +18,7 @@ This is the generated human-readable view of Wikiwiki's structured project knowl
 
 ## Record Counts
 
-- Article: 0
+- Article: 5
 - Concept: 8
 - Decision: 17
 - Event: 23

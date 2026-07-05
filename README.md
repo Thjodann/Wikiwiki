@@ -141,11 +141,15 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - optional read-only Beads integration for developer work context
 - public npm package `@thjodann/wk`
 - GitHub Release-based npm publishing through Trusted Publishing
+- bundled Codex skill behavior where bare `wk`/`/wk` opens the generated site
+- dogfooded article pages for this repo's generated wiki
 - CI and tests
 
-Near-term polish is mostly packaging and docs hygiene for `1.0.1`. Larger
-planned pieces include richer symbol extraction, draft review flows, and watch
-mode.
+The package and release foundation is complete enough for regular patch
+releases. The current polish milestone is `1.0.3 Open the Wiki`: make bare
+`/wk` show the generated site and make this repo's own generated wiki useful at
+first glance. The next larger feature remains draft review flows for approving
+or rejecting closeout and compile drafts.
 
 Generated `wiki/` and `wiki-site/` are intentionally not shipped in the npm
 package. Installed users generate their own copies from their own records.
@@ -194,9 +198,10 @@ not release commitments.
 
 | Planned feature | Completion | Notes |
 | --- | ---: | --- |
-| `1.0.1` package polish | 70% | Bundle the current README and skill docs, and decide whether repo artwork such as `assets/wikiwiki-banner.png` should ship inside the npm tarball rather than only through GitHub-hosted README links. |
-| Agent setup polish | 85% | `wk setup --agent codex` and `wk install-agent codex` exist; remaining work is clearer multi-agent targeting and stricter destination previews. |
-| Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are still early. |
+| `1.0.3` Open the Wiki | 95% | Bare `wk`/`/wk` opens an existing generated site, five starter article records seed this repo's wiki, and package docs point at the current release path. |
+| Package and release foundation | 96% | README/docs/skill files ship in npm, generated dogfood output and `assets/wikiwiki-banner.png` stay out of the tarball, and GitHub Releases drive Trusted Publishing with a manual 2FA fallback. |
+| Agent setup polish | 88% | `wk setup --agent codex` and `wk install-agent codex` preserve the bundled skill behavior; remaining work is broader target support and clearer destination previews. |
+| Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are the next larger feature after `1.0.3`. |
 | Richer symbol extraction | 20% | Symbol records and pages exist, but important symbols are still captured manually. |
 | Watch mode | 10% | Batch commands exist for `status`, `spin`, and `closeout`; no file watcher is built yet. |
 | `scratch` review command | 10% | Validation and search exist; contradiction, drift, and stale-knowledge review is not a dedicated command yet. |
@@ -208,9 +213,9 @@ not release commitments.
 
 Shared completion snapshot:
 
-- Package and release foundation: about 92%
-- Named future roadmap: about 44%
-- Blended overall product vision: about 74%
+- Package and release foundation: about 96%
+- Named future roadmap: about 45%
+- Blended overall product vision: about 77%
 
 ## License
 

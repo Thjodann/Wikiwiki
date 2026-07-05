@@ -2,4 +2,52 @@
 
 # Articles
 
-_No articles captured yet._
+## [Agent setup](./articles/Agent-Setup.md)
+
+Install the Codex-compatible wk skill so agents can run the same local wiki protocol as the CLI.
+
+Categories: `agent`, `setup`, `instructions`
+
+Aliases: `codex setup`, `wk skill`
+
+Record: `article_d2716fa1-9e38-45c4-a428-4e14b8ee399e`
+
+## [FAQ and troubleshooting](./articles/FAQ-Troubleshooting.md)
+
+Common fixes for npm installs, missing generated sites, Beads coordination, and npm Trusted Publishing releases.
+
+Categories: `faq`, `troubleshooting`, `release`
+
+Aliases: `faq`, `troubleshooting`
+
+Record: `article_0813c454-1df9-4ec4-b19a-dde8223e03f8`
+
+## [Getting started](./articles/Getting-Started.md)
+
+Install the npm package, set up a repo wiki, generate the site, and verify the first local output.
+
+Categories: `getting-started`, `instructions`, `homepage`
+
+Aliases: `quick start`, `first install`
+
+Record: `article_1e1ed20d-081b-4fa0-9cf5-3a6c06331325`
+
+## [Project overview](./articles/Project-Overview.md)
+
+Wikiwiki keeps local article-first project wikis beside the code, with structured records as the durable source of truth.
+
+Categories: `product`, `overview`, `homepage`
+
+Aliases: `overview`, `what is wikiwiki`
+
+Record: `article_14111689-8c21-4e67-a8ce-af01bf169e38`
+
+## [Workflows](./articles/Workflows.md)
+
+Use status/spin for orientation, records for durable knowledge, render/site for output, and closeout for reviewable end-of-work packets.
+
+Categories: `workflows`, `maintenance`, `instructions`
+
+Aliases: `daily workflow`, `agent workflow`
+
+Record: `article_d44352a8-8230-403f-9176-12d6d1a648c2`
