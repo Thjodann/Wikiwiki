@@ -21,7 +21,7 @@ This is the generated human-readable view of Wikiwiki's structured project knowl
 - Article: 5
 - Concept: 8
 - Decision: 17
-- Event: 23
+- Event: 24
 - Note: 3
 - Symbol: 7
 - Link: 2

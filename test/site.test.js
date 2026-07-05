@@ -337,6 +337,64 @@ test("buildSiteFiles renders article-first pages and search entries", () => {
   assert.match(articleSearch.text, /Potion Crafting/);
 });
 
+test("buildSiteFiles renders Markdown article bodies as safe HTML", () => {
+  const root = tempRoot();
+  seedRecords(root);
+  appendRecord(root, "article", {
+    type: "article",
+    id: "article_markdown_body",
+    source: "agent",
+    authority: "agent",
+    confidence: "high",
+    created_at: "2026-01-02T00:00:00.000Z",
+    updated_at: "2026-01-02T00:00:00.000Z",
+    title: "Markdown Body",
+    slug: "Markdown-Body",
+    summary: "Summary with `inline` code.",
+    body: [
+      "## Brewing Basics",
+      "",
+      "Use [Static wiki site](concept_static_site) and `inline-code` safely.",
+      "",
+      "- Gather ingredients",
+      "- Mix potions",
+      "",
+      "1. Validate records",
+      "2. Render site",
+      "",
+      "> Keep generated files deterministic.",
+      "",
+      "```ts",
+      "const potion = \"<safe>\";",
+      "```",
+      "",
+      "Raw HTML stays text: <script>alert('x')</script>",
+      "",
+      "Unsafe [bad link](javascript:alert%281%29) stays text."
+    ].join("\n"),
+    categories: ["Docs"],
+    aliases: [],
+    source_record_ids: ["concept_static_site"],
+    files: [],
+    tags: ["audience:all", "docs"]
+  });
+
+  const files = buildSiteFiles(root);
+  const article = file(files, "articles/Markdown-Body.html");
+
+  assert.match(article, /<h2>Brewing Basics<\/h2>/);
+  assert.doesNotMatch(article, /## Brewing Basics/);
+  assert.match(article, /<a href="..\/records\/concept\/concept_static_site\.html">Static wiki site<\/a>/);
+  assert.match(article, /<code>inline-code<\/code>/);
+  assert.match(article, /<ul>\s*<li>Gather ingredients<\/li>\s*<li>Mix potions<\/li>\s*<\/ul>/);
+  assert.match(article, /<ol>\s*<li>Validate records<\/li>\s*<li>Render site<\/li>\s*<\/ol>/);
+  assert.match(article, /<blockquote><p>Keep generated files deterministic\.<\/p><\/blockquote>/);
+  assert.match(article, /<pre><code class="language-ts">const potion = &quot;&lt;safe&gt;&quot;;<\/code><\/pre>/);
+  assert.match(article, /Raw HTML stays text: &lt;script&gt;alert\(&#39;x&#39;\)&lt;\/script&gt;/);
+  assert.match(article, /Unsafe bad link stays text\./);
+  assert.doesNotMatch(article, /href="javascript:/);
+});
+
 test("buildSiteFiles generated HTML has no missing local links", () => {
   const root = tempRoot();
   seedRecords(root);

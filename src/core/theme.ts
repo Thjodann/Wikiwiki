@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { siteThemePath, type WikiwikiSiteTheme, type WikiwikiThemePalette } from "./config";
+import { siteThemePath, type WikiwikiSiteTheme, type WikiwikiThemeFont, type WikiwikiThemePalette } from "./config";
 import { relativeReportPath } from "./paths";
 
 export const themeMoods = ["calm", "vivid", "editorial", "utility", "playful", "dark"] as const;
@@ -20,6 +20,7 @@ export type ThemePreviewResult = {
   exists: boolean;
   mood: ThemeMood;
   style_sources: string[];
+  asset_sources: string[];
   identity: ThemeIdentity;
   theme: WikiwikiSiteTheme;
 };
@@ -82,6 +83,29 @@ type StyleInference = {
   hasGlow: boolean;
   hasGlass: boolean;
   hasShadow: boolean;
+};
+
+type ThemeAssets = {
+  logoPath?: string;
+  wordmarkPath?: string;
+  faviconPath?: string;
+  fonts: WikiwikiThemeFont[];
+  sources: string[];
+};
+
+type ImageAssetKind = "logo" | "wordmark" | "favicon";
+
+type ImageAssetCandidate = {
+  kind: ImageAssetKind;
+  file: string;
+  score: number;
+  explicit: boolean;
+};
+
+type FontAssetCandidate = {
+  file: string;
+  score: number;
+  font: WikiwikiThemeFont;
 };
 
 type Rgb = {
@@ -479,9 +503,10 @@ const moodThemes: Record<ThemeMood, MoodTheme> = {
 
 export function previewTheme(root: string, options: ThemeOptions = {}): ThemePreviewResult {
   const style = inferProjectStyle(root);
+  const assets = inferProjectAssets(root);
   const identity = inferThemeIdentity(root, options);
   const mood = resolveThemeMood(root, identity, options.mood, style);
-  const theme = applyProjectStyle(moodThemes[mood], style);
+  const theme = applyProjectFonts(applyProjectStyle(moodThemes[mood], style), assets.fonts);
   return {
     ok: true,
     mode: "preview",
@@ -489,10 +514,15 @@ export function previewTheme(root: string, options: ThemeOptions = {}): ThemePre
     exists: fs.existsSync(siteThemePath(root)),
     mood,
     style_sources: style.sources.map((source) => relativeReportPath(root, source.file)),
+    asset_sources: assets.sources,
     identity,
     theme: {
       project_name: identity.project_name,
       project_description: identity.project_description,
+      ...(assets.logoPath ? { logo_path: assets.logoPath } : {}),
+      ...(assets.wordmarkPath ? { wordmark_path: assets.wordmarkPath } : {}),
+      ...(assets.faviconPath ? { favicon_path: assets.faviconPath } : {}),
+      ...(assets.fonts.length > 0 ? { fonts: assets.fonts } : {}),
       default_color_scheme: style.defaultColorScheme ?? "auto",
       ...theme.light,
       modes: {

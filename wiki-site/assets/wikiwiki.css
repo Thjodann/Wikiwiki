@@ -583,18 +583,75 @@ input[type="search"]:focus {
   padding: clamp(1rem, 3vw, 1.6rem);
 }
 
-.prose h2 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
   margin: 1.3rem 0 0.3rem;
+}
+
+.prose h1 {
+  font-size: 1.55rem;
+}
+
+.prose h2 {
   font-size: 1.25rem;
 }
 
-.prose h2:first-child {
+.prose h3 {
+  font-size: 1.1rem;
+}
+
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-size: 1rem;
+}
+
+.prose h1:first-child,
+.prose h2:first-child,
+.prose h3:first-child,
+.prose h4:first-child,
+.prose h5:first-child,
+.prose h6:first-child {
   margin-top: 0;
 }
 
 .prose p,
-.prose ul {
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose pre {
   color: var(--text);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.45rem;
+}
+
+.prose blockquote {
+  margin: 1rem 0;
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--muted);
+}
+
+.prose pre {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  padding: 0.85rem;
+}
+
+.prose pre code {
+  display: block;
+  overflow-wrap: normal;
+  background: transparent;
+  padding: 0;
+  white-space: pre;
 }
 
 .record-meta {

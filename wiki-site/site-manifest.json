@@ -68,6 +68,7 @@
     "records/event/event_27daec8b-1546-41d7-867a-66ee93138ae7.html",
     "records/event/event_d67ebd8e-e9f4-4c08-a011-72295a6e7210.html",
     "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html",
+    "records/event/event_da383319-890e-4cc2-a090-a6e9561fea76.html",
     "records/event/event_e38dffad-d6eb-4d9b-9833-967ed2a947b6.html",
     "records/event/event_495227ea-a813-41fa-b7a6-910f338a518f.html",
     "records/link/link_f1dadf17-2e61-4024-bb02-d237e43ea911.html",
@@ -412,6 +413,12 @@
       "id": "event_1222a170-521f-476b-bd83-7359a4ba66c2",
       "title": "Renamed CLI identity to wk",
       "url": "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html"
+    },
+    {
+      "type": "event",
+      "id": "event_da383319-890e-4cc2-a090-a6e9561fea76",
+      "title": "Rendered article Markdown as safe HTML",
+      "url": "records/event/event_da383319-890e-4cc2-a090-a6e9561fea76.html"
     },
     {
       "type": "event",

@@ -49,9 +49,21 @@ export type WikiwikiThemePalette = {
   gloss?: string;
 };
 
+export type WikiwikiThemeFont = {
+  family: string;
+  path: string;
+  weight?: string;
+  style?: string;
+  display?: string;
+};
+
 export type WikiwikiSiteTheme = WikiwikiThemePalette & {
   project_name?: string;
   project_description?: string;
+  logo_path?: string;
+  wordmark_path?: string;
+  favicon_path?: string;
+  fonts?: WikiwikiThemeFont[];
   default_color_scheme?: WikiwikiColorScheme;
   modes?: {
     light?: WikiwikiThemePalette;
@@ -131,6 +143,50 @@ export function readWikiwikiSiteTheme(root: string): WikiwikiSiteTheme {
     }
   }
 
+  for (const key of siteThemeAssetKeys) {
+    const value = theme[key];
+    if (value !== undefined) {
+      if (typeof value !== "string") {
+        throw new Error(`.wikiwiki/site-theme.json ${key} must be a string.`);
+      }
+      result[key] = value;
+    }
+  }
+
+  if (theme.fonts !== undefined) {
+    if (!Array.isArray(theme.fonts)) {
+      throw new Error(".wikiwiki/site-theme.json fonts must be an array.");
+    }
+    const fonts: WikiwikiThemeFont[] = [];
+    for (const [index, value] of theme.fonts.entries()) {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new Error(`.wikiwiki/site-theme.json fonts[${index}] must be an object.`);
+      }
+      const font = value as Record<string, unknown>;
+      if (typeof font.family !== "string" || !font.family.trim()) {
+        throw new Error(`.wikiwiki/site-theme.json fonts[${index}].family must be a non-empty string.`);
+      }
+      if (typeof font.path !== "string" || !font.path.trim()) {
+        throw new Error(`.wikiwiki/site-theme.json fonts[${index}].path must be a non-empty string.`);
+      }
+      for (const key of ["weight", "style", "display"] as const) {
+        if (font[key] !== undefined && typeof font[key] !== "string") {
+          throw new Error(`.wikiwiki/site-theme.json fonts[${index}].${key} must be a string.`);
+        }
+      }
+      fonts.push({
+        family: font.family,
+        path: font.path,
+        ...(font.weight ? { weight: font.weight as string } : {}),
+        ...(font.style ? { style: font.style as string } : {}),
+        ...(font.display ? { display: font.display as string } : {})
+      });
+    }
+    if (fonts.length > 0) {
+      result.fonts = fonts;
+    }
+  }
+
   const defaultColorScheme = theme.default_color_scheme;
   if (defaultColorScheme !== undefined) {
     if (typeof defaultColorScheme !== "string" || !(wikiwikiColorSchemes as readonly string[]).includes(defaultColorScheme)) {
@@ -204,6 +260,12 @@ function parseIntegrationsConfig(value: unknown): WikiwikiConfig["integrations"]
 const siteThemeIdentityKeys = [
   "project_name",
   "project_description"
+] as const;
+
+const siteThemeAssetKeys = [
+  "logo_path",
+  "wordmark_path",
+  "favicon_path"
 ] as const;
 
 export const siteThemePaletteKeys = [

@@ -185,3 +185,11 @@ Published the first public npm release as @thjodann/wk with wk and wikiwiki bina
 Files: `package.json`, `README.md`, `docs/setup.md`, `docs/reference.md`, `src/index.ts`, `src/cli/commands/pages.ts`, `src/core/pages.ts`, `test/cli.test.js`
 
 Recorded: 2026-07-05T01:52:02.648Z | Record: `event_27daec8b-1546-41d7-867a-66ee93138ae7` | Confidence: high
+
+## Rendered article Markdown as safe HTML
+
+Updated the static site renderer so article and summary prose convert common Markdown blocks into safe HTML: headings, paragraphs, unordered and ordered lists, blockquotes, fenced code blocks, inline code, and Markdown links. Raw HTML remains escaped, and unsafe Markdown link schemes render as text instead of clickable links. Added site renderer regression coverage for the screenshot-driven Markdown rendering gap.
+
+Files: `src/core/site.ts`, `test/site.test.js`
+
+Recorded: 2026-07-05T04:24:28.217Z | Record: `event_da383319-890e-4cc2-a090-a6e9561fea76` | Confidence: high

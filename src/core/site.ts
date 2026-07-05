@@ -976,25 +976,108 @@ function recordCard(record: AnyRecord, currentFile: string, _model: SiteModel): 
 }
 
 function formatText(text: string, context: RenderContext): string {
-  const trimmed = text.trim();
+  const trimmed = text.replace(/\r\n/g, "\n").trim();
   if (!trimmed) {
     return "<p>Not recorded.</p>";
   }
 
-  const blocks = trimmed.split(/\n{2,}/);
-  return blocks.map((block) => formatBlock(block, context)).join("\n");
+  return formatMarkdownBlocks(trimmed.split("\n"), context);
 }
 
-function formatBlock(block: string, context: RenderContext): string {
-  const lines = block.split(/\r?\n/);
-  if (lines.every((line) => line.trim().startsWith("- "))) {
-    const items = lines
-      .map((line) => `<li>${formatInline(line.trim().slice(2), context)}</li>`)
-      .join("\n");
-    return `<ul>${items}</ul>`;
+function formatMarkdownBlocks(lines: string[], context: RenderContext): string {
+  const blocks: string[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index] ?? "";
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      index += 1;
+      continue;
+    }
+
+    const fence = /^```([A-Za-z0-9_-]+)?\s*$/.exec(trimmed);
+    if (fence) {
+      const codeLines: string[] = [];
+      index += 1;
+      while (index < lines.length && !/^```\s*$/.test((lines[index] ?? "").trim())) {
+        codeLines.push(lines[index] ?? "");
+        index += 1;
+      }
+      if (index < lines.length) {
+        index += 1;
+      }
+      const languageClass = fence[1] ? ` class="language-${escapeAttribute(fence[1])}"` : "";
+      blocks.push(`<pre><code${languageClass}>${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+      continue;
+    }
+
+    const heading = /^(#{1,6})\s+(.+?)\s*#*\s*$/.exec(trimmed);
+    if (heading) {
+      const level = heading[1].length;
+      blocks.push(`<h${level}>${formatInline(heading[2], context)}</h${level}>`);
+      index += 1;
+      continue;
+    }
+
+    if (/^>\s?/.test(trimmed)) {
+      const quoteLines: string[] = [];
+      while (index < lines.length && /^>\s?/.test((lines[index] ?? "").trim())) {
+        quoteLines.push((lines[index] ?? "").trim().replace(/^>\s?/, ""));
+        index += 1;
+      }
+      blocks.push(`<blockquote>${formatMarkdownBlocks(quoteLines, context)}</blockquote>`);
+      continue;
+    }
+
+    if (/^[-*+]\s+/.test(trimmed)) {
+      const items: string[] = [];
+      while (index < lines.length && /^[-*+]\s+/.test((lines[index] ?? "").trim())) {
+        items.push(`<li>${formatInline((lines[index] ?? "").trim().replace(/^[-*+]\s+/, ""), context)}</li>`);
+        index += 1;
+      }
+      blocks.push(`<ul>${items.join("\n")}</ul>`);
+      continue;
+    }
+
+    if (/^\d+[.)]\s+/.test(trimmed)) {
+      const items: string[] = [];
+      while (index < lines.length && /^\d+[.)]\s+/.test((lines[index] ?? "").trim())) {
+        items.push(`<li>${formatInline((lines[index] ?? "").trim().replace(/^\d+[.)]\s+/, ""), context)}</li>`);
+        index += 1;
+      }
+      blocks.push(`<ol>${items.join("\n")}</ol>`);
+      continue;
+    }
+
+    const paragraphLines: string[] = [];
+    while (index < lines.length) {
+      const paragraphLine = lines[index] ?? "";
+      const paragraphTrimmed = paragraphLine.trim();
+      if (!paragraphTrimmed) {
+        break;
+      }
+      if (paragraphLines.length > 0 && isMarkdownBlockStart(paragraphTrimmed)) {
+        break;
+      }
+      paragraphLines.push(paragraphTrimmed);
+      index += 1;
+    }
+    blocks.push(`<p>${formatInline(paragraphLines.join(" "), context)}</p>`);
   }
 
-  return `<p>${formatInline(lines.join(" "), context)}</p>`;
+  return blocks.join("\n");
+}
+
+function isMarkdownBlockStart(trimmedLine: string): boolean {
+  return (
+    /^```/.test(trimmedLine) ||
+    /^(#{1,6})\s+/.test(trimmedLine) ||
+    /^>\s?/.test(trimmedLine) ||
+    /^[-*+]\s+/.test(trimmedLine) ||
+    /^\d+[.)]\s+/.test(trimmedLine)
+  );
 }
 
 function formatInline(text: string, context: RenderContext): string {
@@ -1013,7 +1096,8 @@ function formatInline(text: string, context: RenderContext): string {
       if (linkMatch) {
         const label = linkMatch[1];
         const target = linkMatch[2];
-        parts.push(`<a href="${escapeAttribute(normalizeContentHref(target, context))}">${escapeHtml(label)}</a>`);
+        const href = normalizeContentHref(target, context);
+        parts.push(href ? `<a href="${escapeAttribute(href)}">${escapeHtml(label)}</a>` : escapeHtml(label));
       }
     }
     lastIndex = match.index + token.length;
@@ -1056,10 +1140,15 @@ function sourceFileLink(file: string, context: RenderContext): string {
   return `<a class="source-link" href="${escapeAttribute(href)}"><code>${escapeHtml(file)}</code></a>`;
 }
 
-function normalizeContentHref(target: string, context: RenderContext): string {
+function normalizeContentHref(target: string, context: RenderContext): string | undefined {
   const trimmed = target.trim();
-  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed) || trimmed.startsWith("#")) {
+  if (trimmed.startsWith("#")) {
     return trimmed;
+  }
+
+  const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(trimmed)?.[1].toLowerCase();
+  if (scheme) {
+    return ["http", "https", "mailto"].includes(scheme) ? trimmed : undefined;
   }
 
   const recordHrefForTarget = context.hrefById.get(trimmed);
@@ -2634,18 +2723,75 @@ input[type="search"]:focus {
   padding: clamp(1rem, 3vw, 1.6rem);
 }
 
-.prose h2 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
   margin: 1.3rem 0 0.3rem;
+}
+
+.prose h1 {
+  font-size: 1.55rem;
+}
+
+.prose h2 {
   font-size: 1.25rem;
 }
 
-.prose h2:first-child {
+.prose h3 {
+  font-size: 1.1rem;
+}
+
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-size: 1rem;
+}
+
+.prose h1:first-child,
+.prose h2:first-child,
+.prose h3:first-child,
+.prose h4:first-child,
+.prose h5:first-child,
+.prose h6:first-child {
   margin-top: 0;
 }
 
 .prose p,
-.prose ul {
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose pre {
   color: var(--text);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.45rem;
+}
+
+.prose blockquote {
+  margin: 1rem 0;
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--muted);
+}
+
+.prose pre {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  padding: 0.85rem;
+}
+
+.prose pre code {
+  display: block;
+  overflow-wrap: normal;
+  background: transparent;
+  padding: 0;
+  white-space: pre;
 }
 
 .record-meta {
