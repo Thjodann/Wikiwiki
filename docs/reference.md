@@ -313,8 +313,8 @@ not on every push to `main`; npm versions are immutable, so each release needs a
 new `package.json` version first. If a release is re-run for a version that is
 already on npm, the workflow skips `npm publish` after tests and validation pass.
 
-For the initial `v1.0.0` GitHub Release, tag the commit that matches the
-already-published `@thjodann/wk@1.0.0` npm package.
+The initial `v1.0.0` GitHub Release was created after a manual npm publish;
+future releases should use this workflow end-to-end.
 
 Release checklist:
 
@@ -349,16 +349,18 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - agent-mediated UX/DX human wiki compilation
 - local search across articles, active records, and rendered docs
 - agent-readable JSON output
-- scriptable non-AI setup through `wk setup` and repo scripts
+- scriptable setup through `wk setup`, repo scripts, and optional `--agent codex`
 - user-focused GitHub Pages workflow scaffolding through `wk pages init`
 - deterministic closeout draft packets through `wk closeout`
+- installable Codex-compatible `wk` agent skill
 - optional read-only Beads integration with developer-only `work.html`
-- npm package published as `@thjodann/wk@1.0.0`
+- public npm package `@thjodann/wk`
 - GitHub Release-based npm publishing through Trusted Publishing
 - CI and tests
 
 Some planned pieces are not built yet:
 
+- `1.0.1` package/docs polish
 - richer symbol extraction
 - draft review flows
 - watch mode
@@ -368,14 +370,22 @@ package. Installed users generate their own copies from their own records.
 
 ## Roadmap
 
-The turntable metaphor is light, but useful:
+Roadmap estimates are rough planning signals, not release commitments.
 
-- `spin` inspects repo changes and suggests knowledge updates.
-- `scratch` could review recent knowledge, events, and contradictions.
-- `press` could become a friendly alias for rendering docs.
-- `crate` could rebuild indexes and local retrieval data.
-- `ask` could query the repo knowledge base.
-- `watch` could batch near-real-time updates while work is happening.
+| Area | Completion | Next |
+| --- | ---: | --- |
+| `1.0.1` package polish | 70% | Ship current README and skill docs, then decide whether repo artwork such as `assets/wikiwiki-banner.png` belongs in the npm tarball. |
+| Agent setup polish | 85% | `wk setup --agent codex` and `wk install-agent codex` exist; future work is broader target support and clearer destination previews. |
+| Draft review flows | 45% | Closeout and compile drafts exist; approving, rejecting, and applying record drafts is still early. |
+| Richer symbol extraction | 20% | Symbol records and pages exist, but extraction is still mostly manual. |
+| Watch mode | 10% | Batch commands exist; no file watcher is built yet. |
+| `scratch` review command | 10% | Validation and search exist; contradiction, drift, and stale-knowledge review is not a dedicated command yet. |
+| `press` render alias | 30% | `render`, `site`, and `closeout` cover the workflow; the friendlier alias is not implemented. |
+| `crate` rebuild/index command | 35% | Markdown, static site, and search indexes can be rebuilt; there is no unified rebuild/retrieval command yet. |
+| `ask` repo knowledge query | 25% | `wk search` provides lookup; answer synthesis over repo knowledge is not built yet. |
 
-Wikiwiki should stay local-first, text-first, and agent-friendly even as those
-capabilities grow.
+The turntable metaphor is light, but useful: `spin` inspects changes, `scratch`
+reviews knowledge, `press` renders docs, `crate` rebuilds local retrieval data,
+`ask` queries the repo knowledge base, and `watch` keeps updates moving while
+work is happening. Wikiwiki should stay local-first, text-first, and
+agent-friendly as those capabilities grow.

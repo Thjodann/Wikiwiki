@@ -156,19 +156,19 @@ wk --version || true
 git status --short
 ```
 
-2. If npm is available, update the repo-local CLI from the current GitHub source
-package until the npm package is published:
+2. If npm is available, update the repo-local CLI from the published npm
+package:
 
 ```sh
 test "$(npm prefix)" = "$PWD" || npm init -y
-npm install --prefix "$PWD" --save-dev --package-lock=false git+https://github.com/Thjodann/Wikiwiki.git
+npm install --prefix "$PWD" --save-dev @thjodann/wk@latest
 ./node_modules/.bin/wk --version
 ./node_modules/.bin/wk install-agent codex --yes
 ```
 
-Use `@thjodann/wk@latest` instead of the GitHub URL after the package is
-published to npm. If the project uses another JavaScript package manager, use
-the closest equivalent and keep the install rooted in the target repo.
+If the project uses another JavaScript package manager, use the closest
+equivalent and keep the install rooted in the target repo. Do not default to a
+GitHub source install now that npm is the release channel.
 
 3. If npm and equivalent package managers are not available, do not pretend the
 CLI was updated. Refresh only the agent skill from GitHub raw files, preserving

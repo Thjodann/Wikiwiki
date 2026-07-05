@@ -27,7 +27,8 @@ npm install --prefix "$PWD" --save-dev @thjodann/wk
 ./node_modules/.bin/wk --help
 ```
 
-The public package is published on npm as `@thjodann/wk@1.0.0`.
+The public package is published on npm as `@thjodann/wk`; the badge above shows
+the latest version.
 
 The `npm prefix` check prevents npm from climbing into an ancestor project
 when the target repo has no local `package.json`. Use your repo's normal
@@ -133,18 +134,18 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - product-identity theme generation through `wk theme`, including paired light/dark palettes
 - agent-mediated UX/DX human wiki compilation
 - local search across articles, active records, and rendered docs
-- scriptable non-AI setup through `wk setup`
-- agentic setup that can install the companion `wk` skill through `wk setup --agent codex`
+- scriptable setup through `wk setup`, including optional Codex skill install with `--agent codex`
 - user-focused GitHub Pages workflow scaffolding through `wk pages init`
 - deterministic closeout draft packets through `wk closeout`
 - installable Codex-compatible `wk` agent skill
 - optional read-only Beads integration for developer work context
-- npm package published as `@thjodann/wk@1.0.0`
+- public npm package `@thjodann/wk`
 - GitHub Release-based npm publishing through Trusted Publishing
 - CI and tests
 
-Some planned pieces are not built yet: richer symbol extraction, draft review
-flows, and watch mode.
+Near-term polish is mostly packaging and docs hygiene for `1.0.1`. Larger
+planned pieces include richer symbol extraction, draft review flows, and watch
+mode.
 
 Generated `wiki/` and `wiki-site/` are intentionally not shipped in the npm
 package. Installed users generate their own copies from their own records.
@@ -193,21 +194,23 @@ not release commitments.
 
 | Planned feature | Completion | Notes |
 | --- | ---: | --- |
-| Richer symbol extraction | 20% | Symbol records and pages exist, but important symbols are still captured manually. |
+| `1.0.1` package polish | 70% | Bundle the current README and skill docs, and decide whether repo artwork such as `assets/wikiwiki-banner.png` should ship inside the npm tarball rather than only through GitHub-hosted README links. |
+| Agent setup polish | 85% | `wk setup --agent codex` and `wk install-agent codex` exist; remaining work is clearer multi-agent targeting and stricter destination previews. |
 | Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are still early. |
+| Richer symbol extraction | 20% | Symbol records and pages exist, but important symbols are still captured manually. |
 | Watch mode | 10% | Batch commands exist for `status`, `spin`, and `closeout`; no file watcher is built yet. |
 | `scratch` review command | 10% | Validation and search exist; contradiction, drift, and stale-knowledge review is not a dedicated command yet. |
 | `press` render alias | 30% | `render`, `site`, and `closeout` cover the workflow; the friendlier alias is not implemented. |
 | `crate` rebuild/index command | 35% | Markdown, static site, and search indexes can be rebuilt; no unified rebuild/retrieval command exists yet. |
 | `ask` repo knowledge query | 25% | `wk search` provides local lookup; answer synthesis over repo knowledge is not built yet. |
-| GitHub Pages scaffolding | 85% | `wk pages init` writes a GitHub Actions workflow for the user-facing site, persists user audience/source URL defaults, and reports the manual Pages settings step; authenticated settings and custom-domain automation remain future work. |
-| Product-identity theme generation | 90% | `wk theme preview` and `wk theme init` create mood-based light/dark project themes with Auto/Light/Dark site controls; richer logo and layout customization remains future work. |
+| GitHub Pages publishing polish | 85% | `wk pages init` covers workflow scaffolding; authenticated settings and custom-domain automation remain future work. |
+| Theme customization polish | 90% | `wk theme preview` and `wk theme init` create mood-based light/dark themes; richer logo and layout customization remains future work. |
 
 Shared completion snapshot:
 
-- V1 package readiness: about 80%
-- Named future roadmap: about 45%
-- Blended overall product vision: about 72%
+- Package and release foundation: about 92%
+- Named future roadmap: about 44%
+- Blended overall product vision: about 74%
 
 ## License
 
