@@ -8,7 +8,7 @@ details that are useful after the first quick start.
 | Command | Purpose |
 | --- | --- |
 | `wk init [--profile mixed\|user\|developer]` | Create the knowledge store and choose a first-pass wiki profile |
-| `wk setup [--profile mixed\|user\|developer] [--audience all\|user\|developer]` | Create repo defaults and safe package scripts for portable wiki automation |
+| `wk setup [--profile mixed\|user\|developer] [--audience all\|user\|developer] [--agent codex]` | Create repo defaults, safe package scripts, and optionally the companion agent skill |
 | `wk closeout [--profile mixed\|user\|developer] [--audience all\|user\|developer] --json` | Create a deterministic closeout draft packet, then validate and render docs |
 | `wk status --json` | Report store status, record counts, generated pages, and Git changes |
 | `wk install-agent codex [--yes] [--force]` | Install the bundled wk skill for Codex-compatible agents |

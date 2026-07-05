@@ -161,12 +161,17 @@ event. Then verify the generated site like a real local artifact:
 ## Agentic IDE Setup
 
 Agentic IDE setup is for teams that want their coding agent to maintain the
-wiki while development is happening. Install the CLI first, run the repo setup,
-then install the bundled `wk` skill into your agentic IDE.
+wiki while development is happening. Install the CLI first, then run setup with
+the companion skill install enabled:
 
 ```sh
-wk setup --profile mixed --audience all
+wk setup --profile mixed --audience all --agent codex
 ```
+
+For Codex-compatible skills, `--agent codex` installs the bundled `wk` skill
+into `${CODEX_HOME:-$HOME/.codex}/skills/wk`. Use `--agent-dest <path>` for a
+custom skill directory. If that directory contains unknown files, setup refuses
+to install the skill; use `--force` only after checking the destination.
 
 If the repo also uses Beads, keep Beads as the task graph and Wikiwiki as the
 knowledge graph. Initialize or preserve Beads in its own flow:
@@ -176,9 +181,10 @@ bd init
 bd setup codex
 ```
 
-Then install the Wikiwiki agent instructions:
+`wk install-agent codex` remains available when you want to preview or refresh
+only the companion skill.
 
-For Codex-compatible skills, preview the destination:
+Preview the destination:
 
 ```sh
 wk install-agent codex

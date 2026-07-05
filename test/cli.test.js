@@ -306,6 +306,7 @@ test("bundled wk skill includes Beads coordination rules", () => {
   assert.match(skill, /## First Install Style And Substance/);
   assert.match(skill, /Inspect actual visual sources before writing a theme/);
   assert.match(skill, /Auto\/Light\/Dark controls/);
+  assert.match(skill, /wk setup --profile mixed --audience all --agent codex/);
 });
 
 test("install-agent codex previews and installs the bundled wk skill", () => {
@@ -410,6 +411,40 @@ test("setup initializes config and reports copy-ready scripts without package.js
   assert.equal(result.package_json.copy_commands["wiki:closeout"], "wk closeout --profile mixed --audience all");
   assert.ok(fs.existsSync(path.join(root, ".wikiwiki/config.json")));
   assert.ok(fs.existsSync(path.join(root, ".wikiwiki/records/concepts.jsonl")));
+});
+
+test("setup can install the companion Codex skill during agentic setup", () => {
+  const root = tempRepo();
+  const destination = path.join(root, "codex-skills/wk");
+
+  const result = runJson(root, [
+    "setup",
+    "--profile",
+    "mixed",
+    "--audience",
+    "all",
+    "--agent",
+    "codex",
+    "--agent-dest",
+    destination,
+    "--json"
+  ]);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.agent.ok, true);
+  assert.equal(result.agent.target, "codex");
+  assert.equal(result.agent.destination, destination);
+  assert.ok(fs.existsSync(path.join(destination, "SKILL.md")));
+  assert.ok(fs.existsSync(path.join(destination, "agents/openai.yaml")));
+  assert.match(fs.readFileSync(path.join(destination, "SKILL.md"), "utf8"), /# WK/);
+});
+
+test("setup requires an agent target when an agent destination is passed", () => {
+  const root = tempRepo();
+
+  const failed = runFailure(root, ["setup", "--agent-dest", path.join(root, "codex-skills/wk"), "--json"]);
+
+  assert.match(failed, /--agent-dest requires --agent codex/);
 });
 
 test("setup persists profile and audience defaults", () => {

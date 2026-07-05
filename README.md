@@ -50,6 +50,12 @@ wk theme init
 wk pages init
 ```
 
+For an agentic IDE install, include the companion skill:
+
+```sh
+wk setup --profile mixed --audience all --agent codex
+```
+
 Check status and inspect the current working tree:
 
 ```sh
@@ -128,6 +134,7 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - agent-mediated UX/DX human wiki compilation
 - local search across articles, active records, and rendered docs
 - scriptable non-AI setup through `wk setup`
+- agentic setup that can install the companion `wk` skill through `wk setup --agent codex`
 - user-focused GitHub Pages workflow scaffolding through `wk pages init`
 - deterministic closeout draft packets through `wk closeout`
 - installable Codex-compatible `wk` agent skill

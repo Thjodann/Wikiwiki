@@ -18,7 +18,7 @@ Prefer JSON output, preserve user work, and treat structured records as the sour
    - `node dist/index.js <command>` when working inside the Wikiwiki repo.
    - `npm run dev -- <command>` when the repo has Wikiwiki source installed.
    - `npx @thjodann/wk <command>` when the package is available.
-3. If the repo is not initialized and the user wants Wikiwiki adopted, run `wk setup --profile mixed --audience all` unless the user clearly wants `user`, `developer`, or a narrower site audience.
+3. If the repo is not initialized and the user wants Wikiwiki adopted in Codex, run `wk setup --profile mixed --audience all --agent codex` unless the user clearly wants `user`, `developer`, or a narrower local site audience.
 4. If `.beads/` exists, run `bd prime` before wiki work when `bd` is available.
 5. Run `wk status --json`.
 6. Run `wk spin --profile mixed --json` unless the repo config or user request specifies another profile.
@@ -50,7 +50,7 @@ Inspect:
 
 ```sh
 bd prime # only when .beads/ exists and bd is available
-wk setup --profile mixed --audience all
+wk setup --profile mixed --audience all --agent codex
 wk status --json
 wk spin --profile mixed --json
 wk search <query> --json
@@ -125,7 +125,7 @@ For normal wiki maintenance during development:
 When adopting Wikiwiki in a repo for the first time, do more than make a valid
 wiki. Make the first generated site feel native to the host project:
 
-1. Run `wk setup --profile mixed --audience all`.
+1. Run `wk setup --profile mixed --audience all --agent codex` in Codex-compatible IDEs so repo setup also installs the companion `/wk` skill.
 2. Inspect README/docs/package metadata for product identity and durable facts.
 3. Inspect actual visual sources before writing a theme: app/global CSS, design
    tokens, theme files, landing page styles, app shell/layout styles, and any
@@ -221,14 +221,14 @@ When a user asks how to set up Wikiwiki for an agentic IDE:
 
 - Explain that Wikiwiki works without AI through the CLI and repo scripts.
 - Recommend installing the `wk` CLI first.
-- Recommend `wk setup --profile mixed --audience all` before adding agent-specific instructions.
-- If the repo uses Beads, recommend keeping `bd init` / `bd setup codex` as Beads' own setup and then installing Wikiwiki's skill. Do not overwrite or duplicate Beads' agent instructions.
+- Recommend `wk setup --profile mixed --audience all --agent codex` for Codex-compatible IDEs so repo setup also installs the companion `/wk` skill.
+- If the repo uses Beads, recommend keeping `bd init` / `bd setup codex` as Beads' own setup, then run Wikiwiki setup with `--agent codex`. Do not overwrite or duplicate Beads' agent instructions.
 - Explain that `wk setup` creates `.wikiwiki/config.json`, adds safe package scripts when `package.json` exists, and refuses conflicting scripts unless `--force` is explicit.
 - Recommend `wk spin --profile mixed --json` for first-pass dogfood, then article records for public pages and audience tags on every durable user/developer record.
 - Recommend `wk closeout --profile mixed --audience all --json` after meaningful work; clarify that it creates reviewable drafts and does not append records automatically.
-- Recommend installing this skill into the agent's skill/custom-instructions system with `wk install-agent codex` when supported.
+- Explain that `wk install-agent codex` remains available for previewing or refreshing only the companion skill.
 - Explain that `wk install-agent codex --yes` refuses unknown destination files; use `--force` only after the user or agent has inspected the destination.
-- For Codex-compatible skills, copy this `SKILL.md` into `${CODEX_HOME:-$HOME/.codex}/skills/wk/SKILL.md`.
+- For Codex-compatible skills, `--agent codex` installs this skill into `${CODEX_HOME:-$HOME/.codex}/skills/wk/`; use `--agent-dest` only for custom destinations.
 - For other agentic IDEs, copy the body of this file into the IDE's persistent agent instructions and keep the start/closeout loops intact.
 
 Keep setup advice local-first, script-first, and provider-agnostic.

@@ -10,12 +10,16 @@ export function registerSetupCommand(program: Command): void {
     .option("--profile <profile>", "wiki profile: mixed, user, developer")
     .option("--audience <audience>", "site audience: all, user, developer")
     .option("--source-base-url <url>", "base URL for source file links")
+    .option("--agent <target>", "install companion agent skill, currently: codex")
+    .option("--agent-dest <path>", "destination skill directory for --agent")
     .option("--force", "overwrite conflicting Wikiwiki package scripts")
     .option("--json", "print machine-readable output")
     .action((options: {
       profile?: string;
       audience?: string;
       sourceBaseUrl?: string;
+      agent?: string;
+      agentDest?: string;
       force?: boolean;
       json?: boolean;
     }) => {
@@ -52,6 +56,9 @@ export function registerSetupCommand(program: Command): void {
         for (const [name, command] of Object.entries(result.package_json.copy_commands)) {
           console.log(`- ${name}: ${command}`);
         }
+      }
+      if (result.agent) {
+        console.log(`Agent skill: installed ${result.agent.target} skill to ${result.agent.destination}`);
       }
       console.log("Next: run `wk theme preview --json`, then `wk theme init` to create a branded .wikiwiki/site-theme.json from repo identity and app styles.");
       console.log("For an impressive first install, seed high-signal records, then run `wk validate`, `wk render`, and `wk site`.");

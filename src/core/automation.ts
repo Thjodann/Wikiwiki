@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { installAgentSkill, type AgentInstallResult } from "./agents";
 import { readIntegrations, shouldReportIntegrations, type IntegrationSummary } from "./beads";
 import { configPath, normalizeSourceBaseUrl, readWikiwikiConfig, writeWikiwikiConfig, type WikiwikiConfig } from "./config";
 import { changedFiles, suppressedGitStatusSummary, type SuppressedGitStatusSummary } from "./git";
@@ -16,6 +17,8 @@ export type SetupOptions = {
   profile?: string;
   audience?: string;
   sourceBaseUrl?: string;
+  agent?: string;
+  agentDest?: string;
   force?: boolean;
 };
 
@@ -26,6 +29,7 @@ export type SetupResult = {
   config_path: string;
   config: WikiwikiConfig;
   package_json: PackageSetupResult;
+  agent?: AgentInstallResult;
   integrations?: IntegrationSummary;
 };
 
@@ -112,6 +116,10 @@ type PackageJson = {
 };
 
 export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupResult {
+  if (options.agentDest && !options.agent) {
+    throw new Error("--agent-dest requires --agent codex.");
+  }
+
   const existingConfig = readWikiwikiConfig(root);
   const profile = parseWikiProfile(options.profile ?? existingConfig.wiki_profile, "mixed");
   const audience = parseSiteAudience(options.audience ?? existingConfig.site_audience, "all");
@@ -132,6 +140,7 @@ export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupRe
   ensureStore(root);
   writeWikiwikiConfig(root, nextConfig);
   writePackageScripts(root, packageJson);
+  const agent = options.agent ? installAgentSkill(options.agent, { dest: options.agentDest, force: options.force }) : undefined;
   const integrations = readIntegrations(root, nextConfig);
 
   const result: SetupResult = {
@@ -142,6 +151,9 @@ export function setupWikiwiki(root: string, options: SetupOptions = {}): SetupRe
     config: nextConfig,
     package_json: packageJson.result
   };
+  if (agent) {
+    result.agent = agent;
+  }
   if (shouldReportIntegrations(integrations)) {
     result.integrations = integrations;
   }
