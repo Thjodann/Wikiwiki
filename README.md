@@ -4,6 +4,8 @@
 
 # Wikiwiki
 
+[![npm](https://img.shields.io/npm/v/@thjodann/wk?label=npm)](https://www.npmjs.com/package/@thjodann/wk)
+
 > Spin the docs. Ship the code.
 
 Wikiwiki is quiet infrastructure for a project's own wiki. It is a scriptable
