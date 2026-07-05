@@ -1,12 +1,10 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/assets/wikiwiki-wordmark.png" alt="Wikiwiki wordmark" width="100%">
+  <img src="https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/assets/wikiwiki-banner.png" alt="Wikiwiki banner: Spin the docs. Ship the code." width="100%">
 </p>
 
-# Wikiwiki
-
-[![npm](https://img.shields.io/npm/v/@thjodann/wk?label=npm)](https://www.npmjs.com/package/@thjodann/wk)
-
-> Spin the docs. Ship the code.
+<p align="center">
+  <a href="https://www.npmjs.com/package/@thjodann/wk"><img src="https://img.shields.io/npm/v/@thjodann/wk?label=npm" alt="npm package"></a>
+</p>
 
 Wikiwiki is quiet infrastructure for a project's own wiki. It is a scriptable
 CLI for teams that want local, deterministic project knowledge, and it becomes
