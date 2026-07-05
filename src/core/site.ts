@@ -8,6 +8,7 @@ import {
   readWikiwikiSiteTheme,
   siteThemePaletteKeys,
   type WikiwikiColorScheme,
+  type WikiwikiThemeFont,
   type WikiwikiSiteTheme,
   type WikiwikiThemePalette
 } from "./config";
@@ -35,7 +36,7 @@ export const siteStaticPageFileNames = [
 
 export type SiteFile = {
   fileName: string;
-  content: string;
+  content: string | Buffer;
 };
 
 export type SiteOptions = {
@@ -63,6 +64,7 @@ type SiteModel = {
   siteTitle: string;
   siteDescription: string;
   projectInitials: string;
+  assets: SiteAssets;
   records: RecordsByType;
   flatRecords: AnyRecord[];
   sourceRecords: AnyRecord[];
@@ -73,6 +75,32 @@ type SiteModel = {
   options: ResolvedSiteOptions;
   audience: SiteAudience;
   integrations: IntegrationSummary;
+};
+
+type SiteAssetKind = "logo" | "wordmark" | "favicon";
+
+type SiteAsset = {
+  kind: SiteAssetKind;
+  sourcePath: string;
+  outputFileName: string;
+  mimeType?: string;
+};
+
+type SiteFontAsset = WikiwikiThemeFont & {
+  sourcePath: string;
+  outputFileName: string;
+  cssUrl: string;
+  format?: string;
+};
+
+type SiteAssets = {
+  logo?: SiteAsset;
+  wordmark?: SiteAsset;
+  favicon?: SiteAsset;
+  faviconLight?: SiteAsset;
+  sidebarMark?: SiteAsset;
+  fonts: SiteFontAsset[];
+  files: SiteFile[];
 };
 
 type LayoutOptions = {
@@ -278,11 +306,12 @@ export function buildSiteFiles(root: string, options: SiteOptions = {}): SiteFil
   files.push(
     { fileName: "favicon.svg", content: faviconSvg(model) },
     { fileName: "assets/wikiwiki.css", content: siteCss() },
-    { fileName: "assets/project-theme.css", content: projectThemeCss(model.options.theme) },
+    { fileName: "assets/project-theme.css", content: projectThemeCss(model.options.theme, model.assets.fonts) },
     { fileName: "assets/search-index.js", content: searchIndexJs(model) },
     { fileName: "assets/wikiwiki.js", content: siteJs() },
     { fileName: ".nojekyll", content: "" },
-    { fileName: "site-manifest.json", content: `${JSON.stringify(siteManifest(model), null, 2)}\n` }
+    { fileName: "site-manifest.json", content: `${JSON.stringify(siteManifest(model), null, 2)}\n` },
+    ...model.assets.files
   );
 
   return files;
@@ -298,7 +327,11 @@ export function renderSite(root: string, options: SiteOptions = {}): string[] {
   return files.map((file) => {
     const outputFile = path.join(outputPath, file.fileName);
     fs.mkdirSync(path.dirname(outputFile), { recursive: true });
-    fs.writeFileSync(outputFile, file.content, "utf8");
+    if (typeof file.content === "string") {
+      fs.writeFileSync(outputFile, file.content, "utf8");
+    } else {
+      fs.writeFileSync(outputFile, file.content);
+    }
     return outputFile;
   });
 }
@@ -325,6 +358,7 @@ function createSiteModel(root: string, records: RecordsByType, options: Resolved
   const articleHrefByLookup = articleLookupMap(audienceRecords.article);
   const counts = Object.fromEntries(recordTypes.map((type) => [type, audienceRecords[type].length])) as Record<RecordType, number>;
   const repoName = options.theme.project_name?.trim() || path.basename(root);
+  const assets = resolveSiteAssets(root, options.theme);
 
   return {
     root,
@@ -332,6 +366,7 @@ function createSiteModel(root: string, records: RecordsByType, options: Resolved
     siteTitle: `${repoName} Wiki`,
     siteDescription: options.theme.project_description?.trim() || "A project wiki generated from durable repo knowledge.",
     projectInitials: initialsForName(repoName),
+    assets,
     records: audienceRecords,
     flatRecords,
     sourceRecords,
@@ -370,6 +405,10 @@ function renderLayout(options: LayoutOptions): string {
     : `${options.title} - ${options.model.siteTitle}`;
   const defaultColorScheme = defaultThemeColorScheme(options.model.options.theme);
   const defaultThemeAttribute = defaultColorScheme === "auto" ? "" : ` data-theme="${defaultColorScheme}"`;
+  const homeBrandAsset = options.active === "home" ? homeBrandAssetHtml(options.model, options.fileName) : "";
+  const homeBrandAssetMarkup = homeBrandAsset ? `        ${homeBrandAsset}\n` : "";
+  const homeHasWordmark = options.active === "home" && options.model.assets.wordmark !== undefined;
+  const h1Class = homeHasWordmark ? ` class="visually-hidden"` : "";
 
   return `${siteGeneratedNotice}
 <!doctype html>
@@ -380,7 +419,7 @@ function renderLayout(options: LayoutOptions): string {
   <meta name="generator" content="Wikiwiki">
   <title>${escapeHtml(htmlTitle)}</title>
   <script>${themeBootScript(defaultColorScheme)}</script>
-  <link rel="icon" href="${prefix}favicon.svg" type="image/svg+xml">
+  ${faviconLink(options.model, options.fileName, prefix)}
   <link rel="stylesheet" href="${prefix}assets/wikiwiki.css">
   <link rel="stylesheet" href="${prefix}assets/project-theme.css">
   <script src="${prefix}assets/search-index.js" defer></script>
@@ -392,7 +431,7 @@ function renderLayout(options: LayoutOptions): string {
     <aside class="sidebar" aria-label="Wiki navigation">
       <div class="sidebar-top">
         <a class="brand" href="${hrefFrom(options.fileName, "index.html")}" aria-label="Wiki home">
-          <span class="brand-mark">${escapeHtml(options.model.projectInitials)}</span>
+          ${brandMarkHtml(options.model, options.fileName)}
           <span>
             <strong>${escapeHtml(options.model.repoName)}</strong>
             <small>Project wiki</small>
@@ -410,8 +449,8 @@ function renderLayout(options: LayoutOptions): string {
       </div>
     </aside>
     <main id="content" class="content">
-      <header class="page-header">
-        <h1>${escapeHtml(options.title)}</h1>
+      <header class="page-header${homeBrandAsset ? " has-brand-asset" : ""}">
+${homeBrandAssetMarkup}        <h1${h1Class}>${escapeHtml(options.title)}</h1>
         <p>${escapeHtml(options.description)}</p>
       </header>
       ${options.body}
@@ -434,6 +473,47 @@ function themeBootScript(defaultColorScheme: WikiwikiColorScheme): string {
 function themeChoiceButton(mode: WikiwikiColorScheme, label: string, title: string, defaultColorScheme: WikiwikiColorScheme): string {
   const pressed = mode === defaultColorScheme ? "true" : "false";
   return `<button type="button" data-theme-choice="${mode}" aria-pressed="${pressed}" title="${escapeAttribute(title)}">${escapeHtml(label)}</button>`;
+}
+
+function faviconLink(model: SiteModel, currentFile: string, fallbackPrefix: string): string {
+  const asset = model.assets.favicon;
+  if (!asset) {
+    return `<link rel="icon" href="${fallbackPrefix}favicon.svg" type="image/svg+xml">`;
+  }
+
+  const type = asset.mimeType ? ` type="${escapeAttribute(asset.mimeType)}"` : "";
+  const darkHref = hrefFrom(currentFile, asset.outputFileName);
+  const lightHref = model.assets.faviconLight ? hrefFrom(currentFile, model.assets.faviconLight.outputFileName) : darkHref;
+  const lightType = model.assets.faviconLight?.mimeType ?? asset.mimeType;
+  const faviconData = [
+    `data-wikiwiki-favicon`,
+    `data-favicon-dark="${darkHref}"`,
+    `data-favicon-light="${lightHref}"`,
+    ...(asset.mimeType ? [`data-favicon-dark-type="${escapeAttribute(asset.mimeType)}"`] : []),
+    ...(lightType ? [`data-favicon-light-type="${escapeAttribute(lightType)}"`] : [])
+  ].join(" ");
+  return `<link rel="icon" href="${darkHref}"${type} ${faviconData}>`;
+}
+
+function brandMarkHtml(model: SiteModel, currentFile: string): string {
+  const asset = model.assets.sidebarMark;
+  if (!asset) {
+    return `<span class="brand-mark">${escapeHtml(model.projectInitials)}</span>`;
+  }
+
+  return `<span class="brand-mark has-image"><img src="${hrefFrom(currentFile, asset.outputFileName)}" alt="" aria-hidden="true"></span>`;
+}
+
+function homeBrandAssetHtml(model: SiteModel, currentFile: string): string {
+  const asset = model.assets.wordmark ?? model.assets.logo;
+  if (!asset) {
+    return "";
+  }
+
+  const label = asset.kind === "wordmark" ? "wordmark" : "logo";
+  return `<div class="home-brand-asset ${asset.kind}">
+          <img src="${hrefFrom(currentFile, asset.outputFileName)}" alt="${escapeAttribute(`${model.repoName} ${label}`)}">
+        </div>`;
 }
 
 function renderNav(model: SiteModel, currentFile: string, active: string): string {
@@ -1250,6 +1330,181 @@ function isDirectoryPath(root: string, file: string): boolean {
   }
 }
 
+function resolveSiteAssets(root: string, theme: WikiwikiSiteTheme): SiteAssets {
+  const usedOutputFileNames = new Set<string>();
+  const files: SiteFile[] = [];
+  const logo = resolveImageAsset(root, "logo", theme.logo_path, usedOutputFileNames, files);
+  const wordmark = resolveImageAsset(root, "wordmark", theme.wordmark_path, usedOutputFileNames, files);
+  const favicon = resolveImageAsset(root, "favicon", theme.favicon_path, usedOutputFileNames, files);
+  const faviconLight = favicon ? resolveLightFaviconAsset(favicon, usedOutputFileNames, files) : undefined;
+  const fonts = resolveFontAssets(root, theme.fonts ?? [], usedOutputFileNames, files);
+
+  return {
+    ...(logo ? { logo } : {}),
+    ...(wordmark ? { wordmark } : {}),
+    ...(favicon ? { favicon } : {}),
+    ...(faviconLight ? { faviconLight } : {}),
+    sidebarMark: favicon ?? logo,
+    fonts,
+    files
+  };
+}
+
+function resolveLightFaviconAsset(
+  favicon: SiteAsset,
+  usedOutputFileNames: Set<string>,
+  files: SiteFile[]
+): SiteAsset | undefined {
+  const mimeType = favicon.mimeType;
+  if (!mimeType?.startsWith("image/")) {
+    return undefined;
+  }
+
+  const source = fs.readFileSync(favicon.sourcePath);
+  const outputFileName = uniqueOutputFileName("assets/favicon-light.svg", usedOutputFileNames);
+  files.push({
+    fileName: outputFileName,
+    content: lightModeFaviconSvg(`data:${mimeType};base64,${source.toString("base64")}`)
+  });
+
+  return {
+    kind: "favicon",
+    sourcePath: favicon.sourcePath,
+    outputFileName,
+    mimeType: "image/svg+xml"
+  };
+}
+
+function resolveImageAsset(
+  root: string,
+  kind: SiteAssetKind,
+  configuredPath: string | undefined,
+  usedOutputFileNames: Set<string>,
+  files: SiteFile[]
+): SiteAsset | undefined {
+  const sourcePath = resolveThemeAssetPath(root, configuredPath);
+  if (!sourcePath) {
+    return undefined;
+  }
+
+  const extension = assetExtension(sourcePath);
+  if (!extension || !["svg", "png", "jpg", "jpeg", "webp", "ico"].includes(extension)) {
+    return undefined;
+  }
+
+  const outputFileName = uniqueOutputFileName(`assets/${kind}.${extension}`, usedOutputFileNames);
+  files.push({ fileName: outputFileName, content: fs.readFileSync(sourcePath) });
+  return {
+    kind,
+    sourcePath,
+    outputFileName,
+    mimeType: mimeTypeForExtension(extension)
+  };
+}
+
+function resolveFontAssets(
+  root: string,
+  fonts: WikiwikiThemeFont[],
+  usedOutputFileNames: Set<string>,
+  files: SiteFile[]
+): SiteFontAsset[] {
+  const resolved: SiteFontAsset[] = [];
+  for (const font of fonts) {
+    const sourcePath = resolveThemeAssetPath(root, font.path);
+    if (!sourcePath || !font.family.trim()) {
+      continue;
+    }
+
+    const extension = assetExtension(sourcePath);
+    if (!extension || !["woff2", "woff", "otf", "ttf"].includes(extension)) {
+      continue;
+    }
+
+    const weight = font.weight?.trim() || "400";
+    const style = font.style?.trim() || "normal";
+    const baseName = safeFileName(`${font.family}-${weight}-${style}`).toLowerCase();
+    const outputFileName = uniqueOutputFileName(`assets/fonts/${baseName}.${extension}`, usedOutputFileNames);
+    files.push({ fileName: outputFileName, content: fs.readFileSync(sourcePath) });
+    resolved.push({
+      ...font,
+      weight,
+      style,
+      display: font.display?.trim() || "swap",
+      sourcePath,
+      outputFileName,
+      cssUrl: `./fonts/${path.posix.basename(outputFileName)}`,
+      format: fontFormatForExtension(extension)
+    });
+  }
+
+  return resolved;
+}
+
+function resolveThemeAssetPath(root: string, configuredPath: string | undefined): string | undefined {
+  const normalized = toPosixPath(configuredPath?.trim() ?? "").replace(/^\.\//, "");
+  if (!normalized || path.isAbsolute(normalized) || normalized.startsWith("../") || normalized.includes("://") || normalized.startsWith("#")) {
+    return undefined;
+  }
+
+  const rootPath = path.resolve(root);
+  const fullPath = path.resolve(rootPath, normalized);
+  if (fullPath !== rootPath && !fullPath.startsWith(`${rootPath}${path.sep}`)) {
+    return undefined;
+  }
+
+  try {
+    return fs.statSync(fullPath).isFile() ? fullPath : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function assetExtension(file: string): string | undefined {
+  const extension = path.extname(file).replace(/^\./, "").toLowerCase();
+  return extension || undefined;
+}
+
+function uniqueOutputFileName(fileName: string, used: Set<string>): string {
+  const normalized = toPosixPath(fileName);
+  if (!used.has(normalized)) {
+    used.add(normalized);
+    return normalized;
+  }
+
+  const directory = path.posix.dirname(normalized);
+  const extension = path.posix.extname(normalized);
+  const base = path.posix.basename(normalized, extension);
+  let index = 2;
+  while (used.has(`${directory}/${base}-${index}${extension}`)) {
+    index += 1;
+  }
+  const result = `${directory}/${base}-${index}${extension}`;
+  used.add(result);
+  return result;
+}
+
+function mimeTypeForExtension(extension: string): string | undefined {
+  const types: Record<string, string> = {
+    svg: "image/svg+xml",
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    webp: "image/webp",
+    ico: "image/x-icon"
+  };
+  return types[extension];
+}
+
+function fontFormatForExtension(extension: string): string | undefined {
+  const formats: Record<string, string> = {
+    woff2: "woff2",
+    woff: "woff",
+    otf: "opentype",
+    ttf: "truetype"
+  };
+  return formats[extension];
+}
+
 function searchIndexJs(model: SiteModel): string {
   const articleEntries: SearchEntry[] = model.records.article.map((article) => ({
     type: "article",
@@ -1321,6 +1576,7 @@ function siteManifest(model: SiteModel) {
     audience: model.audience,
     project_name: model.repoName,
     theme_file: ".wikiwiki/site-theme.json",
+    ...(siteManifestAssets(model) ? { assets: siteManifestAssets(model) } : {}),
     pages: sitePages(model),
     ...(integrations ? { integrations } : {}),
     articles: model.records.article.map((article) => ({
@@ -1335,6 +1591,29 @@ function siteManifest(model: SiteModel) {
       title: recordTitle(record),
       url: recordHref(record)
     }))
+  };
+}
+
+function siteManifestAssets(model: SiteModel) {
+  if (!model.assets.logo && !model.assets.wordmark && !model.assets.favicon && model.assets.fonts.length === 0) {
+    return undefined;
+  }
+
+  return {
+    ...(model.assets.logo ? { logo: model.assets.logo.outputFileName } : {}),
+    ...(model.assets.wordmark ? { wordmark: model.assets.wordmark.outputFileName } : {}),
+    ...(model.assets.favicon ? { favicon: model.assets.favicon.outputFileName } : {}),
+    ...(model.assets.faviconLight ? { favicon_light: model.assets.faviconLight.outputFileName } : {}),
+    ...(model.assets.fonts.length > 0
+      ? {
+        fonts: model.assets.fonts.map((font) => ({
+          family: font.family,
+          weight: font.weight,
+          style: font.style,
+          url: font.outputFileName
+        }))
+      }
+      : {})
   };
 }
 
@@ -1797,10 +2076,14 @@ function escapeAttribute(value: string): string {
   return escapeHtml(value);
 }
 
-function projectThemeCss(theme: WikiwikiSiteTheme): string {
+function projectThemeCss(theme: WikiwikiSiteTheme, fonts: SiteFontAsset[] = []): string {
   const resolved = resolveThemePalettes(theme);
+  const fontFaces = fontFaceCss(fonts);
   if (!resolved.hasTheme) {
-    return "/* Optional project theme. Add .wikiwiki/site-theme.json to override CSS custom properties. */\n";
+    const fontFamily = fonts[0]?.family
+      ? `\n:root {\n  --font-family: ${cssString(fonts[0].family)}, Inter, ui-sans-serif, system-ui, sans-serif;\n}\n`
+      : "";
+    return `/* Optional project theme. Add .wikiwiki/site-theme.json to override CSS custom properties. */\n${fontFaces}${fontFamily}`;
   }
 
   const light = themeWithContrastGuardrails(resolved.light, "light");
@@ -1811,6 +2094,7 @@ function projectThemeCss(theme: WikiwikiSiteTheme): string {
     : "";
 
   return `/* Generated from .wikiwiki/site-theme.json. Edit the theme file, then run \`wk site\`. */${commentBlock}
+${fontFaces}
 ${themeCssBlock(":root,\n:root[data-theme=\"light\"]", light.theme, "light")}
 
 @media (prefers-color-scheme: dark) {
@@ -1819,6 +2103,23 @@ ${themeCssBlock(":root:not([data-theme=\"light\"])", dark.theme, "dark", "  ")}
 
 ${themeCssBlock(":root[data-theme=\"dark\"]", dark.theme, "dark")}
 `;
+}
+
+function fontFaceCss(fonts: SiteFontAsset[]): string {
+  if (fonts.length === 0) {
+    return "";
+  }
+
+  return `${fonts.map((font) => {
+    const format = font.format ? ` format("${font.format}")` : "";
+    return `@font-face {
+  font-family: ${cssString(font.family)};
+  src: url("${cssUrl(font.cssUrl)}")${format};
+  font-weight: ${cssValue(font.weight ?? "400")};
+  font-style: ${cssValue(font.style ?? "normal")};
+  font-display: ${cssValue(font.display ?? "swap")};
+}`;
+  }).join("\n\n")}\n\n`;
 }
 
 function resolveThemePalettes(theme: WikiwikiSiteTheme): {
@@ -2127,12 +2428,40 @@ function cssValue(value: string): string {
   return value.replace(/[;\n\r]/g, "").trim();
 }
 
+function cssString(value: string): string {
+  return `"${value.replace(/["\\\n\r]/g, "")}"`;
+}
+
+function cssUrl(value: string): string {
+  return value.replace(/["\\\n\r]/g, "");
+}
+
 function faviconSvg(model: SiteModel): string {
   const initials = escapeHtml(model.projectInitials.slice(0, 2));
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="14" fill="#111827"/>
-  <circle cx="46" cy="18" r="8" fill="#38bdf8"/>
-  <text x="32" y="41" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700" fill="#f8fafc">${initials}</text>
+  <path d="M15 17c0-2.2 1.8-4 4-4h12c2.2 0 4 1.8 4 4v32c0 1.1-.9 2-2 2H19c-2.2 0-4-1.8-4-4V17Z" fill="#f8fafc"/>
+  <path d="M29 13h16c2.2 0 4 1.8 4 4v30c0 2.2-1.8 4-4 4H33c1.1 0 2-.9 2-2V17c0-2.2-1.8-4-4-4h-2Z" fill="#38bdf8"/>
+  <path d="M22 23h6M22 30h6M39 23h5M39 30h5" stroke="#111827" stroke-width="2.4" stroke-linecap="round"/>
+  <text x="32" y="44" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#111827">${initials}</text>
+</svg>
+`;
+}
+
+function lightModeFaviconSvg(dataUri: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="wikiwiki-light-brand-filter" color-interpolation-filters="sRGB">
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="1 0"/>
+        <feFuncG type="table" tableValues="1 0"/>
+        <feFuncB type="table" tableValues="1 0"/>
+      </feComponentTransfer>
+      <feColorMatrix type="hueRotate" values="180"/>
+      <feColorMatrix type="saturate" values="1.14"/>
+    </filter>
+  </defs>
+  <image href="${escapeAttribute(dataUri)}" width="512" height="512" preserveAspectRatio="xMidYMid meet" filter="url(#wikiwiki-light-brand-filter)"/>
 </svg>
 `;
 }
@@ -2160,6 +2489,7 @@ function siteCss(): string {
   --card-gradient: linear-gradient(180deg, #fffdf7 0%, #faf9f3 100%);
   --brand-gradient: linear-gradient(135deg, var(--accent), var(--accent-strong));
   --brand-mark-text: #fffaf0;
+  --brand-asset-filter: invert(1) hue-rotate(180deg) saturate(1.14);
   --badge-bg: #e5f0ed;
   --badge-text: var(--accent-strong);
   --tag-bg: #f8e8f1;
@@ -2192,6 +2522,7 @@ function siteCss(): string {
     --card-gradient: linear-gradient(180deg, #1a261f 0%, #141e18 100%);
     --brand-gradient: linear-gradient(135deg, var(--accent), #2dd4bf);
     --brand-mark-text: #101914;
+    --brand-asset-filter: none;
     --badge-bg: rgba(110, 231, 199, 0.16);
     --badge-text: #d1fae5;
     --tag-bg: rgba(240, 171, 252, 0.18);
@@ -2224,6 +2555,7 @@ function siteCss(): string {
   --card-gradient: linear-gradient(180deg, #1a261f 0%, #141e18 100%);
   --brand-gradient: linear-gradient(135deg, var(--accent), #2dd4bf);
   --brand-mark-text: #101914;
+  --brand-asset-filter: none;
   --badge-bg: rgba(110, 231, 199, 0.16);
   --badge-text: #d1fae5;
   --tag-bg: rgba(240, 171, 252, 0.18);
@@ -2238,6 +2570,7 @@ function siteCss(): string {
 
 :root[data-theme="light"] {
   color-scheme: light;
+  --brand-asset-filter: invert(1) hue-rotate(180deg) saturate(1.14);
 }
 
 * {
@@ -2334,6 +2667,21 @@ code {
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0;
+}
+
+.brand-mark.has-image {
+  overflow: hidden;
+  background: color-mix(in srgb, var(--panel) 86%, transparent);
+  padding: 0.22rem;
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: var(--brand-asset-filter);
+  object-fit: contain;
+  transition: filter 160ms ease;
 }
 
 .brand strong,
@@ -2463,10 +2811,49 @@ input[type="search"]:focus {
   margin-bottom: 1.5rem;
 }
 
+.home-brand-asset {
+  display: flex;
+  align-items: center;
+  min-height: 3.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.home-brand-asset img {
+  display: block;
+  filter: var(--brand-asset-filter);
+  max-width: min(28rem, 100%);
+  max-height: 5.5rem;
+  object-fit: contain;
+  object-position: left center;
+  transition: filter 160ms ease;
+}
+
+.home-brand-asset.logo img {
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--panel) 82%, transparent);
+  box-shadow: var(--shadow);
+  padding: 0.35rem;
+}
+
 .page-header h1 {
   margin: 0.15rem 0 0.45rem;
   font-size: clamp(2rem, 4vw, 3.8rem);
   line-height: 1;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
 }
 
 .page-header p {
@@ -3021,6 +3408,34 @@ function siteJs(): string {
     return validThemeModes.includes(value) ? value : "auto";
   }
 
+  function effectiveThemeMode(mode) {
+    const normalizedMode = normalizeThemeMode(mode);
+    if (normalizedMode === "light" || normalizedMode === "dark") {
+      return normalizedMode;
+    }
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  function updateFavicon(mode) {
+    const link = document.querySelector("link[data-wikiwiki-favicon]");
+    if (!link) {
+      return;
+    }
+    const effectiveMode = effectiveThemeMode(mode);
+    const href = effectiveMode === "light"
+      ? link.getAttribute("data-favicon-light")
+      : link.getAttribute("data-favicon-dark");
+    const type = effectiveMode === "light"
+      ? link.getAttribute("data-favicon-light-type")
+      : link.getAttribute("data-favicon-dark-type");
+    if (href) {
+      link.setAttribute("href", href);
+    }
+    if (type) {
+      link.setAttribute("type", type);
+    }
+  }
+
   function applyThemeMode(mode, persist) {
     const normalizedMode = normalizeThemeMode(mode);
     if (normalizedMode === "light" || normalizedMode === "dark") {
@@ -3029,6 +3444,7 @@ function siteJs(): string {
       delete document.documentElement.dataset.theme;
     }
     document.documentElement.dataset.themeMode = normalizedMode;
+    updateFavicon(normalizedMode);
     document.querySelectorAll("[data-theme-choice]").forEach((button) => {
       button.setAttribute("aria-pressed", button.getAttribute("data-theme-choice") === normalizedMode ? "true" : "false");
     });
@@ -3137,6 +3553,19 @@ function siteJs(): string {
       applyThemeMode(button.getAttribute("data-theme-choice") || "auto", true);
     });
   });
+  if (window.matchMedia) {
+    const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const updateAutoFavicon = () => {
+      if (normalizeThemeMode(document.documentElement.dataset.themeMode || "auto") === "auto") {
+        updateFavicon("auto");
+      }
+    };
+    if (colorSchemeQuery.addEventListener) {
+      colorSchemeQuery.addEventListener("change", updateAutoFavicon);
+    } else if (colorSchemeQuery.addListener) {
+      colorSchemeQuery.addListener(updateAutoFavicon);
+    }
+  }
 }());
 `;
 }

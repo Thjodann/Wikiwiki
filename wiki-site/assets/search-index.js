@@ -621,6 +621,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "event",
     "typeLabel": "Devlog",
+    "id": "event_01f3f236-b341-403a-9492-fa56f05c1501",
+    "title": "Added product companion branding assets to generated sites",
+    "summary": "Added product companion branding assets to generated sites",
+    "tags": [
+      "devlog",
+      "theme",
+      "customization",
+      "site"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_01f3f236-b341-403a-9492-fa56f05c1501.html",
+    "text": "event_01f3f236-b341-403a-9492-fa56f05c1501 agent agent high 2026-07-05T04:40:04.070Z event Added product companion branding assets to generated sites Extended theme preview/init and static site generation so Wikiwiki can discover repo-local logo, wordmark, favicon, and font assets; persist them in .wikiwiki/site-theme.json; copy them into wiki-site/assets; render custom favicons/sidebar marks/home masthead assets; emit @font-face rules; and keep a wiki-specific generated favicon fallback. src/core/theme.ts src/core/site.ts src/core/config.ts test/cli.test.js test/site.test.js docs/reference.md docs/setup.md skills/wk/SKILL.md README.md audience:developer devlog theme customization site"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_1d0da54d-a525-45ce-8060-592f4fece547",
     "title": "Added setup and closeout automation",
     "summary": "Added setup and closeout automation",
@@ -823,6 +841,44 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "event",
     "typeLabel": "Devlog",
+    "id": "event_915974e1-c78c-48c3-846a-28a75b1299e9",
+    "title": "Installed Wikiwiki brand assets and site theme",
+    "summary": "Installed Wikiwiki brand assets and site theme",
+    "tags": [
+      "devlog",
+      "branding",
+      "theme",
+      "assets",
+      "site"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_915974e1-c78c-48c3-846a-28a75b1299e9.html",
+    "text": "event_915974e1-c78c-48c3-846a-28a75b1299e9 git-diff agent high 2026-07-05T04:57:45.681Z event Installed Wikiwiki brand assets and site theme Added the supplied Wikiwiki wordmark and favicon as repo assets, configured the wiki site to use them for the home wordmark, sidebar mark, and browser favicon, and tuned the site palette around the extracted cream, night, pink, and violet brand colors. .wikiwiki/site-theme.json assets/wikiwiki-favicon.png assets/wikiwiki-wordmark.png README.md docs/reference.md audience:developer devlog branding theme assets site"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
+    "id": "event_42019d3b-62d9-4549-bc1d-7bb586c632a3",
+    "title": "Polished wordmark rendering and light-mode brand assets",
+    "summary": "Polished wordmark rendering and light-mode brand assets",
+    "tags": [
+      "devlog",
+      "branding",
+      "theme",
+      "site",
+      "accessibility"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_42019d3b-62d9-4549-bc1d-7bb586c632a3.html",
+    "text": "event_42019d3b-62d9-4549-bc1d-7bb586c632a3 git-diff agent high 2026-07-05T05:09:40.071Z event Polished wordmark rendering and light-mode brand assets Changed generated home pages so a detected wordmark replaces the visible title text while preserving an accessible hidden heading. Added light-mode brand image filtering and a generated light favicon variant that the theme toggle swaps in for custom favicons. src/core/site.ts test/site.test.js wiki-site/index.html wiki-site/assets/wikiwiki.css wiki-site/assets/wikiwiki.js wiki-site/assets/favicon-light.svg audience:developer devlog branding theme site accessibility"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_27daec8b-1546-41d7-867a-66ee93138ae7",
     "title": "Published @thjodann/wk 1.0.0 to npm",
     "summary": "Published @thjodann/wk 1.0.0 to npm",
@@ -885,6 +941,24 @@ window.WIKIWIKI_SEARCH_INDEX = [
   {
     "type": "event",
     "typeLabel": "Devlog",
+    "id": "event_73fe76ce-30fe-4f07-a361-45c4c92b7e0c",
+    "title": "Replaced Wikiwiki brand graphics with updated assets",
+    "summary": "Replaced Wikiwiki brand graphics with updated assets",
+    "tags": [
+      "devlog",
+      "branding",
+      "assets",
+      "site"
+    ],
+    "authority": "agent",
+    "confidence": "high",
+    "audienceLabel": "For developers",
+    "url": "records/event/event_73fe76ce-30fe-4f07-a361-45c4c92b7e0c.html",
+    "text": "event_73fe76ce-30fe-4f07-a361-45c4c92b7e0c manual agent high 2026-07-05T05:15:37.700Z event Replaced Wikiwiki brand graphics with updated assets Updated the repo wordmark and favicon from the supplied desktop PNGs while keeping the existing theme paths. Regenerated the static wiki so the home wordmark, sidebar mark, browser favicon, and generated light-mode favicon variant use the new artwork. assets/wikiwiki-favicon.png assets/wikiwiki-wordmark.png wiki-site/assets/favicon.png wiki-site/assets/wordmark.png wiki-site/assets/favicon-light.svg audience:developer devlog branding assets site"
+  },
+  {
+    "type": "event",
+    "typeLabel": "Devlog",
     "id": "event_e38dffad-d6eb-4d9b-9833-967ed2a947b6",
     "title": "Split README into focused package docs",
     "summary": "Split README into focused package docs",
@@ -928,14 +1002,14 @@ window.WIKIWIKI_SEARCH_INDEX = [
     "type": "link",
     "typeLabel": "Link",
     "id": "link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0",
-    "title": "README.md embeds assets/wikiwiki-banner.png",
-    "summary": "README.md embeds assets/wikiwiki-banner.png",
+    "title": "README.md embeds assets/wikiwiki-wordmark.png",
+    "summary": "README.md embeds assets/wikiwiki-wordmark.png",
     "tags": [],
     "authority": "agent",
     "confidence": "high",
     "audienceLabel": "",
     "url": "records/link/link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0.html",
-    "text": "link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0 agent agent high 2026-07-04T00:07:23.753Z link README.md assets/wikiwiki-banner.png embeds"
+    "text": "link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0 agent agent high 2026-07-04T00:07:23.753Z 2026-07-05T04:53:56.439Z link README.md assets/wikiwiki-wordmark.png embeds"
   },
   {
     "type": "note",

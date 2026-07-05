@@ -140,8 +140,9 @@ wiki. Make the first generated site feel native to the host project:
 1. Run `wk setup --profile mixed --audience all --agent codex` in Codex-compatible IDEs so repo setup also installs the companion `/wk` skill.
 2. Inspect README/docs/package metadata for product identity and durable facts.
 3. Inspect actual visual sources before writing a theme: app/global CSS, design
-   tokens, theme files, landing page styles, app shell/layout styles, and any
-   existing brand palette files.
+   tokens, theme files, landing page styles, app shell/layout styles, brand
+   image assets, favicon files, repo-local font files, and any existing brand
+   palette files.
 4. Run `wk theme preview --json`. If the preview looks right, run
    `wk theme init`; otherwise pass explicit `--project-name`, `--description`,
    or `--mood`, then preview again.
@@ -149,8 +150,9 @@ wiki. Make the first generated site feel native to the host project:
    architecture, distribution/support, important symbols, and a devlog event.
 6. Run `wk validate`, `wk render`, and `wk site --audience all`.
 7. Verify the generated site locally: Auto/Light/Dark controls, default theme,
-   search, local links/source-file links, and contrast for body text, muted
-   text, accents, badges, and tags.
+   favicon, sidebar mark, home logo/wordmark, custom fonts, search, local
+   links/source-file links, and contrast for body text, muted text, accents,
+   badges, and tags.
 
 Do not edit generated CSS in `wiki-site/`. The source of truth is
 `.wikiwiki/site-theme.json` plus structured records.
@@ -260,4 +262,4 @@ steps and use the normal Wikiwiki flow.
 
 ## Site Theme Guidance
 
-When asked to make the human wiki match a project, edit `.wikiwiki/site-theme.json` rather than generated CSS. Prefer `wk theme preview --json` and `wk theme init` first because they inspect CSS/design sources when present. If you hand-edit, use the host project's real visual language literally: default color mode, paired light/dark palettes, accent spectrum, neutral surfaces, sidebar/hero/card gradients, brand gradient, badge/tag colors, focus ring, gloss, shadows, border radius, code background, and font family. Then run `wk validate`, `wk render`, and `wk site`.
+When asked to make the human wiki match a project, edit `.wikiwiki/site-theme.json` rather than generated CSS. Prefer `wk theme preview --json` and `wk theme init` first because they inspect CSS/design sources, brand image assets, favicon files, and repo-local font files when present. If you hand-edit, use the host project's real visual language literally: default color mode, paired light/dark palettes, accent spectrum, neutral surfaces, sidebar/hero/card gradients, brand gradient, logo/wordmark/favicon paths, badge/tag colors, focus ring, gloss, shadows, border radius, code background, font files, and font family. Then run `wk validate`, `wk render`, and `wk site`.

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/assets/wikiwiki-banner.png" alt="Wikiwiki banner: Spin the docs. Ship the code." width="100%">
+  <img src="https://raw.githubusercontent.com/Thjodann/Wikiwiki/main/assets/wikiwiki-wordmark.png" alt="Wikiwiki wordmark" width="100%">
 </p>
 
 # Wikiwiki
@@ -199,7 +199,7 @@ not release commitments.
 | Planned feature | Completion | Notes |
 | --- | ---: | --- |
 | `1.0.3` Open the Wiki | 95% | Bare `wk`/`/wk` opens an existing generated site, five starter article records seed this repo's wiki, and package docs point at the current release path. |
-| Package and release foundation | 96% | README/docs/skill files ship in npm, generated dogfood output and `assets/wikiwiki-banner.png` stay out of the tarball, and GitHub Releases drive Trusted Publishing with a manual 2FA fallback. |
+| Package and release foundation | 96% | README/docs/skill files ship in npm, generated dogfood output and repo brand assets stay out of the tarball, and GitHub Releases drive Trusted Publishing with a manual 2FA fallback. |
 | Agent setup polish | 88% | `wk setup --agent codex` and `wk install-agent codex` preserve the bundled skill behavior; remaining work is broader target support and clearer destination previews. |
 | Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are the next larger feature after `1.0.3`. |
 | Richer symbol extraction | 20% | Symbol records and pages exist, but important symbols are still captured manually. |
@@ -209,7 +209,7 @@ not release commitments.
 | `crate` rebuild/index command | 35% | Markdown, static site, and search indexes can be rebuilt; no unified rebuild/retrieval command exists yet. |
 | `ask` repo knowledge query | 25% | `wk search` provides local lookup; answer synthesis over repo knowledge is not built yet. |
 | GitHub Pages publishing polish | 85% | `wk pages init` covers workflow scaffolding; authenticated settings and custom-domain automation remain future work. |
-| Theme customization polish | 90% | `wk theme preview` and `wk theme init` create mood-based light/dark themes; richer logo and layout customization remains future work. |
+| Theme customization polish | 95% | `wk theme preview` and `wk theme init` create mood-based light/dark themes, discover repo-local logo/wordmark/favicon assets, and wire custom fonts into the generated site. |
 
 Shared completion snapshot:
 

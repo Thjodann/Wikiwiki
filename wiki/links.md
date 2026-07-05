@@ -14,6 +14,6 @@ Record: `link_f1dadf17-2e61-4024-bb02-d237e43ea911` | Authority: agent | Confide
 
 From: `README.md`
 
-To: `assets/wikiwiki-banner.png`
+To: `assets/wikiwiki-wordmark.png`
 
 Record: `link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0` | Authority: agent | Confidence: high

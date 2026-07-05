@@ -6,6 +6,12 @@
   "audience": "all",
   "project_name": "Wikiwiki",
   "theme_file": ".wikiwiki/site-theme.json",
+  "assets": {
+    "logo": "assets/logo.png",
+    "wordmark": "assets/wordmark.png",
+    "favicon": "assets/favicon.png",
+    "favicon_light": "assets/favicon-light.svg"
+  },
   "pages": [
     "index.html",
     "articles.html",
@@ -51,6 +57,7 @@
     "records/event/event_e116aa8a-281e-4d85-a8be-abca622110e6.html",
     "records/event/event_957eb317-04d9-4cd3-bce3-5b0b58de4bec.html",
     "records/event/event_4683be8c-c419-472d-b2fe-c7ef2456b713.html",
+    "records/event/event_01f3f236-b341-403a-9492-fa56f05c1501.html",
     "records/event/event_1d0da54d-a525-45ce-8060-592f4fece547.html",
     "records/event/event_45056ffe-30bc-4251-9de0-3566f289f059.html",
     "records/event/event_da489cef-22d6-46db-989d-25eb52891c37.html",
@@ -65,10 +72,13 @@
     "records/event/event_f8c324a7-1f16-44c4-bc69-4584386c1085.html",
     "records/event/event_2c53f001-eb63-4e55-82d3-fc9df43b53f2.html",
     "records/event/event_6c360d34-0e2b-414e-9445-af1fe597103a.html",
+    "records/event/event_915974e1-c78c-48c3-846a-28a75b1299e9.html",
+    "records/event/event_42019d3b-62d9-4549-bc1d-7bb586c632a3.html",
     "records/event/event_27daec8b-1546-41d7-867a-66ee93138ae7.html",
     "records/event/event_d67ebd8e-e9f4-4c08-a011-72295a6e7210.html",
     "records/event/event_1222a170-521f-476b-bd83-7359a4ba66c2.html",
     "records/event/event_da383319-890e-4cc2-a090-a6e9561fea76.html",
+    "records/event/event_73fe76ce-30fe-4f07-a361-45c4c92b7e0c.html",
     "records/event/event_e38dffad-d6eb-4d9b-9833-967ed2a947b6.html",
     "records/event/event_495227ea-a813-41fa-b7a6-910f338a518f.html",
     "records/link/link_f1dadf17-2e61-4024-bb02-d237e43ea911.html",
@@ -314,6 +324,12 @@
     },
     {
       "type": "event",
+      "id": "event_01f3f236-b341-403a-9492-fa56f05c1501",
+      "title": "Added product companion branding assets to generated sites",
+      "url": "records/event/event_01f3f236-b341-403a-9492-fa56f05c1501.html"
+    },
+    {
+      "type": "event",
       "id": "event_1d0da54d-a525-45ce-8060-592f4fece547",
       "title": "Added setup and closeout automation",
       "url": "records/event/event_1d0da54d-a525-45ce-8060-592f4fece547.html"
@@ -398,6 +414,18 @@
     },
     {
       "type": "event",
+      "id": "event_915974e1-c78c-48c3-846a-28a75b1299e9",
+      "title": "Installed Wikiwiki brand assets and site theme",
+      "url": "records/event/event_915974e1-c78c-48c3-846a-28a75b1299e9.html"
+    },
+    {
+      "type": "event",
+      "id": "event_42019d3b-62d9-4549-bc1d-7bb586c632a3",
+      "title": "Polished wordmark rendering and light-mode brand assets",
+      "url": "records/event/event_42019d3b-62d9-4549-bc1d-7bb586c632a3.html"
+    },
+    {
+      "type": "event",
       "id": "event_27daec8b-1546-41d7-867a-66ee93138ae7",
       "title": "Published @thjodann/wk 1.0.0 to npm",
       "url": "records/event/event_27daec8b-1546-41d7-867a-66ee93138ae7.html"
@@ -422,6 +450,12 @@
     },
     {
       "type": "event",
+      "id": "event_73fe76ce-30fe-4f07-a361-45c4c92b7e0c",
+      "title": "Replaced Wikiwiki brand graphics with updated assets",
+      "url": "records/event/event_73fe76ce-30fe-4f07-a361-45c4c92b7e0c.html"
+    },
+    {
+      "type": "event",
       "id": "event_e38dffad-d6eb-4d9b-9833-967ed2a947b6",
       "title": "Split README into focused package docs",
       "url": "records/event/event_e38dffad-d6eb-4d9b-9833-967ed2a947b6.html"
@@ -441,7 +475,7 @@
     {
       "type": "link",
       "id": "link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0",
-      "title": "README.md embeds assets/wikiwiki-banner.png",
+      "title": "README.md embeds assets/wikiwiki-wordmark.png",
       "url": "records/link/link_09cfb3d6-d044-48f2-832b-6d6f4e20faf0.html"
     },
     {

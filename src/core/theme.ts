@@ -775,6 +775,347 @@ function applyProjectStyle(base: MoodTheme, style: StyleInference): MoodTheme {
   };
 }
 
+function applyProjectFonts(theme: MoodTheme, fonts: WikiwikiThemeFont[]): MoodTheme {
+  if (fonts.length === 0) {
+    return theme;
+  }
+
+  const family = fonts[0].family.trim();
+  if (!family) {
+    return theme;
+  }
+
+  return {
+    light: {
+      ...theme.light,
+      font_family: fontStack(family, theme.light.font_family)
+    },
+    dark: {
+      ...theme.dark,
+      font_family: fontStack(family, theme.dark.font_family)
+    }
+  };
+}
+
+function fontStack(family: string, fallback: string | undefined): string {
+  const base = fallback?.trim() || "Inter, ui-sans-serif, system-ui, sans-serif";
+  if (base.toLowerCase().includes(family.toLowerCase())) {
+    return base;
+  }
+
+  return `"${family.replace(/"/g, "")}", ${base}`;
+}
+
+function inferProjectAssets(root: string): ThemeAssets {
+  const imageCandidates = findImageAssetCandidates(root);
+  const favicon = bestImageCandidate(imageCandidates, "favicon");
+  const explicitWordmark = bestImageCandidate(imageCandidates.filter((candidate) => candidate.explicit), "wordmark");
+  const wordmark = explicitWordmark ?? bestImageCandidate(imageCandidates, "wordmark");
+  const logo = bestImageCandidate(
+    imageCandidates.filter((candidate) => candidate.file !== wordmark?.file || candidate.explicit),
+    "logo"
+  ) ?? bestImageCandidate(imageCandidates, "logo");
+  const fonts = findFontAssetCandidates(root);
+  const sources = [
+    logo?.file,
+    wordmark?.file,
+    favicon?.file,
+    ...fonts.map((font) => font.file)
+  ]
+    .filter((file): file is string => Boolean(file))
+    .map((file) => relativeReportPath(root, file));
+
+  return {
+    ...(logo ? { logoPath: relativeReportPath(root, logo.file) } : {}),
+    ...(wordmark ? { wordmarkPath: relativeReportPath(root, wordmark.file) } : {}),
+    ...(favicon ? { faviconPath: relativeReportPath(root, favicon.file) } : {}),
+    fonts: fonts.map((font) => font.font),
+    sources: [...new Set(sources)]
+  };
+}
+
+function findImageAssetCandidates(root: string): ImageAssetCandidate[] {
+  const files = findAssetFiles(root, imageAssetFileScore);
+  return files.flatMap((file) => imageAssetCandidatesFor(root, file));
+}
+
+function imageAssetCandidatesFor(root: string, file: string): ImageAssetCandidate[] {
+  const relative = relativeReportPath(root, file);
+  return (["favicon", "wordmark", "logo"] as const)
+    .map((kind) => {
+      const score = imageAssetScore(relative, kind);
+      return score > 0
+        ? { kind, file, score, explicit: explicitImageAsset(relative, kind) }
+        : undefined;
+    })
+    .filter((candidate): candidate is ImageAssetCandidate => candidate !== undefined);
+}
+
+function bestImageCandidate(candidates: ImageAssetCandidate[], kind: ImageAssetKind): ImageAssetCandidate | undefined {
+  return candidates
+    .filter((candidate) => candidate.kind === kind)
+    .sort((a, b) => b.score - a.score || a.file.localeCompare(b.file))[0];
+}
+
+function findFontAssetCandidates(root: string): FontAssetCandidate[] {
+  const seen = new Set<string>();
+  return findAssetFiles(root, fontAssetFileScore)
+    .map((file) => fontAssetCandidate(root, file))
+    .filter((candidate): candidate is FontAssetCandidate => candidate !== undefined)
+    .filter((candidate) => {
+      const key = `${candidate.font.family}:${candidate.font.weight ?? ""}:${candidate.font.style ?? ""}:${candidate.font.path}`;
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => b.score - a.score || a.font.family.localeCompare(b.font.family) || a.file.localeCompare(b.file))
+    .slice(0, 8);
+}
+
+function fontAssetCandidate(root: string, file: string): FontAssetCandidate | undefined {
+  const relative = relativeReportPath(root, file);
+  const score = fontAssetFileScore(relative);
+  if (score <= 0) {
+    return undefined;
+  }
+
+  const family = fontFamilyFromFile(file);
+  if (!family) {
+    return undefined;
+  }
+
+  return {
+    file,
+    score,
+    font: {
+      family,
+      path: relative,
+      weight: fontWeightFromFile(file),
+      style: /(?:^|[-_\s])(?:italic|oblique|ital)(?:[-_\s]|$)/i.test(path.basename(file)) ? "italic" : "normal",
+      display: "swap"
+    }
+  };
+}
+
+function findAssetFiles(root: string, scorer: (relativeFile: string) => number): string[] {
+  const files: string[] = [];
+  collectAssetFiles(root, root, files, 0, scorer);
+  return files
+    .filter((file) => scorer(relativeReportPath(root, file)) > 0)
+    .sort((a, b) => scorer(relativeReportPath(root, b)) - scorer(relativeReportPath(root, a)) || a.localeCompare(b))
+    .slice(0, 80);
+}
+
+function collectAssetFiles(
+  root: string,
+  directory: string,
+  files: string[],
+  depth: number,
+  scorer: (relativeFile: string) => number
+): void {
+  if (files.length >= 320 || depth > 7) {
+    return;
+  }
+
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(directory, { withFileTypes: true });
+  } catch {
+    return;
+  }
+
+  for (const entry of entries) {
+    if (entry.name.startsWith(".") && entry.name !== ".storybook") {
+      continue;
+    }
+
+    const file = path.join(directory, entry.name);
+    const relative = relativeReportPath(root, file);
+    if (entry.isDirectory()) {
+      if (!ignoredStyleDirectory(entry.name)) {
+        collectAssetFiles(root, file, files, depth + 1, scorer);
+      }
+      continue;
+    }
+
+    if (entry.isFile() && scorer(relative) > 0) {
+      files.push(file);
+    }
+  }
+}
+
+function imageAssetFileScore(file: string): number {
+  const lower = file.toLowerCase();
+  if (!/\.(svg|png|jpe?g|webp|ico)$/.test(lower)) {
+    return 0;
+  }
+  if (/(screenshot|mockup|preview|cover|social|og-image|twitter-card|wallpaper|background)/.test(lower)) {
+    return 0;
+  }
+
+  return Math.max(imageAssetScore(file, "favicon"), imageAssetScore(file, "wordmark"), imageAssetScore(file, "logo"));
+}
+
+function imageAssetScore(file: string, kind: ImageAssetKind): number {
+  const lower = file.toLowerCase();
+  const name = path.basename(lower);
+  let score = 0;
+
+  if (kind === "favicon") {
+    if (/(^|[-_.])favicon[-_.]/.test(name) || name === "favicon.svg" || name === "favicon.png" || name === "favicon.ico") {
+      score += 110;
+    }
+    if (/(site-icon|browser-icon|wiki-icon|apple-touch-icon|app-icon|appicon)/.test(name)) {
+      score += 70;
+    }
+    if (/(^|[-_.])icon[-_.]/.test(name) || name.startsWith("icon.")) {
+      score += 18;
+    }
+  }
+
+  if (kind === "wordmark") {
+    if (/(wordmark|logotype|logo-type|lockup|logo-lockup|brand-lockup|horizontal-logo|logo-horizontal)/.test(name)) {
+      score += 110;
+    }
+    if (/(brand|masthead)/.test(name)) {
+      score += 45;
+    }
+    if (/logo/.test(name) && !/(icon|mark-only|symbol)/.test(name)) {
+      score += 35;
+    }
+  }
+
+  if (kind === "logo") {
+    if (/(^|[-_.])logo[-_.]/.test(name) || name.startsWith("logo.")) {
+      score += 92;
+    }
+    if (/(brand-mark|logomark|logo-mark|app-icon|appicon|mark)/.test(name)) {
+      score += 76;
+    }
+    if (/(^|[-_.])icon[-_.]/.test(name) || name.startsWith("icon.")) {
+      score += 32;
+    }
+    if (/favicon/.test(name)) {
+      score += 20;
+    }
+  }
+
+  if (score === 0) {
+    return 0;
+  }
+
+  if (/(^|\/)(assets?|public|static|images?|img|brand|branding|logo|logos|icons?)\//.test(lower)) {
+    score += 20;
+  }
+  if (/\/(test|tests|fixtures?|mocks?|snapshots?)\//.test(lower)) {
+    score -= 28;
+  }
+  if (lower.endsWith(".svg")) {
+    score += 12;
+  }
+  if (lower.endsWith(".png")) {
+    score += 8;
+  }
+  if (kind === "favicon" && lower.endsWith(".ico")) {
+    score += 10;
+  }
+
+  return Math.max(0, score);
+}
+
+function explicitImageAsset(file: string, kind: ImageAssetKind): boolean {
+  const name = path.basename(file.toLowerCase());
+  if (kind === "favicon") {
+    return /favicon|site-icon|browser-icon|wiki-icon|apple-touch-icon/.test(name);
+  }
+  if (kind === "wordmark") {
+    return /wordmark|logotype|lockup|horizontal-logo|logo-horizontal|brand-lockup/.test(name);
+  }
+  return /logo|brand-mark|logomark|logo-mark|app-icon|appicon/.test(name);
+}
+
+function fontAssetFileScore(file: string): number {
+  const lower = file.toLowerCase();
+  if (!/\.(woff2?|otf|ttf)$/.test(lower)) {
+    return 0;
+  }
+  if (/(fontawesome|font-awesome|materialicons|material-icons|bootstrap-icons|glyphicons|iconfont|icons?[-_]?font)/.test(lower)) {
+    return 0;
+  }
+
+  let score = 20;
+  if (/(^|\/)(assets?|public|static|fonts?|typefaces?|typography|brand|branding)\//.test(lower)) {
+    score += 40;
+  }
+  if (/(^|\/)(src|app|styles?)\//.test(lower)) {
+    score += 10;
+  }
+  if (/variable|vf|wght/.test(lower)) {
+    score += 16;
+  }
+  if (lower.endsWith(".woff2")) {
+    score += 14;
+  } else if (lower.endsWith(".woff")) {
+    score += 10;
+  }
+  if (/\/(test|tests|fixtures?|mocks?|snapshots?)\//.test(lower)) {
+    score -= 28;
+  }
+
+  return Math.max(0, score);
+}
+
+function fontFamilyFromFile(file: string): string | undefined {
+  const base = path.basename(file).replace(/\.(woff2?|otf|ttf)$/i, "");
+  const normalized = base
+    .replace(/variablefont.*$/i, "")
+    .replace(/[-_ ]?(thin|extra[-_ ]?light|extralight|light|regular|book|medium|semi[-_ ]?bold|semibold|demi[-_ ]?bold|demibold|bold|extra[-_ ]?bold|extrabold|black|heavy|roman|italic|oblique|ital|vf|wght|slnt|opsz|normal)$/gi, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!normalized) {
+    return undefined;
+  }
+
+  return normalized.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function fontWeightFromFile(file: string): string {
+  const name = path.basename(file).toLowerCase();
+  if (/variable|vf|wght/.test(name)) {
+    return "100 900";
+  }
+  if (/thin/.test(name)) {
+    return "100";
+  }
+  if (/extra[-_ ]?light|extralight/.test(name)) {
+    return "200";
+  }
+  if (/light/.test(name)) {
+    return "300";
+  }
+  if (/medium/.test(name)) {
+    return "500";
+  }
+  if (/semi[-_ ]?bold|semibold|demi[-_ ]?bold|demibold/.test(name)) {
+    return "600";
+  }
+  if (/extra[-_ ]?bold|extrabold/.test(name)) {
+    return "800";
+  }
+  if (/black|heavy/.test(name)) {
+    return "900";
+  }
+  if (/bold/.test(name)) {
+    return "700";
+  }
+
+  return "400";
+}
+
 function findStyleSources(root: string): StyleSource[] {
   const files: string[] = [];
   collectStyleFiles(root, root, files, 0);

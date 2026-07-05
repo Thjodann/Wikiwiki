@@ -215,8 +215,10 @@ wk theme init --mood editorial
 falling back to README copy: app/global CSS, design tokens, theme files, landing
 page styles, and app shell/layout styles. In styled repos, the generated theme
 can infer a likely default color mode, accent spectrum, radius, font family,
-gradients, glass/gloss, shadows, badges, and tag colors. In plain repos, the
-named mood palettes remain the fallback.
+gradients, glass/gloss, shadows, badges, and tag colors. They also look for
+repo-local logo, wordmark, favicon, and font assets so the generated wiki can
+carry the product mark and typography. In plain repos, the named mood palettes
+and generated wiki favicon remain the fallback.
 
 `wk theme init` writes `.wikiwiki/site-theme.json` and refuses to overwrite an
 existing theme unless `--force` is explicit. You can also edit
@@ -226,6 +228,17 @@ existing theme unless `--force` is explicit. You can also edit
 {
   "project_name": "PRISM",
   "project_description": "A project wiki for PRISM.",
+  "logo_path": "public/brand/logo.svg",
+  "wordmark_path": "public/brand/wordmark.svg",
+  "favicon_path": "public/brand/wiki-favicon.svg",
+  "fonts": [
+    {
+      "family": "Satoshi",
+      "path": "public/fonts/Satoshi-Regular.woff2",
+      "weight": "400",
+      "style": "normal"
+    }
+  ],
   "default_color_scheme": "auto",
   "accent": "#7c3aed",
   "accent_strong": "#4c1d95",
@@ -378,7 +391,7 @@ Roadmap estimates are rough planning signals, not release commitments.
 | Area | Completion | Next |
 | --- | ---: | --- |
 | `1.0.3` Open the Wiki | 95% | Bare `wk`/`/wk` opens an existing generated site, five starter article records seed this repo's wiki, and package docs point at the current release path. |
-| Package and release foundation | 96% | README/docs/skill files ship in npm, generated dogfood output and `assets/wikiwiki-banner.png` stay out of the tarball, and GitHub Releases drive Trusted Publishing with a manual 2FA fallback. |
+| Package and release foundation | 96% | README/docs/skill files ship in npm, generated dogfood output and repo brand assets stay out of the tarball, and GitHub Releases drive Trusted Publishing with a manual 2FA fallback. |
 | Agent setup polish | 88% | `wk setup --agent codex` and `wk install-agent codex` preserve the bundled skill behavior; future work is broader target support and clearer destination previews. |
 | Draft review flows | 45% | Closeout and compile drafts exist; approving, rejecting, and applying record drafts is the next larger feature after `1.0.3`. |
 | Richer symbol extraction | 20% | Symbol records and pages exist, but extraction is still mostly manual. |

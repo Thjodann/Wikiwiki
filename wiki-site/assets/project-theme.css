@@ -1,1 +1,103 @@
-/* Optional project theme. Add .wikiwiki/site-theme.json to override CSS custom properties. */
+/* Generated from .wikiwiki/site-theme.json. Edit the theme file, then run `wk site`. */
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --accent: #c03078;
+  --accent-strong: #6f22c8;
+  --secondary: #9048fc;
+  --bg: #fff6e8;
+  --panel: #fffaf0;
+  --panel-soft: #f4e2cc;
+  --text: #14000f;
+  --muted: #5c4b44;
+  --border: #e7cda9;
+  --code-bg: #f4e8d8;
+  --shadow: 0 18px 45px rgba(24, 0, 48, 0.09);
+  --shadow-strong: 0 28px 80px rgba(24, 0, 48, 0.16);
+  --radius: 8px;
+  --font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  --sidebar-bg: linear-gradient(180deg, rgba(255, 250, 240, 0.96), rgba(244, 226, 204, 0.9));
+  --hero-gradient: radial-gradient(circle at top left, rgba(144, 72, 252, 0.16), transparent 34%), linear-gradient(135deg, #fffaf0 0%, #f7e4cf 58%, #f2ddff 100%);
+  --card-gradient: linear-gradient(180deg, #fffaf0 0%, #fff2e0 100%);
+  --brand-gradient: linear-gradient(135deg, #9048fc 0%, #c054fc 44%, #fc3c90 100%);
+  --brand-mark-text: #00000c;
+  --badge-bg: #f7d8e8;
+  --badge-text: #7f1e53;
+  --tag-bg: #ede0ff;
+  --tag-text: #5620b0;
+  --success-bg: #e7f3df;
+  --success-text: #2d5c1f;
+  --warning-bg: #f8e2d2;
+  --warning-text: #7d3414;
+  --focus-ring: rgba(252, 60, 144, 0.28);
+  --gloss: rgba(144, 72, 252, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --accent: #fc3c90;
+    --accent-strong: #fcf0d8;
+    --secondary: #c054fc;
+    --bg: #00000c;
+    --panel: #070510;
+    --panel-soft: #120824;
+    --text: #fcf0d8;
+    --muted: #d8c0a8;
+    --border: #3a1748;
+    --code-bg: #05000a;
+    --shadow: 0 24px 80px rgba(0, 0, 12, 0.46);
+    --shadow-strong: 0 36px 120px rgba(0, 0, 12, 0.66);
+    --radius: 8px;
+    --font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    --sidebar-bg: linear-gradient(180deg, rgba(7, 5, 16, 0.96), rgba(0, 0, 12, 0.92));
+    --hero-gradient: radial-gradient(circle at top left, rgba(144, 72, 252, 0.3), transparent 34%), radial-gradient(circle at 76% 0%, rgba(252, 60, 144, 0.22), transparent 30%), linear-gradient(135deg, #120824 0%, #00000c 100%);
+    --card-gradient: linear-gradient(180deg, rgba(18, 8, 36, 0.92) 0%, rgba(7, 5, 16, 0.96) 100%);
+    --brand-gradient: linear-gradient(135deg, #9048fc 0%, #c054fc 44%, #fc3c90 100%);
+    --brand-mark-text: #00000c;
+    --badge-bg: rgba(252, 60, 144, 0.2);
+    --badge-text: #ffd8ee;
+    --tag-bg: rgba(144, 72, 252, 0.22);
+    --tag-text: #ead9ff;
+    --success-bg: rgba(134, 239, 172, 0.16);
+    --success-text: #bbf7d0;
+    --warning-bg: rgba(253, 186, 116, 0.16);
+    --warning-text: #fed7aa;
+    --focus-ring: rgba(252, 60, 144, 0.34);
+    --gloss: rgba(252, 60, 144, 0.22);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --accent: #fc3c90;
+  --accent-strong: #fcf0d8;
+  --secondary: #c054fc;
+  --bg: #00000c;
+  --panel: #070510;
+  --panel-soft: #120824;
+  --text: #fcf0d8;
+  --muted: #d8c0a8;
+  --border: #3a1748;
+  --code-bg: #05000a;
+  --shadow: 0 24px 80px rgba(0, 0, 12, 0.46);
+  --shadow-strong: 0 36px 120px rgba(0, 0, 12, 0.66);
+  --radius: 8px;
+  --font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  --sidebar-bg: linear-gradient(180deg, rgba(7, 5, 16, 0.96), rgba(0, 0, 12, 0.92));
+  --hero-gradient: radial-gradient(circle at top left, rgba(144, 72, 252, 0.3), transparent 34%), radial-gradient(circle at 76% 0%, rgba(252, 60, 144, 0.22), transparent 30%), linear-gradient(135deg, #120824 0%, #00000c 100%);
+  --card-gradient: linear-gradient(180deg, rgba(18, 8, 36, 0.92) 0%, rgba(7, 5, 16, 0.96) 100%);
+  --brand-gradient: linear-gradient(135deg, #9048fc 0%, #c054fc 44%, #fc3c90 100%);
+  --brand-mark-text: #00000c;
+  --badge-bg: rgba(252, 60, 144, 0.2);
+  --badge-text: #ffd8ee;
+  --tag-bg: rgba(144, 72, 252, 0.22);
+  --tag-text: #ead9ff;
+  --success-bg: rgba(134, 239, 172, 0.16);
+  --success-text: #bbf7d0;
+  --warning-bg: rgba(253, 186, 116, 0.16);
+  --warning-text: #fed7aa;
+  --focus-ring: rgba(252, 60, 144, 0.34);
+  --gloss: rgba(252, 60, 144, 0.22);
+}

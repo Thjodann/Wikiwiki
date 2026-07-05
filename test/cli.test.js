@@ -1223,6 +1223,12 @@ test("theme preview and init inspect app CSS and sanitize README HTML", () => {
   const root = tempRepo();
   run(root, ["init", "--json"]);
   writePrismLikeFixture(root);
+  fs.mkdirSync(path.join(root, "public/brand"), { recursive: true });
+  fs.writeFileSync(path.join(root, "public/brand/prism-logo.svg"), `<svg xmlns="http://www.w3.org/2000/svg"><text>PR</text></svg>\n`);
+  fs.writeFileSync(path.join(root, "public/brand/prism-wordmark.svg"), `<svg xmlns="http://www.w3.org/2000/svg"><text>PRISM</text></svg>\n`);
+  fs.writeFileSync(path.join(root, "public/brand/favicon.svg"), `<svg xmlns="http://www.w3.org/2000/svg"><text>WI</text></svg>\n`);
+  fs.mkdirSync(path.join(root, "public/fonts"), { recursive: true });
+  fs.writeFileSync(path.join(root, "public/fonts/Satoshi-Regular.woff2"), "fake font");
 
   const preview = runJson(root, ["theme", "preview", "--json"]);
 
@@ -1232,6 +1238,17 @@ test("theme preview and init inspect app CSS and sanitize README HTML", () => {
   assert.doesNotMatch(preview.theme.project_description, /<img|<p|<div|logo|mark/);
   assert.equal(preview.theme.default_color_scheme, "dark");
   assert.deepEqual(preview.style_sources, ["app/globals.css"]);
+  assert.deepEqual(preview.asset_sources, [
+    "public/brand/prism-logo.svg",
+    "public/brand/prism-wordmark.svg",
+    "public/brand/favicon.svg",
+    "public/fonts/Satoshi-Regular.woff2"
+  ]);
+  assert.equal(preview.theme.logo_path, "public/brand/prism-logo.svg");
+  assert.equal(preview.theme.wordmark_path, "public/brand/prism-wordmark.svg");
+  assert.equal(preview.theme.favicon_path, "public/brand/favicon.svg");
+  assert.equal(preview.theme.fonts[0].family, "Satoshi");
+  assert.equal(preview.theme.fonts[0].path, "public/fonts/Satoshi-Regular.woff2");
   assert.equal(preview.theme.modes.dark.accent, "#ff4d6d");
   assert.equal(preview.theme.modes.dark.bg, "#120d0f");
   assert.equal(preview.theme.modes.dark.panel, "#1b1518");
@@ -1256,6 +1273,10 @@ test("theme preview and init inspect app CSS and sanitize README HTML", () => {
   assert.equal(created.written, true);
   assert.equal(written.default_color_scheme, "dark");
   assert.equal(written.project_description, preview.theme.project_description);
+  assert.equal(written.logo_path, "public/brand/prism-logo.svg");
+  assert.equal(written.wordmark_path, "public/brand/prism-wordmark.svg");
+  assert.equal(written.favicon_path, "public/brand/favicon.svg");
+  assert.equal(written.fonts[0].family, "Satoshi");
   assert.equal(written.modes.dark.bg, "#120d0f");
   assert.equal(written.modes.dark.radius, "28px");
 
@@ -1270,7 +1291,15 @@ test("theme preview and init inspect app CSS and sanitize README HTML", () => {
   assert.match(css, /--tag-bg:/);
   assert.match(css, /--focus-ring:/);
   assert.match(css, /--gloss:/);
+  assert.match(css, /@font-face/);
+  assert.match(css, /url\("\.\/fonts\/satoshi-400-normal\.woff2"\)/);
   assert.match(index, /data-default-theme="dark" data-theme="dark"/);
+  assert.match(index, /href="assets\/favicon\.svg"/);
+  assert.match(index, /class="home-brand-asset wordmark"/);
+  assert.ok(fs.existsSync(path.join(root, "wiki-site/assets/logo.svg")));
+  assert.ok(fs.existsSync(path.join(root, "wiki-site/assets/wordmark.svg")));
+  assert.ok(fs.existsSync(path.join(root, "wiki-site/assets/favicon.svg")));
+  assert.ok(fs.existsSync(path.join(root, "wiki-site/assets/fonts/satoshi-400-normal.woff2")));
   assert.match(index, /data-theme-choice="auto"/);
   assert.match(index, /data-theme-choice="light"/);
   assert.match(index, /data-theme-choice="dark"/);

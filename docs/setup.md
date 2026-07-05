@@ -139,12 +139,13 @@ wk site --audience user
 
 Before running `wk theme init`, the agent should inspect the host repo's actual
 visual sources: app/global CSS, design tokens, theme files, landing page styles,
-and app shell/layout styles. `wk theme preview` and `wk theme init` also inspect
-those files automatically when they are present, then fall back to README and
-package metadata for naming and copy. In styled web apps, this lets
+app shell/layout styles, brand image assets, favicon files, and repo-local font
+files. `wk theme preview` and `wk theme init` also inspect those files
+automatically when they are present, then fall back to README and package
+metadata for naming and copy. In styled web apps, this lets
 `.wikiwiki/site-theme.json` start with the host product's likely color mode,
 accent spectrum, radius, font family, gradients, glass/gloss, shadows, badges,
-and tag colors.
+tag colors, product mark, and typography.
 
 After the theme is in place, seed a small set of high-signal records before
 publishing the first site: product promise, privacy/data boundary, architecture
@@ -155,6 +156,7 @@ event. Then verify the generated site like a real local artifact:
 - check Auto, Light, and Dark controls
 - check local links and source-file links
 - check search
+- check the tab favicon, sidebar mark, home logo/wordmark, and custom fonts
 - check contrast for body text, muted text, accents, badges, and tags
 - keep `wiki-site/` generated; edit `.wikiwiki/site-theme.json` and records
 

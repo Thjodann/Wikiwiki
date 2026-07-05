@@ -193,3 +193,35 @@ Updated the static site renderer so article and summary prose convert common Mar
 Files: `src/core/site.ts`, `test/site.test.js`
 
 Recorded: 2026-07-05T04:24:28.217Z | Record: `event_da383319-890e-4cc2-a090-a6e9561fea76` | Confidence: high
+
+## Added product companion branding assets to generated sites
+
+Extended theme preview/init and static site generation so Wikiwiki can discover repo-local logo, wordmark, favicon, and font assets; persist them in .wikiwiki/site-theme.json; copy them into wiki-site/assets; render custom favicons/sidebar marks/home masthead assets; emit @font-face rules; and keep a wiki-specific generated favicon fallback.
+
+Files: `src/core/theme.ts`, `src/core/site.ts`, `src/core/config.ts`, `test/cli.test.js`, `test/site.test.js`, `docs/reference.md`, `docs/setup.md`, `skills/wk/SKILL.md`, `README.md`
+
+Recorded: 2026-07-05T04:40:04.070Z | Record: `event_01f3f236-b341-403a-9492-fa56f05c1501` | Confidence: high
+
+## Installed Wikiwiki brand assets and site theme
+
+Added the supplied Wikiwiki wordmark and favicon as repo assets, configured the wiki site to use them for the home wordmark, sidebar mark, and browser favicon, and tuned the site palette around the extracted cream, night, pink, and violet brand colors.
+
+Files: `.wikiwiki/site-theme.json`, `assets/wikiwiki-favicon.png`, `assets/wikiwiki-wordmark.png`, `README.md`, `docs/reference.md`
+
+Recorded: 2026-07-05T04:57:45.681Z | Record: `event_915974e1-c78c-48c3-846a-28a75b1299e9` | Confidence: high
+
+## Polished wordmark rendering and light-mode brand assets
+
+Changed generated home pages so a detected wordmark replaces the visible title text while preserving an accessible hidden heading. Added light-mode brand image filtering and a generated light favicon variant that the theme toggle swaps in for custom favicons.
+
+Files: `src/core/site.ts`, `test/site.test.js`, `wiki-site/index.html`, `wiki-site/assets/wikiwiki.css`, `wiki-site/assets/wikiwiki.js`, `wiki-site/assets/favicon-light.svg`
+
+Recorded: 2026-07-05T05:09:40.071Z | Record: `event_42019d3b-62d9-4549-bc1d-7bb586c632a3` | Confidence: high
+
+## Replaced Wikiwiki brand graphics with updated assets
+
+Updated the repo wordmark and favicon from the supplied desktop PNGs while keeping the existing theme paths. Regenerated the static wiki so the home wordmark, sidebar mark, browser favicon, and generated light-mode favicon variant use the new artwork.
+
+Files: `assets/wikiwiki-favicon.png`, `assets/wikiwiki-wordmark.png`, `wiki-site/assets/favicon.png`, `wiki-site/assets/wordmark.png`, `wiki-site/assets/favicon-light.svg`
+
+Recorded: 2026-07-05T05:15:37.700Z | Record: `event_73fe76ce-30fe-4f07-a361-45c4c92b7e0c` | Confidence: high

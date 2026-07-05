@@ -603,6 +603,63 @@ test("buildSiteFiles supports project theme overrides", () => {
   assert.equal(manifest.theme_file, ".wikiwiki/site-theme.json");
 });
 
+test("buildSiteFiles copies theme image assets and custom fonts", () => {
+  const root = tempRoot();
+  seedRecords(root);
+  writeFile(root, "assets/brand/acme-logo.svg", `<svg xmlns="http://www.w3.org/2000/svg"><text>Logo</text></svg>\n`);
+  writeFile(root, "assets/brand/acme-wordmark.svg", `<svg xmlns="http://www.w3.org/2000/svg"><text>Acme</text></svg>\n`);
+  writeFile(root, "assets/brand/favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg"><text>WK</text></svg>\n`);
+  writeFile(root, "assets/fonts/AcmeSans-Regular.woff2", "fake font");
+  writeFile(root, ".wikiwiki/site-theme.json", `${JSON.stringify({
+    project_name: "Acme Docs",
+    logo_path: "assets/brand/acme-logo.svg",
+    wordmark_path: "assets/brand/acme-wordmark.svg",
+    favicon_path: "assets/brand/favicon.svg",
+    font_family: "\"Acme Sans\", sans-serif",
+    fonts: [
+      {
+        family: "Acme Sans",
+        path: "assets/fonts/AcmeSans-Regular.woff2",
+        weight: "400",
+        style: "normal"
+      }
+    ]
+  }, null, 2)}\n`);
+
+  const files = buildSiteFiles(root);
+  const index = file(files, "index.html");
+  const css = file(files, "assets/wikiwiki.css");
+  const theme = file(files, "assets/project-theme.css");
+  const js = file(files, "assets/wikiwiki.js");
+  const manifest = JSON.parse(file(files, "site-manifest.json"));
+
+  assert.match(index, /<link rel="icon" href="assets\/favicon\.svg" type="image\/svg\+xml" data-wikiwiki-favicon/);
+  assert.match(index, /data-favicon-light="assets\/favicon-light\.svg"/);
+  assert.match(index, /class="brand-mark has-image"/);
+  assert.match(index, /src="assets\/favicon\.svg"/);
+  assert.match(index, /class="home-brand-asset wordmark"/);
+  assert.match(index, /src="assets\/wordmark\.svg"/);
+  assert.match(index, /<h1 class="visually-hidden">Acme Docs Wiki<\/h1>/);
+  assert.match(css, /--brand-asset-filter: invert\(1\) hue-rotate\(180deg\) saturate\(1\.14\);/);
+  assert.match(css, /\.brand-mark img \{[\s\S]*filter: var\(--brand-asset-filter\);/);
+  assert.match(css, /\.home-brand-asset img \{[\s\S]*filter: var\(--brand-asset-filter\);/);
+  assert.match(js, /function updateFavicon\(mode\)/);
+  assert.match(theme, /@font-face/);
+  assert.match(theme, /font-family: "Acme Sans"/);
+  assert.match(theme, /url\("\.\/fonts\/acme-sans-400-normal\.woff2"\) format\("woff2"\)/);
+  assert.match(theme, /--font-family: &quot;Acme Sans&quot;, sans-serif;|--font-family: "Acme Sans", sans-serif;/);
+  assert.ok(Buffer.isBuffer(files.find((item) => item.fileName === "assets/logo.svg")?.content));
+  assert.ok(Buffer.isBuffer(files.find((item) => item.fileName === "assets/wordmark.svg")?.content));
+  assert.ok(Buffer.isBuffer(files.find((item) => item.fileName === "assets/favicon.svg")?.content));
+  assert.match(file(files, "assets/favicon-light.svg"), /wikiwiki-light-brand-filter/);
+  assert.ok(Buffer.isBuffer(files.find((item) => item.fileName === "assets/fonts/acme-sans-400-normal.woff2")?.content));
+  assert.equal(manifest.assets.logo, "assets/logo.svg");
+  assert.equal(manifest.assets.wordmark, "assets/wordmark.svg");
+  assert.equal(manifest.assets.favicon, "assets/favicon.svg");
+  assert.equal(manifest.assets.favicon_light, "assets/favicon-light.svg");
+  assert.equal(manifest.assets.fonts[0].family, "Acme Sans");
+});
+
 test("buildSiteFiles guards common low-contrast theme overrides", () => {
   const root = tempRoot();
   seedRecords(root);
