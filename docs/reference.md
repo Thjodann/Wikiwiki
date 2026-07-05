@@ -354,7 +354,7 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - Zod validation
 - Git-aware `spin` with deterministic `user`, `developer`, and `mixed` profile recipes
 - audience tagging with `audience:user`, `audience:developer`, and `audience:all`
-- Markdown rendering for article pages plus concepts, decisions, events, notes, symbols, and links
+- safe Markdown rendering for article pages plus concepts, decisions, events, notes, symbols, and links
 - article-led static HTML site generation into `wiki-site/`
 - audience-focused site rendering with `wk site --audience user|developer|all`
 - project-first generated site UX with curated `guides.html`
@@ -390,10 +390,10 @@ Roadmap estimates are rough planning signals, not release commitments.
 
 | Area | Completion | Next |
 | --- | ---: | --- |
-| `1.0.3` Open the Wiki | 95% | Bare `wk`/`/wk` opens an existing generated site, five starter article records seed this repo's wiki, and package docs point at the current release path. |
+| `1.0.4` Safe Markdown Site | 95% | Generated article and summary Markdown render as safe HTML in `wiki-site/`, with raw HTML escaped and unsafe link schemes blocked. |
 | Package and release foundation | 96% | README/docs/skill files ship in npm, generated dogfood output and repo brand assets stay out of the tarball, and GitHub Releases drive Trusted Publishing with a manual 2FA fallback. |
 | Agent setup polish | 88% | `wk setup --agent codex` and `wk install-agent codex` preserve the bundled skill behavior; future work is broader target support and clearer destination previews. |
-| Draft review flows | 45% | Closeout and compile drafts exist; approving, rejecting, and applying record drafts is the next larger feature after `1.0.3`. |
+| Draft review flows | 45% | Closeout and compile drafts exist; approving, rejecting, and applying record drafts is the next larger feature after `1.0.4`. |
 | Richer symbol extraction | 20% | Symbol records and pages exist, but extraction is still mostly manual. |
 | Watch mode | 10% | Batch commands exist; no file watcher is built yet. |
 | `scratch` review command | 10% | Validation and search exist; contradiction, drift, and stale-knowledge review is not a dedicated command yet. |

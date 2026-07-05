@@ -128,6 +128,7 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - audience tagging and audience-focused site rendering
 - article-led Markdown rendering into `wiki/`
 - article-led static HTML site generation into `wiki-site/`
+- safe Markdown-to-HTML rendering for generated article and summary prose
 - project theme overrides with light, dark, and system-auto support
 - product-identity theme generation through `wk theme`, including paired light/dark palettes
 - agent-mediated UX/DX human wiki compilation
@@ -144,10 +145,10 @@ Wikiwiki is an article-first CLI foundation. It currently includes:
 - CI and tests
 
 The package and release foundation is complete enough for regular patch
-releases. The current polish milestone is `1.0.3 Open the Wiki`: make bare
-`/wk` show the generated site and make this repo's own generated wiki useful at
-first glance. The next larger feature remains draft review flows for approving
-or rejecting closeout and compile drafts.
+releases. The current patch release is `1.0.4 Safe Markdown Site`: generated
+article and summary Markdown now renders as safe HTML while raw HTML and unsafe
+link schemes stay escaped. The next larger feature remains draft review flows
+for approving or rejecting closeout and compile drafts.
 
 Generated `wiki/` and `wiki-site/` are intentionally not shipped in the npm
 package. Installed users generate their own copies from their own records.
@@ -196,10 +197,10 @@ not release commitments.
 
 | Planned feature | Completion | Notes |
 | --- | ---: | --- |
-| `1.0.3` Open the Wiki | 95% | Bare `wk`/`/wk` opens an existing generated site, five starter article records seed this repo's wiki, and package docs point at the current release path. |
+| `1.0.4` Safe Markdown Site | 95% | Generated article and summary Markdown render as safe HTML in `wiki-site/`, with raw HTML escaped and unsafe link schemes blocked. |
 | Package and release foundation | 96% | README/docs/skill files ship in npm, generated dogfood output and repo brand assets stay out of the tarball, and GitHub Releases drive Trusted Publishing with a manual 2FA fallback. |
 | Agent setup polish | 88% | `wk setup --agent codex` and `wk install-agent codex` preserve the bundled skill behavior; remaining work is broader target support and clearer destination previews. |
-| Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are the next larger feature after `1.0.3`. |
+| Draft review flows | 45% | Closeout and compile draft packets exist; structured approve, reject, and apply flows are the next larger feature after `1.0.4`. |
 | Richer symbol extraction | 20% | Symbol records and pages exist, but important symbols are still captured manually. |
 | Watch mode | 10% | Batch commands exist for `status`, `spin`, and `closeout`; no file watcher is built yet. |
 | `scratch` review command | 10% | Validation and search exist; contradiction, drift, and stale-knowledge review is not a dedicated command yet. |

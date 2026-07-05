@@ -1,6 +1,6 @@
 {
   "name": "@thjodann/wk",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Wikiwiki is an agent-native living documentation system for code repos.",
   "license": "MIT",
   "type": "commonjs",

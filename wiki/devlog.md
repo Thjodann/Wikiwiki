@@ -188,7 +188,7 @@ Recorded: 2026-07-05T01:52:02.648Z | Record: `event_27daec8b-1546-41d7-867a-66ee
 
 ## Rendered article Markdown as safe HTML
 
-Updated the static site renderer so article and summary prose convert common Markdown blocks into safe HTML: headings, paragraphs, unordered and ordered lists, blockquotes, fenced code blocks, inline code, and Markdown links. Raw HTML remains escaped, and unsafe Markdown link schemes render as text instead of clickable links. Added site renderer regression coverage for the screenshot-driven Markdown rendering gap.
+Updated the static site renderer so article and summary prose convert common Markdown blocks into safe HTML: headings, paragraphs, unordered and ordered lists, blockquotes, fenced code blocks, inline code, and Markdown links. Raw HTML remains escaped, and unsafe Markdown link schemes render as text instead of clickable links. This is the 1.0.4 Safe Markdown Site patch candidate, with site renderer regression coverage for the screenshot-driven Markdown rendering gap.
 
 Files: `src/core/site.ts`, `test/site.test.js`
 

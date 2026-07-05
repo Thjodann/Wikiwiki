@@ -930,13 +930,14 @@ window.WIKIWIKI_SEARCH_INDEX = [
       "devlog",
       "site",
       "markdown",
-      "release-next"
+      "release",
+      "1.0.4"
     ],
     "authority": "agent",
     "confidence": "high",
     "audienceLabel": "For developers",
     "url": "records/event/event_da383319-890e-4cc2-a090-a6e9561fea76.html",
-    "text": "event_da383319-890e-4cc2-a090-a6e9561fea76 agent agent high 2026-07-05T04:24:28.217Z 2026-07-05T04:29:38.313Z event Rendered article Markdown as safe HTML Updated the static site renderer so article and summary prose convert common Markdown blocks into safe HTML: headings, paragraphs, unordered and ordered lists, blockquotes, fenced code blocks, inline code, and Markdown links. Raw HTML remains escaped, and unsafe Markdown link schemes render as text instead of clickable links. Added site renderer regression coverage for the screenshot-driven Markdown rendering gap. src/core/site.ts test/site.test.js audience:developer devlog site markdown release-next"
+    "text": "event_da383319-890e-4cc2-a090-a6e9561fea76 agent agent high 2026-07-05T04:24:28.217Z 2026-07-05T05:35:32.444Z event Rendered article Markdown as safe HTML Updated the static site renderer so article and summary prose convert common Markdown blocks into safe HTML: headings, paragraphs, unordered and ordered lists, blockquotes, fenced code blocks, inline code, and Markdown links. Raw HTML remains escaped, and unsafe Markdown link schemes render as text instead of clickable links. This is the 1.0.4 Safe Markdown Site patch candidate, with site renderer regression coverage for the screenshot-driven Markdown rendering gap. src/core/site.ts test/site.test.js audience:developer devlog site markdown release 1.0.4"
   },
   {
     "type": "event",
